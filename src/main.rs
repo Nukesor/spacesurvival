@@ -2,7 +2,6 @@
 #![plugin(rocket_codegen)]
 
 #[macro_use] extern crate lazy_static;
-extern crate dotenv;
 extern crate uuid;
 extern crate rocket;
 #[macro_use] extern crate rocket_contrib;
@@ -28,13 +27,16 @@ mod responses;
 mod helpers;
 
 fn main() {
-	rocket::ignite()
-		.mount("/api/hello/", routes![api::hello::whoami])
-		.mount("/api/auth/", routes![
-			   api::auth::login,
-			   api::auth::register,
-		])
-		.catch(errors![handlers::bad_request_handler, handlers::unauthorized_handler,
-					   handlers::forbidden_handler, handlers::not_found_handler])
-		.launch();
+    rocket::ignite()
+        .manage(helpers::db::init_db_pool())
+        .mount("/api/hello/", routes![api::hello::whoami])
+        .mount("/api/auth/", routes![
+               api::auth::login,
+               api::auth::register,
+        ])
+        .catch(errors![handlers::bad_request_handler, handlers::unauthorized_handler,
+                       handlers::forbidden_handler, handlers::not_found_handler,
+                       handlers::internal_server_error_handler,
+                       handlers::service_unavailable_handler])
+        .launch();
 }
