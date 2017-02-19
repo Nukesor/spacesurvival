@@ -1,36 +1,39 @@
 module Main exposing (..)
 
-import Html exposing (text)
+import Html
+import View exposing (..)
+import Model exposing (..)
+import Animation
+import Animations
 
 
-type alias Model =
-    {}
-
-
-type Msg
-    = Noop
-
-
-main : Program Never {} msg
+main : Program Never Model Msg
 main =
-    Html.program { init = init, update = update, subscriptions = subscriptions, view = view }
+    Html.program { init = init, update = update, subscriptions = subscriptions, view = View.view }
 
 
 init : ( Model, Cmd msg )
 init =
-    {} ! []
+    let
+        initialStyle =
+            Animation.style [ Animation.translate (Animation.px 50) (Animation.px 0), Animation.opacity 1.0 ]
+
+        targetStyle =
+            Animation.interrupt Animations.wiggle initialStyle
+    in
+        { style = targetStyle } ! []
 
 
-subscriptions : a -> Sub msg
+subscriptions : Model -> Sub Msg
 subscriptions model =
-    Sub.none
+    Animation.subscription Animate [ model.style ]
 
 
-update : msg -> Model -> ( Model, Cmd msg )
+update : Msg -> Model -> ( Model, Cmd Msg )
 update msg model =
-    model ! []
-
-
-view : a -> Html.Html msg
-view model =
-    text "hello from elm :)"
+    case msg of
+        Animate frame ->
+            { model
+                | style = Animation.update frame model.style
+            }
+                ! []
