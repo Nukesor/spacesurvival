@@ -2,3 +2,5 @@ target
 Cargo.lock
 target
 .env
+elm-stuff
+static

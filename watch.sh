@@ -1,3 +1,7 @@
 #!/bin/bash
 
-watchexec --exts rs,toml,sql --restart "./reset.sh && RUST_BACKTRACE=1 cargo run"
+mkdir -p static
+elm-package install
+watchexec --exts rs,toml,sql --restart "./reset.sh && RUST_BACKTRACE=1 cargo run" &
+watchexec --exts elm --restart "elm-make client/Main.elm --output static/main.js" &
+watchexec --watch assets "cp -r assets/* static/"
