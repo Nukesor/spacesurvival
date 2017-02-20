@@ -15,11 +15,8 @@ main =
 init : ( Model, Cmd msg )
 init =
     let
-        initialStyle =
-            Animation.style [ Animation.translate (Animation.px 50) (Animation.px 0), Animation.opacity 1.0 ]
-
         targetStyle =
-            Animation.interrupt Animations.wiggle initialStyle
+            Animation.interrupt Animations.dialogAppear Animations.dialogAppearStyle
     in
         { style = targetStyle } ! []
 

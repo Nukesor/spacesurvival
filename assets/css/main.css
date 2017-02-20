@@ -5,23 +5,13 @@ body {
     margin: 0;
     color: #fafafa;
     font-family: sans-serif;
-    /* Background pattern from Subtle Patterns */
-    background-image: url("/static/img/stardust.png");
-    background-repeat: repeat;
 }
 
 .dialog {
     border: 1px solid #fafafa;
-    background-color: rgba(0, 0, 0, 0.2);
+    background-color: rgba(0, 0, 0, 0.1);
     padding: 1rem;
-    margin: 1rem;
     min-width: 10em;
-    display: flex;
-    flex-direction: column;
-}
-
-.dialog button {
-    align-self: flex-end;
 }
 
 .dialog-container {
@@ -32,9 +22,13 @@ body {
     height: 100%;
 }
 
+.layout-element {
+    padding: 0.5rem;
+}
+
 button {
     padding: 0.5rem;
-    min-width: 8em;
+    min-width: 5em;
     background-color: rgba(200, 200, 255, 0.2);
     border: 1px solid #aaaacc;
     cursor: pointer;

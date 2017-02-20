@@ -1,10 +1,10 @@
 module View exposing (..)
 
-import Html
-import Svg exposing (..)
-import Svg.Attributes exposing (..)
 import Animation
 import Model exposing (..)
+import Templates.Dialog as Dialog
+import Html exposing (..)
+import Html.Attributes exposing (..)
 
 
 type Msg
@@ -13,12 +13,8 @@ type Msg
 
 view : Model -> Html.Html msg
 view model =
-    svg [ version "1.1", width "100%", height "100%" ]
-        [ circle
-            (List.concat
-                [ [ cx "50", cy "50", r "50", fill "#efefef" ]
-                , Animation.render model.style
-                ]
-            )
-            []
+    div [ class "dialog-container" ]
+        [ Dialog.dialog
+            (Animation.render model.style)
+            [ h2 [] [ text "Welcome to SPACE" ], p [] [ text "Your journey is about to begin." ] ]
         ]
