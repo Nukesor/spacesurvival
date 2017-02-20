@@ -1,4 +1,4 @@
 #!/bin/bash
 
-dropdb boilerplateapp
+dropdb browsergame
 diesel setup
