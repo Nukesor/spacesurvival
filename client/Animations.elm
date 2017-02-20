@@ -8,6 +8,7 @@ wiggle =
     [ loop
         [ to [ translate (px 100) (px 0) ]
         , to [ translate (px 50) (px 0) ]
+        , to [ translate (px 500) (px 0)]
         ]
     ]
 
