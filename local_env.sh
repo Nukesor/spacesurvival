@@ -1,1 +1,1 @@
-export DATABASE_URL=postgres://localhost/boilerplateapp
+export DATABASE_URL=postgres://localhost/browsergame
