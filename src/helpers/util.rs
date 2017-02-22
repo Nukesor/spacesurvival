@@ -1,4 +1,4 @@
-use rocket::config::{Config, Environment, self};
+use rocket::config::{Environment, self};
 
 pub fn get_secret<'a>() -> String {
     let default_secret = "secret".to_string();

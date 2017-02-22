@@ -1,13 +1,12 @@
-use rocket_contrib::{JSON, Value};
+use rocket_contrib::{JSON};
 use validation::user::UserSerializer;
 use diesel::prelude::*;
 use diesel;
-use diesel::pg::PgConnection;
 
 use models::user::{UserModel, NewUser};
 use schema::users;
-use schema::users::dsl::*;
 use helpers::db::DB;
+use schema::users::dsl::*;
 use responses::{APIResponse, ok, created, conflict, unauthorized};
 
 

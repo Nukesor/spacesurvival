@@ -26,16 +26,13 @@ mod handlers;
 mod responses;
 mod helpers;
 
-use rocket::response::NamedFile;
-use std::io;
-use std::path::{Path, PathBuf};
 
 fn main() {
     rocket::ignite()
         .manage(helpers::db::init_db_pool())
-        .mount("/", routes![index])
+        .mount("/", routes![api::statics::index])
+        .mount("/static", routes![api::statics::static_files])
         .mount("/api/hello/", routes![api::hello::whoami])
-        .mount("/static", routes![static_files])
         .mount("/api/auth/", routes![
                api::auth::login,
                api::auth::register,
@@ -45,14 +42,4 @@ fn main() {
                        handlers::internal_server_error_handler,
                        handlers::service_unavailable_handler])
         .launch();
-}
-
-#[get("/")]
-fn index() -> io::Result<NamedFile> {
-    NamedFile::open(Path::new("static/index.html"))
-}
-
-#[get("/<path..>")]
-fn static_files(path: PathBuf) -> io::Result<NamedFile> {
-    NamedFile::open(Path::new("static/").join(path))
 }
