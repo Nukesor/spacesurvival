@@ -5,7 +5,6 @@ import View exposing (..)
 import Model exposing (..)
 import Messages exposing (..)
 import Animation
-import Animations
 import Tutorial
 
 
