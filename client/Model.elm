@@ -1,7 +1,7 @@
 module Model exposing (..)
 
-import Animation
+import Components.Modal
 
 
 type alias Model =
-    { style : Animation.State }
+    { modals : List Components.Modal.Model }

@@ -1,23 +1,17 @@
 module View exposing (..)
 
-import Animation
 import Model exposing (..)
-import Templates.Dialog as Dialog
+import Components.Modal
+import Animation
 import Html exposing (..)
 import Html.Attributes exposing (..)
+import Messages
 
 
-type Msg
-    = Animate Animation.Msg
-
-
-view : Model -> Html.Html msg
+view : Model -> Html.Html Messages.Msg
 view model =
     div []
         [ div [ class "dialog-container" ]
-            [ Dialog.dialog
-                (Animation.render model.style)
-                [ h2 [] [ text "Welcome to SPACE" ], p [] [ text "Your journey is about to begin." ] ]
-            ]
+            (List.map Components.Modal.view model.modals)
         , div [ class "bg-container" ] [ div [ class "bg" ] [] ]
         ]
