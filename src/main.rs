@@ -23,6 +23,7 @@ mod validation;
 mod models;
 mod schema;
 mod handlers;
+mod statics;
 mod responses;
 mod helpers;
 
@@ -30,8 +31,8 @@ mod helpers;
 fn main() {
     rocket::ignite()
         .manage(helpers::db::init_db_pool())
-        .mount("/", routes![api::statics::index])
-        .mount("/static", routes![api::statics::static_files])
+        .mount("/", routes![statics::index])
+        .mount("/static", routes![statics::static_files])
         .mount("/api/hello/", routes![api::hello::whoami])
         .mount("/api/auth/", routes![
                api::auth::login,
