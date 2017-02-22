@@ -4,8 +4,15 @@ use rocket::request::{self, Request, FromRequest};
 
 use models::user::UserModel;
 use helpers::db::DB;
-use responses::{APIResponse, bad_request, unauthorized, forbidden, not_found, internal_server_error,
-                service_unavailable};
+use responses::{
+    APIResponse,
+    bad_request,
+    unauthorized,
+    forbidden,
+    not_found,
+    internal_server_error,
+    service_unavailable
+};
 
 
 #[error(400)]
