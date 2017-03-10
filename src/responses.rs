@@ -55,6 +55,7 @@ pub fn created() -> APIResponse {
     }
 }
 
+#[allow(dead_code)]
 pub fn accepted() -> APIResponse {
     APIResponse {
         message: Some("Accepted".to_string()),
@@ -63,6 +64,7 @@ pub fn accepted() -> APIResponse {
     }
 }
 
+#[allow(dead_code)]
 pub fn no_content() -> APIResponse {
     APIResponse {
         message: Some("No Content".to_string()),
@@ -104,6 +106,8 @@ pub fn not_found() -> APIResponse {
     }
 }
 
+
+#[allow(dead_code)]
 pub fn method_not_allowed() -> APIResponse {
     APIResponse {
         message: Some("Method Not Allowed".to_string()),
@@ -120,6 +124,7 @@ pub fn conflict() -> APIResponse {
     }
 }
 
+#[allow(dead_code)]
 pub fn unprocessable_entity() -> APIResponse {
     APIResponse {
         message: Some("Unprocessable Entity".to_string()),

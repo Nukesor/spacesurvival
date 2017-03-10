@@ -1,10 +1,10 @@
-CREATE EXTENSION IF NOT EXISTS "uuid-ossp";
+CREATE EXTENSION if not exists "uuid-ossp";
 
 CREATE TABLE users (
-    id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
-    created_at TIMESTAMP DEFAULT current_timestamp NOT NULL,
-    updated_at TIMESTAMP DEFAULT current_timestamp NOT NULL,
-    email VARCHAR(120) UNIQUE NOT NULL,
-    password_hash VARCHAR(120) NOT NULL
+    id UUID PRIMARY KEY default uuid_generate_v4(),
+    created_at TIMESTAMP default current_timestamp not null,
+    updated_at TIMESTAMP default current_timestamp not null,
+    email VARCHAR(120) UNIQUE not null,
+    password_hash VARCHAR(120) not null
 );
 SELECT diesel_manage_updated_at('users');

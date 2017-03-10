@@ -1,7 +1,7 @@
 [package]
-name = "rust-web-boilerplate"
-version = "0.1.0"
-authors = ["Sven-Hendrik Haase <svenstaro@gmail.com>"]
+name = "spacesurvival"
+version = "0.0.1"
+authors = ["Arne Beer <privat@arne.beer>, Rafael Epplée <raffomania@gmail.com>"]
 
 [dependencies]
 uuid = { version = "0.4", features = ["use_std", "serde", "v4", "rustc-serialize"] }
@@ -22,6 +22,7 @@ validator = "0.4"
 validator_derive = "0.4"
 jsonwebtoken = "1.1.6"
 rustc-serialize = "0.3"
+cargo-update = "0.7.1"
 
 [dependencies.rocket_contrib]
 version = "0.2"
