@@ -14,7 +14,7 @@ describe! auth_tests {
         before_each {
             let mut req = MockRequest::new(Method::Post, "/api/auth/register")
                 .header(ContentType::JSON)
-                .body(r#"{ "username": "admin", "password": "hunter2"}"#);
+                .body(r#"{ "email": "admin", "password": "hunter2"}"#);
             let mut res = req.dispatch_with(&rocket);
             let body_str = res.body().and_then(|b| b.into_string()).unwrap();
         }
