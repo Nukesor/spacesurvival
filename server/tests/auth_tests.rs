@@ -2,20 +2,12 @@ use rocket;
 use rocket::testing::MockRequest;
 use rocket::http::{Status, Method,ContentType};
 
-use spacelib::{api, handlers};
+use spacelib::rocket_factory;
 
 
 describe! auth_tests {
     before_each {
-        let rocket = rocket::ignite()
-            .mount("/api/auth/", routes![
-                   api::auth::auth::register,
-                   api::auth::auth::login
-            ])
-            .catch(errors![handlers::bad_request_handler, handlers::unauthorized_handler,
-                handlers::forbidden_handler, handlers::not_found_handler,
-                handlers::internal_server_error_handler,
-                handlers::service_unavailable_handler]);
+        let rocket = rocket_factory();
     }
 
     describe! status {

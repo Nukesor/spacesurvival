@@ -22,8 +22,23 @@ mod schema;
 mod validation;
 mod models;
 mod responses;
+mod api;
+mod helpers;
+mod handlers;
+mod statics;
 
-pub mod api;
-pub mod helpers;
-pub mod handlers;
-pub mod statics;
+pub fn rocket_factory() -> rocket::Rocket {
+    rocket::ignite()
+        .manage(helpers::db::init_db_pool())
+        .mount("/", routes![statics::index])
+        .mount("/static", routes![statics::static_files])
+        .mount("/api/user/", routes![api::user::user::info])
+        .mount("/api/auth/", routes![
+               api::auth::auth::login,
+               api::auth::auth::register,
+        ])
+        .catch(errors![handlers::bad_request_handler, handlers::unauthorized_handler,
+                       handlers::forbidden_handler, handlers::not_found_handler,
+                       handlers::internal_server_error_handler,
+                       handlers::service_unavailable_handler])
+}
