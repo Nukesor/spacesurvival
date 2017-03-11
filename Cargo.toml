@@ -3,17 +3,29 @@ name = "spacesurvival"
 version = "0.0.1"
 authors = ["Arne Beer <privat@arne.beer>, Rafael Epplée <raffomania@gmail.com>"]
 
+[[bin]]
+path = "server/src/main.rs"
+name = "spacesurvival"
+
+[lib]
+path = "server/src/lib.rs"
+name = "spacelib"
+
+[[test]]
+path = "server/tests/lib.rs"
+name = "spacetest"
+
 [dependencies]
 uuid = { version = "0.4", features = ["use_std", "serde", "v4", "rustc-serialize"] }
 chrono = { version = "0.3", features = ["serde"] }
 argon2rs = "0.2"
-rocket = "0.2"
+stainless = "0.1.10"
+rocket = { version = "0.2", features = ["testing"]}
 rocket_codegen = "0.2"
 diesel = { version = "0.11", features = ["postgres", "uuid", "chrono", "serde_json"] }
 diesel_codegen = { version = "0.11", features = ["postgres"] }
 r2d2 = "0.7.1"
 r2d2-diesel = "0.11"
-# dotenv = "0.8.0" TODO Make use of this later.
 serde = "0.9"
 serde_json = "0.9"
 serde_derive = "0.9"

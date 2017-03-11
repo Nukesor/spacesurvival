@@ -36,6 +36,7 @@ pub fn login(user_in: Result<JSON<UserSerializer>, SerdeError>, db: DB) -> APIRe
     ok().data(json!(user.generate_auth_token("loginsalt")))
 }
 
+
 #[post("/register", data = "<user_data>", format = "application/json")]
 pub fn register(user_data: Result<JSON<UserSerializer>, SerdeError>, db: DB) -> APIResponse {
 
