@@ -33,7 +33,6 @@ pub struct QueueEntry {
     pub module_id: Uuid,
 //    pub duration: PgInterval,
     pub created_at: NaiveDateTime,
-    pub updated_at: NaiveDateTime,
 }
 
 

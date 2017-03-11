@@ -1,6 +1,8 @@
 CREATE TABLE bases (
     name VARCHAR(120) not null, 
     id UUID PRIMARY KEY default uuid_generate_v4(),
+
+    updated_at TIMESTAMP default current_timestamp not null,
     created_at TIMESTAMP DEFAULT current_timestamp not null
 );
 
@@ -10,6 +12,8 @@ CREATE TABLE pods (
     id UUID PRIMARY KEY default uuid_generate_v4(),
     user_id UUID references users(id) not null,
     base_id UUID references bases(id),
+
+    updated_at TIMESTAMP default current_timestamp not null,
     created_at TIMESTAMP DEFAULT current_timestamp not null
 );
 
@@ -40,6 +44,7 @@ CREATE TABLE modules (
     base_id UUID references bases(id) on DELETE CASCADE,
     CHECK (base_id is not null or pod_id is not null),
 
+    updated_at TIMESTAMP default current_timestamp not null,
     created_at TIMESTAMP DEFAULT current_timestamp not null
 );
 
@@ -53,6 +58,7 @@ CREATE TABLE researches (
     base_id UUID references bases(id) on DELETE CASCADE,
     CHECK (base_id is not null or pod_id is not null),
 
+    updated_at TIMESTAMP default current_timestamp not null,
     created_at TIMESTAMP DEFAULT current_timestamp not null
 );
 
@@ -64,7 +70,9 @@ CREATE TABLE queues (
     CHECK (base_id is not null or pod_id is not null),
 
     slots integer not null default 2,
-    CHECK (slots > 0)
+    CHECK (slots > 0),
+    updated_at TIMESTAMP default current_timestamp not null,
+    created_at TIMESTAMP default current_timestamp not null
 );
 
 
@@ -78,3 +86,10 @@ CREATE TABLE queue_entries (
     duration INTERVAL not null,
     created_at TIMESTAMP default current_timestamp not null
 );
+
+
+SELECT diesel_manage_updated_at('bases');
+SELECT diesel_manage_updated_at('pods');
+SELECT diesel_manage_updated_at('modules');
+SELECT diesel_manage_updated_at('researches');
+SELECT diesel_manage_updated_at('queue_entries');
