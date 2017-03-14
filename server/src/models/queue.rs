@@ -1,6 +1,5 @@
 use uuid::Uuid;
 use chrono::NaiveDateTime;
-//use diesel::pg::data_types::PgInterval;
 
 use schema::{queues,queue_entries};
 
