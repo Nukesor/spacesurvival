@@ -5,7 +5,7 @@ use schema::{queues,queue_entries};
 
 
 #[derive(Debug, Serialize, Deserialize, Queryable)]
-pub struct Queues {
+pub struct QueueModel {
     pub slots: i32,
     pub id: Uuid,
     pub pod_id: Uuid,
@@ -25,7 +25,7 @@ pub struct NewQueue {
 
 
 #[derive(Debug, Serialize, Deserialize, Queryable)]
-pub struct QueueEntry {
+pub struct QueueEntryModel {
     pub id: Uuid,
     pub queue_id: Uuid,
     pub research_id: Uuid,

@@ -5,7 +5,7 @@ use schema::researches;
 
 
 #[derive(Debug, Serialize, Deserialize, Queryable)]
-pub struct Research {
+pub struct ResearchModel {
     pub name: String,
     pub id: Uuid,
     pub pod_id: Uuid,

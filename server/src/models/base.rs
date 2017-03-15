@@ -5,7 +5,7 @@ use schema::bases;
 
 
 #[derive(Debug, Serialize, Deserialize, Queryable)]
-pub struct Base {
+pub struct BaseModel {
     pub name: String,
     pub id: Uuid,
     pub created_at: NaiveDateTime,

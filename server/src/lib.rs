@@ -32,10 +32,12 @@ pub fn rocket_factory() -> rocket::Rocket {
         .manage(helpers::db::init_db_pool())
         .mount("/", routes![statics::index])
         .mount("/static", routes![statics::static_files])
-        .mount("/api/user/", routes![api::user::user::info])
+        .mount("/api/user/", routes![
+               api::user::user::info,
+               api::user::user::register,
+        ])
         .mount("/api/auth/", routes![
                api::auth::auth::login,
-               api::auth::auth::register,
         ])
         .catch(errors![handlers::bad_request_handler, handlers::unauthorized_handler,
                        handlers::forbidden_handler, handlers::not_found_handler,

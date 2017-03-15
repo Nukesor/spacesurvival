@@ -1,5 +1,5 @@
 #![feature(plugin)]
-#![plugin(stainless)]
+//#![plugin(stainless)]
 #![plugin(rocket_codegen)]
 
 extern crate rocket;

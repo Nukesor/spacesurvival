@@ -5,7 +5,7 @@ use schema::pods;
 
 
 #[derive(Debug, Serialize, Deserialize, Queryable)]
-pub struct Pod {
+pub struct PodModel {
     pub name: String,
     pub id: Uuid,
     pub user_id: Uuid,

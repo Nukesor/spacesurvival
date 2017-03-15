@@ -5,7 +5,7 @@ use schema::modules;
 
 
 #[derive(Debug, Serialize, Deserialize, Queryable)]
-pub struct Module {
+pub struct ModuleModel {
     pub name: String,
     pub id: Uuid,
     pub pod_id: Uuid,

@@ -4,7 +4,7 @@ use schema::resources;
 
 
 #[derive(Debug, Serialize, Deserialize, Queryable)]
-pub struct Resource {
+pub struct ResourceModel {
     pub id: Uuid,
     pub name: String,
     pub max_amount: i64,
