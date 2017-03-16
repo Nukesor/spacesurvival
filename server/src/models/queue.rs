@@ -6,10 +6,10 @@ use schema::{queues,queue_entries};
 
 #[derive(Debug, Serialize, Deserialize, Queryable)]
 pub struct QueueModel {
-    pub slots: i32,
     pub id: Uuid,
     pub pod_id: Option<Uuid>,
     pub base_id: Option<Uuid>,
+    pub slots: i32,
     pub created_at: NaiveDateTime,
     pub updated_at: NaiveDateTime,
 }

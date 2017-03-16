@@ -1,17 +1,18 @@
-use std::error::Error;
-
 use diesel;
 use diesel::prelude::*;
+
+use std::error::Error;
 use rocket_contrib::{JSON, SerdeError};
-
-use schema::{users, pods};
-use schema::users::dsl::*;
-use models::user::{UserModel, NewUser};
-
-use models::pod::{PodModel, NewPod};
 
 use helpers::db::DB;
 use validation::user::UserSerializer;
+
+use schema::{users, pods, queues};
+use schema::users::dsl::*;
+
+use models::user::{UserModel, NewUser};
+use models::pod::{PodModel, NewPod};
+use models::queue::{QueueModel, NewQueue};
 
 use responses::{APIResponse, ok, created, conflict, bad_request};
 
@@ -68,10 +69,21 @@ pub fn register(user_data: Result<JSON<UserSerializer>, SerdeError>, db: DB) -> 
         user_id: user.id.clone(),
     };
 
-    diesel::insert(&new_pod)
+    let pod = diesel::insert(&new_pod)
         .into(pods::table)
         .get_result::<PodModel>(&*db)
         .expect("Error creating pod");
+
+    let new_queue = NewQueue {
+        slots: 2,
+        pod_id: Some(pod.id.clone()),
+        base_id: None,
+    };
+
+    diesel::insert(&new_queue)
+        .into(queues::table)
+        .get_result::<QueueModel>(&*db)
+        .expect("Error creating pod's queue");
 
     created().message("User created.").data(json!(&user))
 }
