@@ -1,11 +1,19 @@
-use uuid::Uuid;
 use validator::Validate;
 
 #[derive(Deserialize, Debug, Validate)]
 pub struct UserSerializer {
-    pub id: Option<Uuid>,
+    #[validate(length(min = "3", max = "120"))]
     pub nickname: String,
     #[validate(email)]
     pub email: String,
     pub password: String,
+}
+
+#[derive(Deserialize, Debug, Validate)]
+pub struct UserSettingsSerializer {
+    pub nickname: Option<String>,
+    #[validate(email)]
+    pub email: Option<String>,
+    pub password: Option<String>,
+    pub new_password: Option<String>,
 }

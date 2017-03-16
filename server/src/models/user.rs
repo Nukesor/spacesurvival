@@ -81,3 +81,11 @@ pub struct NewUser {
     pub email: String,
     pub password_hash: String,
 }
+
+#[derive(AsChangeset)]
+#[table_name="users"]
+pub struct ChangedUser {
+    pub nickname: Option<String>,
+    pub email: Option<String>,
+    pub password_hash: Option<String>,
+}

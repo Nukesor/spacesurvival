@@ -5,16 +5,24 @@ use std::error::Error;
 use rocket_contrib::{JSON, SerdeError};
 
 use helpers::db::DB;
-use validation::user::UserSerializer;
+use validation::user::{UserSerializer, UserSettingsSerializer};
 
 use schema::{users, pods, queues};
 use schema::users::dsl::*;
 
-use models::user::{UserModel, NewUser};
+use models::user::{UserModel, NewUser, ChangedUser};
 use models::pod::{PodModel, NewPod};
 use models::queue::{QueueModel, NewQueue};
 
-use responses::{APIResponse, ok, created, conflict, bad_request};
+use responses::{
+    APIResponse, 
+    ok,
+    created,
+    conflict,
+    bad_request,
+    forbidden,
+    unauthorized,
+};
 
 
 #[get("/info")]
@@ -86,4 +94,44 @@ pub fn register(user_data: Result<JSON<UserSerializer>, SerdeError>, db: DB) -> 
         .expect("Error creating pod's queue");
 
     created().message("User created.").data(json!(&user))
+}
+
+
+#[post("/settings", data = "<user_data>", format = "application/json")]
+pub fn settings(current_user: UserModel, user_data: Result<JSON<UserSettingsSerializer>, SerdeError>, db: DB) -> APIResponse {
+
+    // Return specific error if invalid JSON has been sent.
+    match user_data {
+        Result::Err(err) => return bad_request().message(err.description()),
+        _ => (),
+    }
+    let user_data = user_data.unwrap();
+
+    let mut new_password_hash: Option<String> = None;
+
+    if user_data.new_password.is_some() {
+        if user_data.password.is_none() {
+            return forbidden().message("The current passwords needs to be specified, if you want to change your password.");
+        }
+        if !current_user.verify_password(user_data.password.as_ref().unwrap().as_str()) {
+            return unauthorized().message("Password incorrect.");
+        }
+
+        // Create new password hash 
+        new_password_hash = Some(UserModel::make_password_hash(user_data.password.as_ref().unwrap().as_str()));
+
+    }
+
+    let changed_user = ChangedUser {
+        nickname: user_data.nickname.clone(),
+        email: user_data.email.clone(),
+        password_hash: new_password_hash,
+    };
+
+    let user = diesel::update(users.filter(id.eq(current_user.id)))
+        .set(&changed_user)
+        .get_result::<UserModel>(&*db)
+        .expect("Failed to update user.");
+
+    ok().message("User data changed.").data(json!(&user))
 }

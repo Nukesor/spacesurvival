@@ -35,6 +35,7 @@ pub fn rocket_factory() -> rocket::Rocket {
         .mount("/api/user/", routes![
                api::user::user::info,
                api::user::user::register,
+               api::user::user::settings,
         ])
         .mount("/api/auth/", routes![
                api::auth::auth::login,
