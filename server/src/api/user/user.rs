@@ -8,7 +8,6 @@ use schema::{users, pods};
 use schema::users::dsl::*;
 use models::user::{UserModel, NewUser};
 
-use schema::pods::dsl::*;
 use models::pod::{PodModel, NewPod};
 
 use helpers::db::DB;
@@ -69,7 +68,7 @@ pub fn register(user_data: Result<JSON<UserSerializer>, SerdeError>, db: DB) -> 
         user_id: user.id.clone(),
     };
 
-    let pod = diesel::insert(&new_pod)
+    diesel::insert(&new_pod)
         .into(pods::table)
         .get_result::<PodModel>(&*db)
         .expect("Error creating pod");

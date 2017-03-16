@@ -8,8 +8,8 @@ pub struct ResourceModel {
     pub id: Uuid,
     pub name: String,
     pub max_amount: i64,
-    pub pod_id: Uuid,
-    pub base_id: Uuid,
+    pub pod_id: Option<Uuid>,
+    pub base_id: Option<Uuid>,
 }
 
 
@@ -18,6 +18,6 @@ pub struct ResourceModel {
 pub struct NewResource {
     pub name: String,
     pub max_amount: i64,
-    pub pod_id: Uuid,
-    pub base_id: Uuid,
+    pub pod_id: Option<Uuid>,
+    pub base_id: Option<Uuid>,
 }

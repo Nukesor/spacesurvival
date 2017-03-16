@@ -10,6 +10,7 @@ CREATE TABLE bases (
 CREATE TABLE pods (
     name VARCHAR(120) not null, 
     id UUID PRIMARY KEY default uuid_generate_v4(),
+
     user_id UUID references users(id) not null,
     base_id UUID references bases(id),
 
@@ -92,4 +93,5 @@ SELECT diesel_manage_updated_at('bases');
 SELECT diesel_manage_updated_at('pods');
 SELECT diesel_manage_updated_at('modules');
 SELECT diesel_manage_updated_at('researches');
+SELECT diesel_manage_updated_at('queues');
 SELECT diesel_manage_updated_at('queue_entries');

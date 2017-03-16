@@ -8,8 +8,8 @@ use schema::researches;
 pub struct ResearchModel {
     pub name: String,
     pub id: Uuid,
-    pub pod_id: Uuid,
-    pub base_id: Uuid,
+    pub pod_id: Option<Uuid>,
+    pub base_id: Option<Uuid>,
     pub created_at: NaiveDateTime,
     pub updated_at: NaiveDateTime,
 }
@@ -19,6 +19,6 @@ pub struct ResearchModel {
 #[table_name="researches"]
 pub struct NewResearch {
     pub name: String,
-    pub pod_id: Uuid,
-    pub base_id: Uuid,
+    pub pod_id: Option<Uuid>,
+    pub base_id: Option<Uuid>,
 }

@@ -9,7 +9,7 @@ pub struct PodModel {
     pub name: String,
     pub id: Uuid,
     pub user_id: Uuid,
-    pub base_id: Uuid,
+    pub base_id: Option<Uuid>,
     pub created_at: NaiveDateTime,
     pub updated_at: NaiveDateTime,
 }
