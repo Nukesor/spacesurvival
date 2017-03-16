@@ -11,10 +11,11 @@ use helpers::util;
 #[derive(Debug, Serialize, Deserialize, Queryable)]
 pub struct UserModel {
     pub id: Uuid,
-    pub nick: String,
+    pub nickname: String,
     pub created_at: NaiveDateTime,
     pub updated_at: NaiveDateTime,
     pub email: String,
+    #[serde(skip_serializing)]
     pub password_hash: String,
 }
 
@@ -76,7 +77,7 @@ impl UserModel {
 #[derive(Insertable)]
 #[table_name="users"]
 pub struct NewUser {
-    pub nick: String,
+    pub nickname: String,
     pub email: String,
     pub password_hash: String,
 }

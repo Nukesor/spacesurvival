@@ -40,11 +40,11 @@ pub fn register(user_data: Result<JSON<UserSerializer>, SerdeError>, db: DB) -> 
         return conflict().message("User with this email already exists.");
     }
 
-    // Check for existing nick
-    let results = users.filter(nick.eq(user_data.nick.clone()))
+    // Check for existing nickname
+    let results = users.filter(nickname.eq(user_data.nickname.clone()))
         .first::<UserModel>(&*db);
     if results.is_ok() {
-        return conflict().message("Nick already taken.");
+        return conflict().message("Nickname already taken.");
     }
 
     // Create new password hash 
@@ -52,7 +52,7 @@ pub fn register(user_data: Result<JSON<UserSerializer>, SerdeError>, db: DB) -> 
 
     // New user model for table insertion
     let new_user = NewUser {
-        nick: user_data.nick.clone(),
+        nickname: user_data.nickname.clone(),
         email: user_data.email.clone(),
         password_hash: new_password_hash,
     };
@@ -65,7 +65,7 @@ pub fn register(user_data: Result<JSON<UserSerializer>, SerdeError>, db: DB) -> 
 
     // New pod
     let new_pod = NewPod {
-        name: format!("{}'s Pod", user.nick.clone()),
+        name: format!("{}'s Pod", user.nickname.clone()),
         user_id: user.id.clone(),
     };
 
