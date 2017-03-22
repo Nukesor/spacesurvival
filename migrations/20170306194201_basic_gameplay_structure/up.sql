@@ -80,11 +80,12 @@ CREATE TABLE queues (
 CREATE TABLE queue_entries (
     id UUID PRIMARY KEY default uuid_generate_v4(),
     queue_id UUID references queues(id) on DELETE CASCADE not null,
-    research_id UUID references researches(id),
     module_id UUID references modules(id),
+    research_id UUID references researches(id),
+    level integer not null,
     CHECK (module_id is not null or research_id is not null),
 
-    duration INTERVAL not null,
+--    duration INTERVAL not null,
     created_at TIMESTAMP default current_timestamp not null
 );
 

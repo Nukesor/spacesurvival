@@ -1,4 +1,3 @@
-use rocket;
 use rocket::testing::MockRequest;
 use rocket::http::{Status, Method,ContentType};
 
@@ -12,9 +11,13 @@ describe! auth_tests {
 
     describe! status {
         before_each {
-            let mut req = MockRequest::new(Method::Post, "/api/auth/register")
+            let mut req = MockRequest::new(Method::Post, "/api/user/register")
                 .header(ContentType::JSON)
-                .body(r#"{ "email": "admin", "password": "hunter2"}"#);
+                .body(r#"{
+                      "email": "admin",
+                      "nickname": "hunter",
+                      "password": "hunter2"}"#
+                      );
             let mut res = req.dispatch_with(&rocket);
             let body_str = res.body().and_then(|b| b.into_string()).unwrap();
         }

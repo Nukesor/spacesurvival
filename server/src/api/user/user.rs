@@ -27,7 +27,7 @@ use responses::{
 
 #[get("/info")]
 pub fn info(current_user: UserModel) -> APIResponse {
-    ok().data(json!(current_user.email))
+    ok().data(json!(current_user))
 }
 
 

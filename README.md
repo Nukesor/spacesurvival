@@ -6,3 +6,15 @@
 4. `source local_env.sh`
 5. Install `elm-platform` from the AUR
 5. `./watch.sh`
+
+
+
+# Missing features from libs:
+    ## Rocket:
+    - General pre request handler
+    - General post request handler
+
+    ## Diesel:
+    - Enum support
+    - Proper relationship support
+    - Don't map models to SQL tables by position
