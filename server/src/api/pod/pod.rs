@@ -3,22 +3,49 @@ use diesel::prelude::*;
 use rocket_contrib::{JSON, SerdeError};
 
 use helpers::db::DB;
-use validation::pod::QueueAddSerializer;
+use validation::pod::{PodSettingsSerializer, QueueAddSerializer};
 
-use schema::{queue_entries};
+use schema::{pods, queue_entries};
 use schema::pods::dsl::*;
 use schema::queues::dsl::*;
 
-use models::pod::PodModel;
+use models::pod::{PodModel, ChangedPod};
 use models::user::UserModel;
 use models::queue::{QueueEntryModel, QueueModel, NewQueueEntry};
 
 
 use responses::{
     APIResponse,
-    created,
     bad_request,
+    created,
+    ok, 
 };
+
+
+#[post("/settings", data = "<pod_settings>", format = "application/json")]
+pub fn settings(pod_settings: Result<JSON<PodSettingsSerializer>, SerdeError>, current_user: UserModel, db: DB) -> APIResponse {
+
+    // Return specific error if invalid JSON has been sent.
+    if pod_settings.is_err() {
+        return bad_request().message(format!("{}", pod_settings.err().unwrap()).as_str());
+    }
+    let pod_settings = pod_settings.unwrap();
+
+    let current_pod = pods.filter(user_id.eq(current_user.id.clone()))
+        .first::<PodModel>(&*db)
+        .unwrap();
+
+    let changed_pod = ChangedPod {
+        name : pod_settings.name.clone(),
+    };
+
+    let pod = diesel::update(pods.filter(pods::id.eq(current_pod.id)))
+        .set(&changed_pod)
+        .get_result::<PodModel>(&*db)
+        .expect("Failed to update pod.");
+
+    ok().message("Pod data changed.").data(json!(&pod))
+}
 
 
 #[post("/queue/add", data = "<queue_entry>", format = "application/json")]

@@ -21,3 +21,10 @@ pub struct NewPod {
     pub name: String,
     pub user_id: Uuid,
 }
+
+
+#[derive(AsChangeset)]
+#[table_name="pods"]
+pub struct ChangedPod {
+    pub name: Option<String>,
+}

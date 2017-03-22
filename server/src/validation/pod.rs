@@ -1,12 +1,19 @@
 use uuid::Uuid;
 use validator::Validate;
 
+
 #[derive(Debug, Deserialize, Validate)]
 #[validate(schema(function = "validate_research_or_module"))]
 pub struct QueueAddSerializer {
     pub research_id: Option<Uuid>,
     pub module_id: Option<Uuid>,
     pub level: i32,
+}
+
+
+#[derive(Debug, Deserialize, Validate)]
+pub struct PodSettingsSerializer {
+    pub name: Option<String>,
 }
 
 
