@@ -1,0 +1,24 @@
+.grid-container {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.grid-container svg {
+    width: 90vh;
+    height: 90vh;
+}
+
+.slot:hover {
+    cursor: pointer;
+}
+
+.slot:active {
+    transform: scale(0.9);
+    transform-origin: 50% 50%;
+}

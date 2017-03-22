@@ -6,6 +6,8 @@ import Model exposing (..)
 import Messages exposing (..)
 import Animation
 import Tutorial
+import Array
+import Model.Grid exposing (Point, Grid, Slot)
 
 
 main : Program Never Model Msg
@@ -15,7 +17,12 @@ main =
 
 init : ( Model, Cmd msg )
 init =
-    { modals = Tutorial.levels } ! []
+    { modals = Tutorial.levels, grid = createGrid } ! []
+
+
+createGrid : Grid
+createGrid =
+    Array.initialize 10 (\x -> Array.initialize 10 (\y -> { position = Point x y }))
 
 
 subscriptions : Model -> Sub Msg

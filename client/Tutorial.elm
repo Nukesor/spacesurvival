@@ -7,8 +7,9 @@ import Html.Attributes exposing (..)
 
 levels : List Modal.Model
 levels =
-    [ Modal.create []
-        [ h3 [] [ text "Welcome to SPACE" ]
-        , p [] [ text "Your adventure begins here." ]
-        ]
-    ]
+    -- [ Modal.create []
+    --     [ h3 [] [ text "Welcome to SPACE" ]
+    --     , p [] [ text "Your adventure begins here." ]
+    --     ]
+    -- ]
+    []
