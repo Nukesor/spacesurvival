@@ -39,7 +39,6 @@ pub fn add_to_queue(queue_entry: Result<JSON<QueueAddSerializer>, SerdeError>, c
         .first::<QueueModel>(&*db)
         .unwrap();
 
-    // TODO: Research tree representation
     let new_queue_entry: NewQueueEntry;
     if queue_entry.research_id.is_some() {
         new_queue_entry = NewQueueEntry {
