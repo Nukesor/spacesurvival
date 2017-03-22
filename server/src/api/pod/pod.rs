@@ -13,7 +13,6 @@ use models::pod::PodModel;
 use models::user::UserModel;
 use models::queue::{QueueEntryModel, QueueModel, NewQueueEntry};
 
-use std::error::Error;
 
 use responses::{
     APIResponse,
@@ -26,9 +25,8 @@ use responses::{
 pub fn add_to_queue(queue_entry: Result<JSON<QueueAddSerializer>, SerdeError>, current_user: UserModel, db: DB) -> APIResponse {
 
     // Return specific error if invalid JSON has been sent.
-    match queue_entry {
-        Result::Err(err) => return bad_request().message(err.description()),
-        _ => (),
+    if queue_entry.is_err() {
+        return bad_request().message(format!("{}", queue_entry.err().unwrap()).as_str());
     }
     let queue_entry = queue_entry.unwrap();
 
@@ -41,7 +39,6 @@ pub fn add_to_queue(queue_entry: Result<JSON<QueueAddSerializer>, SerdeError>, c
         .first::<QueueModel>(&*db)
         .unwrap();
 
-    // TODO: Check proper validation error handling (look into the response or generated error)
     // TODO: Research tree representation
     let new_queue_entry: NewQueueEntry;
     if queue_entry.research_id.is_some() {
