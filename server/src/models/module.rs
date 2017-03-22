@@ -8,6 +8,9 @@ use schema::modules;
 pub struct ModuleModel {
     pub name: String,
     pub id: Uuid,
+    pub stationary: bool,
+    pub x_pos: Option<i32>,
+    pub y_pos: Option<i32>,
     pub pod_id: Option<Uuid>,
     pub base_id: Option<Uuid>,
     pub created_at: NaiveDateTime,
@@ -19,6 +22,9 @@ pub struct ModuleModel {
 #[table_name="modules"]
 pub struct NewModule {
     pub name: String,
+    pub stationary: bool,
+    pub x_pos: Option<i32>,
+    pub y_pos: Option<i32>,
     pub pod_id: Option<Uuid>,
     pub base_id: Option<Uuid>,
 }

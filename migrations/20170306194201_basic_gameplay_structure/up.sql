@@ -38,7 +38,15 @@ CREATE TABLE resources (
 
 CREATE TABLE modules (
     name VARCHAR(120) not null, 
+    level integer not null default 1,
+    stationary BOOLEAN default FALSE,
+    x_pos integer,
+    y_pos integer,
     UNIQUE (name, base_id, pod_id),
+    CHECK (
+        (stationary is true and x_pos is null and y_pos is null) or
+        (stationary is false and x_pos is not null and y_pos is not null)
+    ),
 
     id UUID PRIMARY KEY default uuid_generate_v4(),
     pod_id UUID references pods(id) on DELETE CASCADE,
@@ -52,12 +60,14 @@ CREATE TABLE modules (
 
 CREATE TABLE researches (
     name VARCHAR(120) not null,
+    level integer not null default 1,
     UNIQUE (name, base_id, pod_id),
 
     id UUID PRIMARY KEY default uuid_generate_v4(),
     pod_id UUID references pods(id) on DELETE CASCADE,
     base_id UUID references bases(id) on DELETE CASCADE,
     CHECK (base_id is not null or pod_id is not null),
+
 
     updated_at TIMESTAMP default current_timestamp not null,
     created_at TIMESTAMP DEFAULT current_timestamp not null
@@ -80,11 +90,12 @@ CREATE TABLE queues (
 CREATE TABLE queue_entries (
     id UUID PRIMARY KEY default uuid_generate_v4(),
     queue_id UUID references queues(id) on DELETE CASCADE not null,
-    research_id UUID references researches(id),
     module_id UUID references modules(id),
+    research_id UUID references researches(id),
+    level integer not null,
     CHECK (module_id is not null or research_id is not null),
 
-    duration INTERVAL not null,
+--    duration INTERVAL not null,
     created_at TIMESTAMP default current_timestamp not null
 );
 

@@ -1,7 +1,6 @@
 use diesel;
 use diesel::prelude::*;
 
-use std::error::Error;
 use rocket_contrib::{JSON, SerdeError};
 
 use helpers::db::DB;
@@ -27,7 +26,7 @@ use responses::{
 
 #[get("/info")]
 pub fn info(current_user: UserModel) -> APIResponse {
-    ok().data(json!(current_user.email))
+    ok().data(json!(current_user))
 }
 
 
@@ -35,10 +34,10 @@ pub fn info(current_user: UserModel) -> APIResponse {
 pub fn register(user_data: Result<JSON<UserSerializer>, SerdeError>, db: DB) -> APIResponse {
 
     // Return specific error if invalid JSON has been sent.
-    match user_data {
-        Result::Err(err) => return bad_request().message(err.description()),
-        _ => (),
+    if user_data.is_err() {
+        return bad_request().message(format!("{}", user_data.err().unwrap()).as_str());
     }
+
     let user_data = user_data.unwrap();
 
     // Check for existing user email
@@ -101,10 +100,10 @@ pub fn register(user_data: Result<JSON<UserSerializer>, SerdeError>, db: DB) -> 
 pub fn settings(current_user: UserModel, user_data: Result<JSON<UserSettingsSerializer>, SerdeError>, db: DB) -> APIResponse {
 
     // Return specific error if invalid JSON has been sent.
-    match user_data {
-        Result::Err(err) => return bad_request().message(err.description()),
-        _ => (),
+    if user_data.is_err() {
+        return bad_request().message(format!("{}", user_data.err().unwrap()).as_str());
     }
+
     let user_data = user_data.unwrap();
 
     let mut new_password_hash: Option<String> = None;

@@ -40,6 +40,10 @@ pub fn rocket_factory() -> rocket::Rocket {
         .mount("/api/auth/", routes![
                api::auth::auth::login,
         ])
+        .mount("/api/pod/", routes![
+               api::pod::pod::add_to_queue,
+               api::pod::pod::settings,
+        ])
         .catch(errors![handlers::bad_request_handler, handlers::unauthorized_handler,
                        handlers::forbidden_handler, handlers::not_found_handler,
                        handlers::internal_server_error_handler,
