@@ -32,11 +32,17 @@ mod statics;
 
 
 pub fn rocket_factory() -> rocket::Rocket {
-    let ref values = data::researches::RESEARCH_LIST_2;
-    match values.get(&data::researches::ResearchTypes::PlasmaGenerator) {
-        Some(lol) => println!("{:?}", lol.name),
-        None => println!("{:?}", "Nix gefunden".to_string()),
-    }
+//    let ref values = data::researches::RESEARCH_LIST;
+//    match values.get(&data::types::ResearchTypes::PlasmaGenerator) {
+//        Some(lol) => println!("{:?}", lol.name),
+//        None => println!("{:?}", "Nix gefunden".to_string()),
+//    }
+//
+//    let ref values = data::modules::MODULE_LIST;
+//    match values.get(&data::types::ModuleTypes::Turret) {
+//        Some(lol) => println!("{:?}", lol.level[0].shoots.as_ref().unwrap().range),
+//        None => println!("{:?}", "Nix gefunden".to_string()),
+//    }
     rocket::ignite()
         .manage(helpers::db::init_db_pool())
         .mount("/", routes![statics::index])
