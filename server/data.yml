@@ -1,0 +1,19 @@
+PlasmaGenerator:
+  name: "PlasmaGenerator"
+  dependencies: null
+  level:
+    - level: 1
+      resources:
+        - name: "Water"
+          amount: 100
+
+EnergyWeapons:
+  name: "EnergyWeapons"
+  dependencies:
+      - "PlasmaGenerator"
+  level:
+    - level: 1
+      resources:
+        - name: "Iron"
+          amount: 200
+

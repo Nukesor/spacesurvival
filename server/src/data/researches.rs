@@ -1,42 +1,66 @@
 use std::collections::HashMap;
 
+use std::fs::File;
+use serde_yaml::from_reader;
+use std::env;
 
-pub struct Level {
-    pub level: i32,
-    pub resources: Vec<(String, i32)>,
+
+#[derive(Debug, Eq, Hash, PartialEq, Serialize, Deserialize)]
+pub enum ResearchTypes {
+    PlasmaGenerator,
+    EnergyWeapons
 }
 
 
+#[derive(Debug, Eq, Hash, PartialEq, Serialize, Deserialize)]
+pub enum ResourceTypes {
+    Iron,
+    Water
+}
+
+
+#[derive(Debug, PartialEq, Deserialize)]
+pub struct Level {
+    pub level: i32,
+    pub resources: Vec<Resource>,
+}
+
+
+#[derive(Debug, PartialEq, Deserialize)]
+pub struct Resource {
+    pub name: ResourceTypes,
+    pub amount: i32,
+}
+
+
+#[derive(Debug, PartialEq, Deserialize)]
 pub struct Research {
-    pub name: String,
-    pub dependencies: Option<Vec<String>>,
+    pub name: ResearchTypes,
+    pub dependencies: Option<Vec<ResearchTypes>>,
     pub level: Vec<Level>,
 }
 
 
 lazy_static! {
-    pub static ref RESEARCH_LIST: HashMap<String, Research> = {
-        let mut m = HashMap::new();
-        m.insert(String::from("Rofl"), Research {
-            name: String::from("Rofl"),
-            dependencies: None,
-            level: vec![
-                Level {
-                    level: 1,
-                    resources: vec![(String::from("Iron"), 100)],
-                },
-            ]
-        });
-        m.insert(String::from("Lol"), Research {
-            name: String::from("Lol"),
-            dependencies: Some(vec![String::from("Rofl")]),
-            level: vec![
-                Level {
-                    level: 1,
-                    resources: vec![(String::from("Water"), 200)],
-                },
-            ]
-        });
-        m
+    pub static ref RESEARCH_LIST_2: HashMap<ResearchTypes, Research> = {
+        let p = env::current_dir().unwrap();
+        println!("The current directory is {}", p.display());
+        let file = File::open("./server/data.yml");
+        match file {
+            Ok(v) => {
+                let result = from_reader::<File, HashMap<ResearchTypes, Research>>(v);
+                match result {
+                    Ok(v) => {
+                        return v;
+                    },
+                    Err(e) => {
+                        panic!("{:?}", e);
+                    },
+                }
+            },
+            Err(_) => {
+                panic!("Panic mal. Research YAML nicht gefunden!");
+            },
+        }
     };
 }

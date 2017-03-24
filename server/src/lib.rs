@@ -9,6 +9,7 @@ extern crate r2d2_diesel;
 extern crate argon2rs;
 extern crate rustc_serialize;
 extern crate serde_json;
+extern crate serde_yaml;
 extern crate validator;
 extern crate jsonwebtoken;
 
@@ -29,7 +30,13 @@ mod helpers;
 mod handlers;
 mod statics;
 
+
 pub fn rocket_factory() -> rocket::Rocket {
+    let ref values = data::researches::RESEARCH_LIST_2;
+    match values.get(&data::researches::ResearchTypes::PlasmaGenerator) {
+        Some(lol) => println!("{:?}", lol.name),
+        None => println!("{:?}", "Nix gefunden".to_string()),
+    }
     rocket::ignite()
         .manage(helpers::db::init_db_pool())
         .mount("/", routes![statics::index])
