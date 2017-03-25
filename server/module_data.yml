@@ -1,0 +1,13 @@
+Turret:
+  name: "Turret"
+  dependencies: 
+      - "PlasmaGenerator"
+  level:
+    - level: 1
+      resources:
+        - name: "Iron"
+          amount: 100
+      shoots:
+        rate: 1
+        damage: 10
+        range: 100

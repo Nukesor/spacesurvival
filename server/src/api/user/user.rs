@@ -44,7 +44,7 @@ pub fn register(user_data: Result<JSON<UserSerializer>, SerdeError>, db: DB) -> 
     let results = users.filter(email.eq(user_data.email.clone()))
         .first::<UserModel>(&*db);
     if results.is_ok() {
-        return conflict().message("User with this email already exists.");
+        return conflict().message("Email already taken.");
     }
 
     // Check for existing nickname
@@ -113,7 +113,7 @@ pub fn settings(current_user: UserModel, user_data: Result<JSON<UserSettingsSeri
             return forbidden().message("The current passwords needs to be specified, if you want to change your password.");
         }
         if !current_user.verify_password(user_data.password.as_ref().unwrap().as_str()) {
-            return unauthorized().message("Password incorrect.");
+            return unauthorized().message("Incorrect password.");
         }
 
         // Create new password hash 
