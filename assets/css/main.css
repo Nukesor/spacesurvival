@@ -11,14 +11,6 @@ body {
     box-sizing: border-box;
 }
 
-.bg {
-    /* Background pattern from Subtle Patterns */
-    width: 200vw;
-    height: 200vh;
-    background-image: url("/static/img/stardust.png");
-    background-repeat: repeat;
-    animation: 120s ease-in-out infinite bg-shift;
-}
 
 .bg-container {
     position: absolute;

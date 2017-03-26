@@ -7,6 +7,7 @@ import Html.Attributes exposing (..)
 import Messages
 import GridView exposing (grid)
 import View.Auth exposing (auth)
+import Styles.Background
 
 
 view : Model -> Html.Html Messages.Msg

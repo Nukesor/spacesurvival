@@ -1,0 +1,19 @@
+{
+  "name": "spacesurvival",
+  "dependencies": {
+    "elm-css": "^0.6.0"
+  },
+  "devDependencies": {},
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Nukesor/spacesurvival.git"
+  },
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/Nukesor/spacesurvival/issues"
+  },
+  "homepage": "https://github.com/Nukesor/spacesurvival#readme"
+}
