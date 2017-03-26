@@ -10,8 +10,12 @@ type Classes
     | Container
 
 
+ns =
+    "bg"
+
+
 css =
-    (stylesheet << namespace "bg")
+    (stylesheet << namespace ns)
         [ class Background
             [ width <| vw 200
             , height <| vh 200
