@@ -39,10 +39,10 @@ update msg model =
             { model | authDialogAnimation = Animation.update frame model.authDialogAnimation } ! []
 
         Messages.Login ->
-            model ! []
+            model ! [ Api.Auth.login model ]
 
         Messages.Register ->
-            ( model, Api.Auth.register model )
+            model ! [ Api.Auth.register model ]
 
         ChangeAuthView view ->
             { model | authView = view } ! []
@@ -56,4 +56,12 @@ update msg model =
                     { model | authView = Model.Login } ! []
 
                 Err _ ->
+                    model ! []
+
+        LoggedIn result ->
+            case Debug.log "login result" result of
+                Ok user ->
+                    { model | user = user } ! []
+
+                Err err ->
                     model ! []

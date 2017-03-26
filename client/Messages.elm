@@ -14,3 +14,4 @@ type Msg
     | ChangeAuthView Model.AuthView
     | UpdateUser User
     | Registered (Result Http.Error User)
+    | LoggedIn (Result Http.Error User)

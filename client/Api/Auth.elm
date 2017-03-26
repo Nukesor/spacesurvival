@@ -8,6 +8,10 @@ import Http
 import Messages
 
 
+dataDecoder =
+    Decode.field "data"
+
+
 userEncoder : User -> Encode.Value
 userEncoder user =
     Encode.object
@@ -18,15 +22,23 @@ userEncoder user =
 
 
 registerDecoder =
-    Decode.field "data" (Decode.map2 createUser (Decode.field "nickname" Decode.string) (Decode.field "email" Decode.string))
+    dataDecoder <| Decode.map2 registeredUser (Decode.field "nickname" Decode.string) (Decode.field "email" Decode.string)
 
 
-createUser nickname email =
+loginDecoder =
+    Decode.map loggedInUser (dataDecoder Decode.string)
+
+
+registeredUser nickname email =
     { token = Nothing
     , nickname = nickname
     , email = email
     , password = ""
     }
+
+
+loggedInUser token =
+    { token = Just token, nickname = "", email = "", password = "" }
 
 
 register : Model -> Cmd Messages.Msg
@@ -36,3 +48,12 @@ register model =
             Http.post "/api/user/register" (Http.jsonBody <| userEncoder model.user) registerDecoder
     in
         Http.send Messages.Registered request
+
+
+login : Model -> Cmd Messages.Msg
+login model =
+    let
+        request =
+            Http.post "/api/auth/login" (Http.jsonBody <| userEncoder model.user) loginDecoder
+    in
+        Http.send Messages.LoggedIn request
