@@ -21,5 +21,13 @@ fn validate_research_or_module(data: &QueueAddSerializer) -> Option<(String, Str
     if data.research_id.is_some() && data.module_id.is_some() {
         return Some(("research_id".to_string(), "Don't provide a research and a module id".to_string()))
     }
+
+// We don't need this as we have to do this in the route.
+// The compiler will complain otherwise. But I'll let this here anyway.
+
+//    if data.research_id.is_none() && data.module_id.is_none() {
+//        return Some((String::from("research_id"), String::from("Either a module id or a research id needs to be specified.")))
+//    }
+//
     None
 }

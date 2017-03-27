@@ -33,66 +33,57 @@ pub fn info(current_user: UserModel) -> APIResponse {
 #[post("/register", data = "<user_data>", format = "application/json")]
 pub fn register(user_data: Result<JSON<UserSerializer>, SerdeError>, db: DB) -> APIResponse {
 
-    // Return specific error if invalid JSON has been sent.
-    if user_data.is_err() {
-        return bad_request().message(format!("{}", user_data.err().unwrap()).as_str());
+    match user_data {
+        // Return specific error if invalid JSON has been sent.
+        Err(error) => return bad_request().message(format!("{}", error).as_str()),
+        Ok(data) =>  {
+             // Check for existing user email
+            let results = users.filter(email.eq(data.email.clone()))
+                .first::<UserModel>(&*db);
+            if results.is_ok() {
+                return conflict().message("Nickname already taken.");
+            }
+             // Create new password hash 
+            let new_password_hash = UserModel::make_password_hash(data.password.as_str());
+
+            // New user model for table insertion
+            let new_user = NewUser {
+                nickname: data.nickname.clone(),
+                email: data.email.clone(),
+                password_hash: new_password_hash,
+            };
+
+            // Insert user to get id for pod
+            let user = diesel::insert(&new_user)
+                .into(users::table)
+                .get_result::<UserModel>(&*db)
+                .expect("Error saving new user");
+
+            // New pod
+            let new_pod = NewPod {
+                name: format!("{}'s Pod", user.nickname.clone()),
+                user_id: user.id.clone(),
+            };
+
+            let pod = diesel::insert(&new_pod)
+                .into(pods::table)
+                .get_result::<PodModel>(&*db)
+                .expect("Error creating pod");
+
+            let new_queue = NewQueue {
+                slots: 2,
+                pod_id: Some(pod.id.clone()),
+                base_id: None,
+            };
+
+            diesel::insert(&new_queue)
+                .into(queues::table)
+                .get_result::<QueueModel>(&*db)
+                .expect("Error creating pod's queue");
+
+            return created().message("User created.").data(json!(&user));
+        }
     }
-
-    let user_data = user_data.unwrap();
-
-    // Check for existing user email
-    let results = users.filter(email.eq(user_data.email.clone()))
-        .first::<UserModel>(&*db);
-    if results.is_ok() {
-        return conflict().message("Email already taken.");
-    }
-
-    // Check for existing nickname
-    let results = users.filter(nickname.eq(user_data.nickname.clone()))
-        .first::<UserModel>(&*db);
-    if results.is_ok() {
-        return conflict().message("Nickname already taken.");
-    }
-
-    // Create new password hash 
-    let new_password_hash = UserModel::make_password_hash(user_data.password.as_str());
-
-    // New user model for table insertion
-    let new_user = NewUser {
-        nickname: user_data.nickname.clone(),
-        email: user_data.email.clone(),
-        password_hash: new_password_hash,
-    };
-
-    // Insert user to get id for pod
-    let user = diesel::insert(&new_user)
-        .into(users::table)
-        .get_result::<UserModel>(&*db)
-        .expect("Error saving new user");
-
-    // New pod
-    let new_pod = NewPod {
-        name: format!("{}'s Pod", user.nickname.clone()),
-        user_id: user.id.clone(),
-    };
-
-    let pod = diesel::insert(&new_pod)
-        .into(pods::table)
-        .get_result::<PodModel>(&*db)
-        .expect("Error creating pod");
-
-    let new_queue = NewQueue {
-        slots: 2,
-        pod_id: Some(pod.id.clone()),
-        base_id: None,
-    };
-
-    diesel::insert(&new_queue)
-        .into(queues::table)
-        .get_result::<QueueModel>(&*db)
-        .expect("Error creating pod's queue");
-
-    created().message("User created.").data(json!(&user))
 }
 
 
@@ -100,37 +91,38 @@ pub fn register(user_data: Result<JSON<UserSerializer>, SerdeError>, db: DB) -> 
 pub fn settings(current_user: UserModel, user_data: Result<JSON<UserSettingsSerializer>, SerdeError>, db: DB) -> APIResponse {
 
     // Return specific error if invalid JSON has been sent.
-    if user_data.is_err() {
-        return bad_request().message(format!("{}", user_data.err().unwrap()).as_str());
-    }
+    match user_data {
+        Err(error) => return bad_request().message(format!("{}", error).as_str()),
+        Ok(data) =>  {
+            let mut new_password_hash: Option<String> = None;
+            match data.new_password.as_ref() {
+                Some(new_password) => {
+                    match data.password.as_ref() {
+                        Some(old_password) => {
+                            if !current_user.verify_password(old_password.as_str()) {
+                                return unauthorized().message("Incorrect password.");
+                            }
+                            new_password_hash = Some(UserModel::make_password_hash(new_password.as_str()))
+                        }
+                        None => return forbidden().message("The current passwords needs to be \
+                                    specified, if you want to change your password."),
+                    }
+                }
+                None => (),
+            };
 
-    let user_data = user_data.unwrap();
+            let changed_user = ChangedUser {
+                nickname: data.nickname.clone(),
+                email: data.email.clone(),
+                password_hash: new_password_hash,
+            };
 
-    let mut new_password_hash: Option<String> = None;
+            let user = diesel::update(users.filter(id.eq(current_user.id)))
+                .set(&changed_user)
+                .get_result::<UserModel>(&*db)
+                .expect("Failed to update user.");
 
-    if user_data.new_password.is_some() {
-        if user_data.password.is_none() {
-            return forbidden().message("The current passwords needs to be specified, if you want to change your password.");
+            ok().message("User data changed.").data(json!(&user))
         }
-        if !current_user.verify_password(user_data.password.as_ref().unwrap().as_str()) {
-            return unauthorized().message("Incorrect password.");
-        }
-
-        // Create new password hash 
-        new_password_hash = Some(UserModel::make_password_hash(user_data.password.as_ref().unwrap().as_str()));
-
     }
-
-    let changed_user = ChangedUser {
-        nickname: user_data.nickname.clone(),
-        email: user_data.email.clone(),
-        password_hash: new_password_hash,
-    };
-
-    let user = diesel::update(users.filter(id.eq(current_user.id)))
-        .set(&changed_user)
-        .get_result::<UserModel>(&*db)
-        .expect("Failed to update user.");
-
-    ok().message("User data changed.").data(json!(&user))
 }
