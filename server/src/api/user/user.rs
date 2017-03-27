@@ -95,6 +95,8 @@ pub fn settings(current_user: UserModel, user_data: Result<JSON<UserSettingsSeri
         Err(error) => return bad_request().message(format!("{}", error).as_str()),
         Ok(data) =>  {
             let mut new_password_hash: Option<String> = None;
+            // Check if a new password is provided.
+            // In case it is, we want the old password to verify the identity of the client.
             match data.new_password.as_ref() {
                 Some(new_password) => {
                     match data.password.as_ref() {
