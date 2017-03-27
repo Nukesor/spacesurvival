@@ -12,37 +12,41 @@ use responses::{APIResponse, ok, unauthorized, bad_request};
 #[post("/login", data = "<user_in>", format = "application/json")]
 pub fn login(user_in: Result<JSON<LoginSerializer>, SerdeError>, db: DB) -> APIResponse {
 
-    // Return specific error if invalid JSON has been sent.
-    if user_in.is_err() {
-        return bad_request().message(format!("{}", user_in.err().unwrap()).as_str());
-    }
+    match user_in {
+        // Return specific error if invalid JSON has been sent.
+        Err(error) => return bad_request().message(format!("{}", error).as_str()),
+        Ok(user_in) => {
+            let mut result;
+            // Check if the identifier is a nickname.
+            result = users.filter(nickname.eq(&user_in.identifier))
+                .first::<UserModel>(&*db);
 
-    let user_in = user_in.unwrap();
+            match result {
+                // The identifier was a nickname!
+                Ok(user) => {
+                    if !user.verify_password(user_in.password.as_str()) {
+                        return unauthorized().message("Password incorrect.");
+                    }
+                    return ok().data(json!(user.generate_auth_token("loginsalt")));
+                },
+                // Check if the identifier is an email address
+                Err(_) => {
+                    result = users.filter(email.eq(&user_in.identifier))
+                        .first::<UserModel>(&*db);
 
-    let result;
-    if user_in.nickname.is_some() {
-        result = users.filter(nickname.eq(user_in.nickname.as_ref().unwrap().clone()))
-            .first::<UserModel>(&*db);
+                    match result {
+                        // There is no such email or nickname.
+                        Err(_) => return unauthorized().message("Nickname or email doesn't exist."),
+                        // The identifier was an email!
+                        Ok(user) => {
+                            if !user.verify_password(user_in.password.as_str()) {
+                                return unauthorized().message("Password incorrect.");
+                            }
+                            return ok().data(json!(user.generate_auth_token("loginsalt")));
+                        },
+                    }
+                }
+            }
+        }
     }
-    else if user_in.nickname.is_some() {
-        result = users.filter(email.eq(user_in.email.as_ref().unwrap().clone()))
-            .first::<UserModel>(&*db);
-    }
-    else {
-        return bad_request()
-            .message("Either a nickname or an email needs to be specified");
-    }
-
-    if result.is_err() {
-        return unauthorized().message("Username or password incorrect.");
-    }
-
-    let user = result.unwrap();
-    if !user.verify_password(user_in.password.as_str()) {
-        return unauthorized().message("Username or password incorrect.");
-    }
-
-    ok().data(json!(user.generate_auth_token("loginsalt")))
 }
-
-

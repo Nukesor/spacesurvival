@@ -12,10 +12,7 @@ pub struct UserSerializer {
 
 #[derive(Deserialize, Debug, Validate)]
 pub struct LoginSerializer {
-    #[validate(length(min = "1", max = "120"))]
-    pub nickname: Option<String>,
-    #[validate(email)]
-    pub email: Option<String>,
+    pub identifier: String,
     pub password: String,
 }
 
