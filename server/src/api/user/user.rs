@@ -1,6 +1,7 @@
 use diesel;
 use diesel::prelude::*;
 
+use validator::Validate;
 use rocket_contrib::{JSON, SerdeError};
 
 use helpers::db::DB;
@@ -37,6 +38,21 @@ pub fn register(user_data: Result<JSON<UserSerializer>, SerdeError>, db: DB) -> 
         // Return specific error if invalid JSON has been sent.
         Err(error) => return bad_request().message(format!("{}", error).as_str()),
         Ok(data) =>  {
+            let validation = data.validate();
+            match validation {
+                Err(error) => {
+                    let hashmap = error.inner();
+                    if hashmap.contains_key("email") {
+                        return bad_request().message("Invalid email provided")
+                    }
+                    if hashmap.contains_key("nickname") {
+                        return bad_request().message("Nickname length has to be
+                                                     between 1 and 120 characters.")
+                    }
+                },
+                Ok(_) => (),
+            }
+
              // Check for existing user email
             let results = users.filter(email.eq(data.email.clone()))
                 .first::<UserModel>(&*db);
