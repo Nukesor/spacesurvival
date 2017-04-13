@@ -19,7 +19,7 @@ main =
 
 init : ( Model, Cmd msg )
 init =
-    { grid = createGrid, user = User Nothing "" "" "", authDialogAnimation = Animation.interrupt Animations.dialogAppear Animations.dialogAppearStyle, authView = Model.Login } ! []
+    { grid = createGrid, user = LoggingIn { identifier = "", password = "" }, authDialogAnimation = Animation.interrupt Animations.dialogAppear Animations.dialogAppearStyle, authView = Model.Login } ! []
 
 
 createGrid : Grid
@@ -51,17 +51,17 @@ update msg model =
             { model | user = user } ! []
 
         Registered result ->
-            case Debug.log "result" result of
-                Ok _ ->
-                    { model | authView = Model.Login } ! []
+            case Debug.log "register result" result of
+                Ok user ->
+                    { model | authView = Model.Login, user = Model.User.LoggingIn user } ! []
 
                 Err _ ->
                     model ! []
 
-        LoggedIn result ->
+        Messages.LoggedIn result ->
             case Debug.log "login result" result of
                 Ok user ->
-                    { model | user = user } ! []
+                    { model | user = Model.User.LoggedIn user } ! []
 
                 Err err ->
                     model ! []

@@ -1,2 +1,3 @@
 [development]
 secret = "rofl"
+port = 8080
