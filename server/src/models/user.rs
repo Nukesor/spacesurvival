@@ -16,7 +16,7 @@ pub struct UserModel {
     pub updated_at: NaiveDateTime,
     pub email: String,
     #[serde(skip_serializing)]
-    pub password_hash: String,
+    pub password_hash: Vec<u8>,
 }
 
 #[derive(Debug, RustcEncodable, RustcDecodable)]
@@ -25,15 +25,13 @@ struct UserLoginToken {
 }
 
 impl UserModel {
-    pub fn make_password_hash(new_password: &str) -> String {
-        let password_hash = argon2i_simple(new_password, "loginsalt");
-        String::from_utf8_lossy(&password_hash).into_owned()
+    pub fn make_password_hash(new_password: &str) -> Vec<u8> {
+        argon2i_simple(new_password, "loginsalt").to_vec()
     }
 
     pub fn verify_password(&self, candidate_password: &str) -> bool {
-        let candidate_password = argon2i_simple(candidate_password, "loginsalt");
-        let candidate_password_string = String::from_utf8_lossy(&candidate_password);
-        self.password_hash == candidate_password_string
+        let candidate_hash = argon2i_simple(candidate_password, "loginsalt").to_vec();
+        self.password_hash == candidate_hash
     }
 
     pub fn generate_auth_token(&self, salt: &str) -> String {
@@ -45,10 +43,13 @@ impl UserModel {
         encode(Header::default(),
                &UserLoginToken { user_id: self.id },
                combined_secret.as_bytes())
-            .unwrap()
+                .unwrap()
     }
 
-    pub fn get_user_from_auth_token(token: &str, salt: &str, db: &PgConnection) -> Option<UserModel> {
+    pub fn get_user_from_auth_token(token: &str,
+                                    salt: &str,
+                                    db: &PgConnection)
+                                    -> Option<UserModel> {
         use schema::users::dsl::*;
 
         let secret = util::get_secret();
@@ -64,8 +65,7 @@ impl UserModel {
 
         let token = decrypted_token.unwrap();
 
-        let user = users.filter(id.eq(token.claims.user_id))
-            .first::<UserModel>(&*db);
+        let user = users.filter(id.eq(token.claims.user_id)).first::<UserModel>(&*db);
         if user.is_err() {
             return None;
         }
@@ -79,7 +79,7 @@ impl UserModel {
 pub struct NewUser {
     pub nickname: String,
     pub email: String,
-    pub password_hash: String,
+    pub password_hash: Vec<u8>,
 }
 
 #[derive(AsChangeset)]
@@ -87,5 +87,5 @@ pub struct NewUser {
 pub struct ChangedUser {
     pub nickname: Option<String>,
     pub email: Option<String>,
-    pub password_hash: Option<String>,
+    pub password_hash: Option<Vec<u8>>,
 }
