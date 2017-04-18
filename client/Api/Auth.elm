@@ -13,18 +13,13 @@ dataDecoder =
     Decode.field "data"
 
 
-registerEncoder : User -> Encode.Value
+registerEncoder : RegisterData -> Encode.Value
 registerEncoder user =
-    case user of
-        Registering user ->
-            Encode.object
-                [ ( "nickname", Encode.string user.nickname )
-                , ( "email", Encode.string user.email )
-                , ( "password", Encode.string user.password )
-                ]
-
-        _ ->
-            Encode.null
+    Encode.object
+        [ ( "nickname", Encode.string user.nickname )
+        , ( "email", Encode.string user.email )
+        , ( "password", Encode.string user.password )
+        ]
 
 
 registerDecoder : Decode.Decoder LoginData
@@ -32,14 +27,9 @@ registerDecoder =
     dataDecoder <| Decode.map2 registeredUser (Decode.field "nickname" Decode.string) (Decode.field "email" Decode.string)
 
 
-loginEncoder : User -> Encode.Value
+loginEncoder : LoginData -> Encode.Value
 loginEncoder user =
-    case user of
-        LoggingIn user ->
-            Encode.object [ ( "identifier", Encode.string user.identifier ), ( "password", Encode.string user.password ) ]
-
-        _ ->
-            Encode.null
+    Encode.object [ ( "identifier", Encode.string user.identifier ), ( "password", Encode.string user.password ) ]
 
 
 loginDecoder : Decode.Decoder LoggedInData
@@ -65,7 +55,7 @@ register model =
         Registering user ->
             let
                 request =
-                    Http.post "/api/user/register" (Http.jsonBody <| registerEncoder model.user) registerDecoder
+                    Http.post "/api/user/register" (Http.jsonBody <| registerEncoder user) registerDecoder
             in
                 Http.send Messages.Registered request
 
@@ -79,7 +69,7 @@ login model =
         LoggingIn user ->
             let
                 request =
-                    Http.post "/api/auth/login" (Http.jsonBody <| registerEncoder model.user) loginDecoder
+                    Http.post "/api/auth/login" (Http.jsonBody <| loginEncoder user) loginDecoder
             in
                 Http.send Messages.LoggedIn request
 
