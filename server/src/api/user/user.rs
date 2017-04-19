@@ -14,7 +14,15 @@ use models::user::{UserModel, NewUser, ChangedUser};
 use models::pod::{PodModel, NewPod};
 use models::queue::{QueueModel, NewQueue};
 
-use responses::{APIResponse, ok, created, conflict, bad_request, forbidden, unauthorized};
+use responses::{
+    APIResponse,
+    ok,
+    created,
+    conflict,
+    bad_request,
+    forbidden,
+    unauthorized
+};
 
 
 #[get("/info")]

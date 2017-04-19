@@ -11,6 +11,7 @@ pub struct QueueAddSerializer {
 }
 
 
+#[allow(unused_mut)]
 #[derive(Debug, Deserialize, Validate)]
 pub struct PodSettingsSerializer {
     pub name: Option<String>,

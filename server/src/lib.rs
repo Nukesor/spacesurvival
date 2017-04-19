@@ -12,6 +12,7 @@ extern crate serde_json;
 extern crate serde_yaml;
 extern crate validator;
 extern crate jsonwebtoken;
+extern crate petgraph;
 
 #[macro_use] extern crate rocket_contrib;
 #[macro_use] extern crate serde_derive;
@@ -30,14 +31,18 @@ mod helpers;
 mod handlers;
 mod statics;
 
+use data::researches::build_graph;
+
 
 pub fn rocket_factory() -> rocket::Rocket {
-//    let ref values = data::researches::RESEARCH_LIST;
-//    match values.get(&data::types::ResearchTypes::PlasmaGenerator) {
-//        Some(lol) => println!("{:?}", lol.name),
-//        None => println!("{:?}", "Nix gefunden".to_string()),
-//    }
-//
+    let ref values = data::researches::RESEARCH_LIST;
+    match values.get(&data::types::ResearchTypes::PlasmaGenerator) {
+        Some(lol) => println!("{:?}", lol.name),
+        None => println!("{:?}", "Nix gefunden".to_string()),
+    }
+    let graph = build_graph(values);
+    println!("{:?}", graph);
+
 //    let ref values = data::modules::MODULE_LIST;
 //    match values.get(&data::types::ModuleTypes::Turret) {
 //        Some(lol) => println!("{:?}", lol.level[0].shoots.as_ref().unwrap().range),

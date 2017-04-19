@@ -1,19 +1,20 @@
-#[derive(Debug, Eq, Hash, PartialEq, Serialize, Deserialize)]
+#[derive(Debug, Eq, Clone, Hash, PartialEq, Serialize, Deserialize)]
 pub enum ResearchTypes {
     PlasmaGenerator,
-    EnergyWeapons
+    EnergyWeapons,
+    MiningEfficiency,
 }
 
 
-#[derive(Debug, Eq, Hash, PartialEq, Serialize, Deserialize)]
+#[derive(Debug, Eq, Clone, Hash, PartialEq, Serialize, Deserialize)]
 pub enum ResourceTypes {
     Iron,
-    Water
+    Water,
 }
 
 
-#[derive(Debug, Eq, Hash, PartialEq, Serialize, Deserialize)]
+#[derive(Debug, Eq, Clone, Hash, PartialEq, Serialize, Deserialize)]
 pub enum ModuleTypes {
     Turret,
-    Generator
+    Generator,
 }

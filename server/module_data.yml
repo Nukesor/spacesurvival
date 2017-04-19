@@ -1,7 +1,7 @@
 Turret:
   name: "Turret"
   dependencies: 
-      - "PlasmaGenerator"
+      - "EnergyWeapons"
   level:
     - level: 1
       resources:
