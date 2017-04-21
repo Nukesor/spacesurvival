@@ -28,10 +28,9 @@ pub struct NewQueue {
 pub struct QueueEntryModel {
     pub id: Uuid,
     pub queue_id: Uuid,
-    pub module_id: Option<Uuid>,
-    pub research_id: Option<Uuid>,
+    pub module_name: Option<String>,
+    pub research_name: Option<String>,
     pub level: i32,
-//    pub duration: PgInterval,
     pub created_at: NaiveDateTime,
 }
 
@@ -39,9 +38,8 @@ pub struct QueueEntryModel {
 #[derive(Insertable)]
 #[table_name="queue_entries"]
 pub struct NewQueueEntry {
-//    pub duration: PgInterval,
     pub queue_id: Uuid,
-    pub research_id: Option<Uuid>,
-    pub module_id: Option<Uuid>,
+    pub research_name: Option<String>,
+    pub module_name: Option<String>,
     pub level: i32,
 }

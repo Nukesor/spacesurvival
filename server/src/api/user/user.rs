@@ -54,7 +54,8 @@ pub fn register(user_data: Result<JSON<UserSerializer>, SerdeError>, db: DB) -> 
             }
 
             // Check for existing user email
-            let results = users.filter(email.eq(data.email.clone())).first::<UserModel>(&*db);
+            let results = users.filter(email.eq(data.email.clone()))
+                .first::<UserModel>(&*db);
             if results.is_ok() {
                 return conflict().message("Nickname already taken.");
             }

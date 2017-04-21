@@ -7,6 +7,7 @@ use schema::researches;
 #[derive(Debug, Serialize, Deserialize, Queryable)]
 pub struct ResearchModel {
     pub name: String,
+    pub level: i32,
     pub id: Uuid,
     pub pod_id: Option<Uuid>,
     pub base_id: Option<Uuid>,

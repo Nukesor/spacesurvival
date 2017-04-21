@@ -10,7 +10,6 @@ pub struct UserSerializer {
 }
 
 
-#[allow(unused_mut)]
 #[derive(Debug, Validate, Deserialize)]
 pub struct LoginSerializer {
     pub identifier: String,

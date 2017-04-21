@@ -19,10 +19,7 @@ CREATE TABLE pods (
 );
 
 
--- CREATE TYPE resource_types AS ENUM ('steel', 'energy', 'water');
-
 CREATE TABLE resources (
---    name resource_types not null, 
     name VARCHAR(120) not null, 
     amount bigint not null,
     max_amount bigint not null,
@@ -90,10 +87,10 @@ CREATE TABLE queues (
 CREATE TABLE queue_entries (
     id UUID PRIMARY KEY default uuid_generate_v4(),
     queue_id UUID references queues(id) on DELETE CASCADE not null,
-    module_id UUID references modules(id),
-    research_id UUID references researches(id),
+    module_name VARCHAR(120),
+    research_name VARCHAR(120),
     level integer not null,
-    CHECK (module_id is not null or research_id is not null),
+    CHECK (module_name is not null or research_name is not null),
 
 --    duration INTERVAL not null,
     created_at TIMESTAMP default current_timestamp not null
