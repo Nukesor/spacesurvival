@@ -1,3 +1,5 @@
+use std::ops::Deref;
+
 use diesel;
 use diesel::prelude::*;
 use rocket_contrib::{JSON, SerdeError};
@@ -17,8 +19,12 @@ use models::user::UserModel;
 use models::queue::{QueueEntryModel, QueueModel, NewQueueEntry};
 use models::research::ResearchModel;
 
-use data::helper::get_research_dependency_strings;
+use data::helper::{
+    get_research_dependency_strings,
+    dependencies_fulfilled,
+};
 use data::types::{ResearchTypes, ModuleTypes};
+use data::researches::RESEARCH_LIST;
 
 use responses::{
     APIResponse,
@@ -97,7 +103,16 @@ pub fn add_research_to_queue(queue_entry: Result<JSON<QueueAddResearchSerializer
 
                     let dependencies = research_dsl::researches
                         .filter(research_dsl::name.eq_any(dependency_strings))
-                        .get_result::<ResearchModel>(&*db);
+                        .get_results::<ResearchModel>(&*db);
+
+                    let fulfilled = dependencies_fulfilled(
+                        &research_type,
+                        dependencies,
+                        RESEARCH_LIST.deref()
+                    );
+                    if !fulfilled {
+                        return bad_request().message("Dependencies not fulfilled.")
+                    }
 
                     let queue = queues.filter(pod_id.eq(pod.id))
                         .first::<QueueModel>(&*db)

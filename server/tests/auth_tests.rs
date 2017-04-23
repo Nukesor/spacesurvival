@@ -1,5 +1,5 @@
 use rocket::testing::MockRequest;
-use rocket::http::{Status, Method,ContentType};
+use rocket::http::{Status, Method, ContentType};
 
 use spacelib::rocket_factory;
 

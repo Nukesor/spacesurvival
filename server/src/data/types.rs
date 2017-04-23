@@ -26,7 +26,6 @@ macro_rules! enum_impl {
                     _ => Err(()),
                 }
             }
-
         }
     }
 }

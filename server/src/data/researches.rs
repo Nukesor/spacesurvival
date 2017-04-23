@@ -8,6 +8,7 @@ use std::collections::HashMap;
 
 use data::Resource;
 use data::types::*;
+use data::helper::HasDependencies;
 
 
 #[derive(Debug, PartialEq, Deserialize)]
@@ -17,6 +18,11 @@ pub struct Research {
     pub level: Vec<Level>,
 }
 
+impl HasDependencies for Research {
+    fn get_dependencies(&self) -> Option<&Vec<(ResearchTypes, i32)>> {
+        self.dependencies.as_ref()
+    }
+}
 
 #[derive(Debug, PartialEq, Deserialize)]
 pub struct Level {
