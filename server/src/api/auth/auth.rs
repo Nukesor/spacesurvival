@@ -22,7 +22,7 @@ pub fn login(user_in: Result<JSON<LoginSerializer>, SerdeError>, db: DB) -> APIR
                 .first::<UserModel>(&*db);
 
             match result {
-                // The identifier was a nickname!
+                // The identifier is a nickname
                 Ok(user) => {
                     if !user.verify_password(user_in.password.as_str()) {
                         return unauthorized().message("Password incorrect.");
@@ -37,7 +37,7 @@ pub fn login(user_in: Result<JSON<LoginSerializer>, SerdeError>, db: DB) -> APIR
                     match result {
                         // There is no such email or nickname.
                         Err(_) => return unauthorized().message("Nickname or email doesn't exist."),
-                        // The identifier was an email!
+                        // The identifier is an email
                         Ok(user) => {
                             if !user.verify_password(user_in.password.as_str()) {
                                 return unauthorized().message("Password incorrect.");

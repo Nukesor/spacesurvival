@@ -1,4 +1,4 @@
 #!/bin/bash
 
-dropdb browsergame
+dropdb --if-exists browsergame
 diesel setup

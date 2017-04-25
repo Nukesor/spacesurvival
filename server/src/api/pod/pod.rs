@@ -118,6 +118,8 @@ pub fn add_research_to_queue(queue_entry: Result<JSON<QueueAddResearchSerializer
                         .first::<QueueModel>(&*db)
                         .unwrap();
 
+                    // Check if there already are existing queue entries for this research.
+                    // In case there are, we increase the level by the amount of existing entries.
                     let existing_entries: i64 = queue_entries.count()
                         .filter(queue_id.eq(queue.id))
                         .filter(research_name.eq(research_type.to_string()))
