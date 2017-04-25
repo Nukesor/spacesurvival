@@ -6,7 +6,6 @@ use petgraph::algo::is_cyclic_directed;
 use serde_yaml::from_reader;
 use std::collections::HashMap;
 
-use data::Resource;
 use data::types::*;
 use data::helper::HasDependencies;
 
@@ -27,7 +26,7 @@ impl HasDependencies for Research {
 #[derive(Debug, PartialEq, Deserialize)]
 pub struct Level {
     pub level: i32,
-    pub resources: Vec<Resource>,
+    pub resources: Vec<(ResourceTypes, i64)>,
 }
 
 pub fn build_graph(research_list: &HashMap<ResearchTypes, Research>) -> Graph<ResearchTypes, i32> {

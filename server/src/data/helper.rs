@@ -4,6 +4,7 @@ use std::collections::HashMap;
 use diesel::result::Error;
 
 use models::research::ResearchModel;
+use models::resource::ResourceModel;
 
 use data::types::*;
 use data::researches::RESEARCH_LIST;
@@ -32,7 +33,10 @@ pub fn get_research_dependency_strings(research_type: &ResearchTypes) -> Vec<Str
 /*
 Generic function which accepts an Enum as type identifier.
 */
-pub fn dependencies_fulfilled<T: Eq + Hash, M: HasDependencies>(reliant_type: &T, fulfilled_result: Result<Vec<ResearchModel>, Error>, list: &HashMap<T, M>) -> bool {
+pub fn dependencies_fulfilled<T: Eq + Hash, M: HasDependencies>(
+    reliant_type: &T,
+    fulfilled_result: Result<Vec<ResearchModel>, Error>,
+    list: &HashMap<T, M>) -> bool {
     // Get all researches required for the specified type.
     let requirement_list = list.get(reliant_type)
         .as_ref().unwrap().get_dependencies();
@@ -58,6 +62,41 @@ pub fn dependencies_fulfilled<T: Eq + Hash, M: HasDependencies>(reliant_type: &T
                     Some(research) => {
                         if research.level < level {
                             return false
+                        }
+                    }
+                }
+            }
+            return true;
+        }
+    }
+}
+
+/*
+Generic function which accepts an Enum as type identifier.
+*/
+pub fn subtract_resources(
+    costs: Option<Vec<(ResourceTypes, i64)>>,
+    resources: Vec<ResourceModel>) -> bool {
+
+    match costs {
+        // There are no costs for this module/research
+        None => return true,
+        // There are some costs
+        Some(costs) => {
+            for (ref resource_type, amount) in costs {
+                // Try to get the correct entry from existing resources.
+                let existing = resources.iter()
+                    .filter(|x| x.name == resource_type.to_string())
+                    .next();
+                match existing {
+                    // There is no resource for this resource_type,
+                    // thereby it's not enough.
+                    None => return false,
+                    // There is a resource for this resource type
+                    // We need to check if we got enough of it.
+                    Some(existing_resource) => {
+                        if existing_resource.amount < amount {
+                            return false;
                         }
                     }
                 }

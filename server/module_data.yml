@@ -5,8 +5,8 @@ Turret:
   level:
     - level: 1
       resources:
-        - name: "Iron"
-          amount: 100
+          - ["Iron", 200]
+          - ["Water", 100]
       shoots:
         rate: 1
         damage: 10

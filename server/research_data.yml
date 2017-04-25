@@ -4,8 +4,8 @@ PlasmaGenerator:
   level:
     - level: 1
       resources:
-        - name: "Water"
-          amount: 100
+          - ["Water", 200]
+
 
 EnergyWeapons:
   name: "EnergyWeapons"
@@ -14,8 +14,7 @@ EnergyWeapons:
   level:
     - level: 1
       resources:
-        - name: "Iron"
-          amount: 200
+          - ["Iron", 200]
 
 MiningEfficiency:
   name: "MiningEfficiency"
@@ -24,5 +23,4 @@ MiningEfficiency:
   level:
     - level: 1
       resources:
-        - name: "Iron"
-          amount: 200
+          - ["Iron", 200]

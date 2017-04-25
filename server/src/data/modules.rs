@@ -3,7 +3,6 @@ use std::fs::File;
 use serde_yaml::from_reader;
 use std::collections::HashMap;
 
-use data::Resource;
 use data::types::*;
 use data::components::*;
 
@@ -19,7 +18,7 @@ pub struct Module {
 #[derive(Debug, PartialEq, Deserialize)]
 pub struct Level {
     pub level: i32,
-    pub resources: Vec<Resource>,
+    pub resources: Vec<(ResourceTypes, i64)>,
     pub shoots: Option<Shoots>,
     pub generates_energy: Option<GeneratesEnergy>,
 }
