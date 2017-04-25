@@ -97,21 +97,20 @@ pub fn add_research_to_queue(queue_entry: Result<JSON<QueueAddResearchSerializer
                         // The research is not yet here. We need to check for dependencies.
                         // We just increase the level by 1
                         Err(_) => {
+                            let dependencies = research_dsl::researches
+                                .filter(research_dsl::name.eq_any(dependency_strings))
+                                .get_results::<ResearchModel>(&*db);
+
+                            let fulfilled = dependencies_fulfilled(
+                                &research_type,
+                                dependencies,
+                                RESEARCH_LIST.deref()
+                            );
+                            if !fulfilled {
+                                return bad_request().message("Dependencies not fulfilled.");
+                            }
                             research_level = 1;
                         }
-                    }
-
-                    let dependencies = research_dsl::researches
-                        .filter(research_dsl::name.eq_any(dependency_strings))
-                        .get_results::<ResearchModel>(&*db);
-
-                    let fulfilled = dependencies_fulfilled(
-                        &research_type,
-                        dependencies,
-                        RESEARCH_LIST.deref()
-                    );
-                    if !fulfilled {
-                        return bad_request().message("Dependencies not fulfilled.")
                     }
 
                     let queue = queues.filter(pod_id.eq(pod.id))
