@@ -20,5 +20,5 @@
 
 .slot:active {
     transform: scale(0.9);
-    transform-origin: 50% 50%;
+    transform-origin: center center;
 }
