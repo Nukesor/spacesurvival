@@ -8,8 +8,8 @@ use diesel::prelude::*;
 use schema::users;
 use helpers::util;
 
-#[derive(Debug, Serialize, Deserialize, Queryable)]
-pub struct UserModel {
+#[derive(Debug, Serialize, Deserialize, Identifiable, Queryable, Associations)]
+pub struct User {
     pub id: Uuid,
     pub nickname: String,
     pub created_at: NaiveDateTime,
@@ -24,7 +24,7 @@ struct UserLoginToken {
     user_id: Uuid,
 }
 
-impl UserModel {
+impl User{
     pub fn make_password_hash(new_password: &str) -> Vec<u8> {
         argon2i_simple(new_password, "loginsalt").to_vec()
     }
@@ -49,7 +49,7 @@ impl UserModel {
     pub fn get_user_from_auth_token(token: &str,
                                     salt: &str,
                                     db: &PgConnection)
-                                    -> Option<UserModel> {
+                                    -> Option<User> {
         use schema::users::dsl::*;
 
         let secret = util::get_secret();
@@ -65,7 +65,7 @@ impl UserModel {
 
         let token = decrypted_token.unwrap();
 
-        let user = users.filter(id.eq(token.claims.user_id)).first::<UserModel>(&*db);
+        let user = users.filter(id.eq(token.claims.user_id)).first::<User>(&*db);
         if user.is_err() {
             return None;
         }

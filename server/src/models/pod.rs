@@ -1,11 +1,16 @@
 use uuid::Uuid;
 use chrono::NaiveDateTime;
 
-use schema::pods;
+use schema::{pods, modules, researches, resources};
 
 
-#[derive(Debug, Serialize, Deserialize, Queryable)]
-pub struct PodModel {
+#[derive(Debug, Serialize, Deserialize, Identifiable, Queryable, Associations)]
+#[belongs_to(users)]
+#[belongs_to(bases)]
+#[has_many(modules)]
+#[has_many(researches)]
+#[has_many(resources)]
+pub struct Pod {
     pub name: String,
     pub id: Uuid,
     pub user_id: Uuid,

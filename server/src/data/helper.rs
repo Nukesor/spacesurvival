@@ -3,11 +3,12 @@ use std::collections::HashMap;
 
 use diesel::result::Error;
 
-use models::research::ResearchModel;
-use models::resource::ResourceModel;
+use models::research::Research;
+use models::resource::Resource;
 
 use data::types::*;
 use data::researches::RESEARCH_LIST;
+use helpers::db::DB;
 
 
 pub trait HasDependencies {
@@ -35,7 +36,7 @@ Generic function which accepts an Enum as type identifier.
 */
 pub fn dependencies_fulfilled<T: Eq + Hash, M: HasDependencies>(
     reliant_type: &T,
-    fulfilled_result: Result<Vec<ResearchModel>, Error>,
+    fulfilled_result: Result<Vec<Research>, Error>,
     list: &HashMap<T, M>) -> bool {
     // Get all researches required for the specified type.
     let requirement_list = list.get(reliant_type)
@@ -74,9 +75,10 @@ pub fn dependencies_fulfilled<T: Eq + Hash, M: HasDependencies>(
 /*
 Generic function which accepts an Enum as type identifier.
 */
-pub fn subtract_resources(
+pub fn check_resources(
     costs: Option<Vec<(ResourceTypes, i64)>>,
-    resources: Vec<ResourceModel>) -> bool {
+    resources: Vec<Resource>,
+    db: DB) -> bool {
 
     match costs {
         // There are no costs for this module/research

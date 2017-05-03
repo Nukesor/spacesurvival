@@ -1,11 +1,14 @@
 use uuid::Uuid;
 use chrono::NaiveDateTime;
 
-use schema::{queues,queue_entries};
+use schema::{queues, queue_entries};
 
 
-#[derive(Debug, Serialize, Deserialize, Queryable)]
-pub struct QueueModel {
+#[derive(Debug, Serialize, Deserialize, Identifiable, Queryable, Associations)]
+#[belongs_to(pods)]
+#[belongs_to(bases)]
+#[has_many(queue_entries)]
+pub struct Queue {
     pub id: Uuid,
     pub pod_id: Option<Uuid>,
     pub base_id: Option<Uuid>,
@@ -24,8 +27,9 @@ pub struct NewQueue {
 }
 
 
-#[derive(Debug, Serialize, Deserialize, Queryable)]
-pub struct QueueEntryModel {
+#[derive(Debug, Serialize, Deserialize, Queryable, Associations)]
+#[belongs_to(queues)]
+pub struct QueueEntry {
     pub id: Uuid,
     pub queue_id: Uuid,
     pub module_name: Option<String>,

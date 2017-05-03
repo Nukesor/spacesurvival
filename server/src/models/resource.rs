@@ -3,8 +3,10 @@ use uuid::Uuid;
 use schema::resources;
 
 
-#[derive(Debug, Serialize, Deserialize, Queryable)]
-pub struct ResourceModel {
+#[derive(Debug, Serialize, Deserialize, Identifiable, Queryable, Associations)]
+#[belongs_to(pods)]
+#[belongs_to(bases)]
+pub struct Resource {
     pub name: String,
     pub amount: i64,
     pub max_amount: i64,

@@ -3,7 +3,7 @@ CREATE TABLE bases (
     id UUID PRIMARY KEY default uuid_generate_v4(),
 
     updated_at TIMESTAMP default current_timestamp not null,
-    created_at TIMESTAMP DEFAULT current_timestamp not null
+    created_at TIMESTAMP default current_timestamp not null
 );
 
 
@@ -15,7 +15,7 @@ CREATE TABLE pods (
     base_id UUID references bases(id),
 
     updated_at TIMESTAMP default current_timestamp not null,
-    created_at TIMESTAMP DEFAULT current_timestamp not null
+    created_at TIMESTAMP default current_timestamp not null
 );
 
 
@@ -51,7 +51,7 @@ CREATE TABLE modules (
     CHECK (base_id is not null or pod_id is not null),
 
     updated_at TIMESTAMP default current_timestamp not null,
-    created_at TIMESTAMP DEFAULT current_timestamp not null
+    created_at TIMESTAMP default current_timestamp not null
 );
 
 
@@ -67,7 +67,7 @@ CREATE TABLE researches (
 
 
     updated_at TIMESTAMP default current_timestamp not null,
-    created_at TIMESTAMP DEFAULT current_timestamp not null
+    created_at TIMESTAMP default current_timestamp not null
 );
 
 

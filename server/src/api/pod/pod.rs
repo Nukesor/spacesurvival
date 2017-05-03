@@ -14,10 +14,10 @@ use schema::queues::dsl::*;
 use schema::queue_entries::dsl::*;
 use schema::researches::dsl as research_dsl;
 
-use models::pod::{PodModel, ChangedPod};
-use models::user::UserModel;
-use models::queue::{QueueEntryModel, QueueModel, NewQueueEntry};
-use models::research::ResearchModel;
+use models::pod::{Pod, ChangedPod};
+use models::user::User;
+use models::queue::{QueueEntry, Queue, NewQueueEntry};
+use models::research::Research;
 
 use data::helper::{
     get_research_dependency_strings,
@@ -35,7 +35,7 @@ use responses::{
 
 
 #[post("/settings", data = "<pod_settings>", format = "application/json")]
-pub fn settings(pod_settings: Result<JSON<PodSettingsSerializer>, SerdeError>, current_user: UserModel, db: DB) -> APIResponse {
+pub fn settings(pod_settings: Result<JSON<PodSettingsSerializer>, SerdeError>, current_user: User, db: DB) -> APIResponse {
 
     match pod_settings {
         // Return specific error if invalid JSON has been sent.
@@ -43,7 +43,7 @@ pub fn settings(pod_settings: Result<JSON<PodSettingsSerializer>, SerdeError>, c
         Ok(settings) =>  {
             // Get current pod
             let current_pod = pods.filter(user_id.eq(current_user.id))
-                .first::<PodModel>(&*db)
+                .first::<Pod>(&*db)
                 .unwrap();
 
             // Create changed pod model and push it to the DB
@@ -52,7 +52,7 @@ pub fn settings(pod_settings: Result<JSON<PodSettingsSerializer>, SerdeError>, c
             };
             let pod = diesel::update(pods.filter(pods::id.eq(current_pod.id)))
                 .set(&changed_pod)
-                .get_result::<PodModel>(&*db)
+                .get_result::<Pod>(&*db)
                 .expect("Failed to update pod.");
 
             ok().message("Pod data changed.").data(json!(&pod))
@@ -62,7 +62,7 @@ pub fn settings(pod_settings: Result<JSON<PodSettingsSerializer>, SerdeError>, c
 
 
 #[post("/queue/add_research", data = "<queue_entry>", format = "application/json")]
-pub fn add_research_to_queue(queue_entry: Result<JSON<QueueAddResearchSerializer>, SerdeError>, current_user: UserModel, db: DB) -> APIResponse {
+pub fn add_research_to_queue(queue_entry: Result<JSON<QueueAddResearchSerializer>, SerdeError>, current_user: User, db: DB) -> APIResponse {
 
     match queue_entry {
         // Return specific error if invalid JSON has been sent.
@@ -81,13 +81,13 @@ pub fn add_research_to_queue(queue_entry: Result<JSON<QueueAddResearchSerializer
                     let mut research_level: i32;
                     // Get pod and queue from db
                     let pod = pods.filter(user_id.eq(current_user.id))
-                        .first::<PodModel>(&*db)
+                        .first::<Pod>(&*db)
                         .unwrap();
 
                     let research = research_dsl::researches
                         .filter(research_dsl::pod_id.eq(pod.id))
                         .filter(research_dsl::name.eq(research_type.to_string()))
-                        .get_result::<ResearchModel>(&*db);
+                        .get_result::<Research>(&*db);
                     match research {
                         // Research exists, we don't need to check for dependencies
                         // We just increase the level by 1
@@ -99,7 +99,7 @@ pub fn add_research_to_queue(queue_entry: Result<JSON<QueueAddResearchSerializer
                         Err(_) => {
                             let dependencies = research_dsl::researches
                                 .filter(research_dsl::name.eq_any(dependency_strings))
-                                .get_results::<ResearchModel>(&*db);
+                                .get_results::<Research>(&*db);
 
                             let fulfilled = dependencies_fulfilled(
                                 &research_type,
@@ -114,7 +114,7 @@ pub fn add_research_to_queue(queue_entry: Result<JSON<QueueAddResearchSerializer
                     }
 
                     let queue = queues.filter(pod_id.eq(pod.id))
-                        .first::<QueueModel>(&*db)
+                        .first::<Queue>(&*db)
                         .unwrap();
 
                     // Check if there already are existing queue entries for this research.
@@ -137,7 +137,7 @@ pub fn add_research_to_queue(queue_entry: Result<JSON<QueueAddResearchSerializer
 
                     let new_queue_entry = diesel::insert(&new_entry_model)
                         .into(queue_entries::table)
-                        .get_result::<QueueEntryModel>(&*db)
+                        .get_result::<QueueEntry>(&*db)
                         .expect("Failed to update user.");
 
                     created().message("Queue entry added.").data(json!(&new_queue_entry))
@@ -148,7 +148,7 @@ pub fn add_research_to_queue(queue_entry: Result<JSON<QueueAddResearchSerializer
 }
 
 #[post("/queue/add_module", data = "<queue_entry>", format = "application/json")]
-pub fn add_module_to_queue(queue_entry: Result<JSON<QueueAddModuleSerializer>, SerdeError>, current_user: UserModel, db: DB) -> APIResponse {
+pub fn add_module_to_queue(queue_entry: Result<JSON<QueueAddModuleSerializer>, SerdeError>, current_user: User, db: DB) -> APIResponse {
 
     match queue_entry {
 
@@ -157,11 +157,11 @@ pub fn add_module_to_queue(queue_entry: Result<JSON<QueueAddModuleSerializer>, S
         Ok(entry) =>  {
             // Get pod and queue from db
             let pod = pods.filter(user_id.eq(current_user.id))
-                .first::<PodModel>(&*db)
+                .first::<Pod>(&*db)
                 .unwrap();
 
             let queue = queues.filter(pod_id.eq(pod.id))
-                .first::<QueueModel>(&*db)
+                .first::<Queue>(&*db)
                 .unwrap();
 
             // Check if the given module name maps to a module type.
@@ -181,7 +181,7 @@ pub fn add_module_to_queue(queue_entry: Result<JSON<QueueAddModuleSerializer>, S
 
             let new_queue_entry = diesel::insert(&new_entry_model)
                 .into(queue_entries::table)
-                .get_result::<QueueEntryModel>(&*db)
+                .get_result::<QueueEntry>(&*db)
                 .expect("Failed to update user.");
 
             created().message("Queue entry added.").data(json!(&new_queue_entry))

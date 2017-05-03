@@ -10,9 +10,9 @@ use validation::user::{UserSerializer, UserSettingsSerializer};
 use schema::{users, pods, queues};
 use schema::users::dsl::*;
 
-use models::user::{UserModel, NewUser, ChangedUser};
-use models::pod::{PodModel, NewPod};
-use models::queue::{QueueModel, NewQueue};
+use models::user::{User, NewUser, ChangedUser};
+use models::pod::{Pod, NewPod};
+use models::queue::{Queue, NewQueue};
 
 use responses::{
     APIResponse,
@@ -26,7 +26,7 @@ use responses::{
 
 
 #[get("/info")]
-pub fn info(current_user: UserModel) -> APIResponse {
+pub fn info(current_user: User) -> APIResponse {
     ok().data(json!(current_user))
 }
 
@@ -55,12 +55,12 @@ pub fn register(user_data: Result<JSON<UserSerializer>, SerdeError>, db: DB) -> 
 
             // Check for existing user email
             let results = users.filter(email.eq(data.email.clone()))
-                .first::<UserModel>(&*db);
+                .first::<User>(&*db);
             if results.is_ok() {
                 return conflict().message("Nickname already taken.");
             }
             // Create new password hash
-            let new_password_hash = UserModel::make_password_hash(data.password.as_str());
+            let new_password_hash = User::make_password_hash(data.password.as_str());
 
             // New user model for table insertion
             let new_user = NewUser {
@@ -72,7 +72,7 @@ pub fn register(user_data: Result<JSON<UserSerializer>, SerdeError>, db: DB) -> 
             // Insert user to get id for pod
             let user = diesel::insert(&new_user)
                 .into(users::table)
-                .get_result::<UserModel>(&*db)
+                .get_result::<User>(&*db)
                 .expect("Error saving new user");
 
             // New pod
@@ -83,7 +83,7 @@ pub fn register(user_data: Result<JSON<UserSerializer>, SerdeError>, db: DB) -> 
 
             let pod = diesel::insert(&new_pod)
                 .into(pods::table)
-                .get_result::<PodModel>(&*db)
+                .get_result::<Pod>(&*db)
                 .expect("Error creating pod");
 
             let new_queue = NewQueue {
@@ -94,7 +94,7 @@ pub fn register(user_data: Result<JSON<UserSerializer>, SerdeError>, db: DB) -> 
 
             diesel::insert(&new_queue)
                 .into(queues::table)
-                .get_result::<QueueModel>(&*db)
+                .get_result::<Queue>(&*db)
                 .expect("Error creating pod's queue");
 
             return created().message("User created.").data(json!(&user));
@@ -104,7 +104,7 @@ pub fn register(user_data: Result<JSON<UserSerializer>, SerdeError>, db: DB) -> 
 
 
 #[post("/settings", data = "<user_data>", format = "application/json")]
-pub fn settings(current_user: UserModel,
+pub fn settings(current_user: User,
                 user_data: Result<JSON<UserSettingsSerializer>, SerdeError>,
                 db: DB)
                 -> APIResponse {
@@ -124,7 +124,7 @@ pub fn settings(current_user: UserModel,
                                 return unauthorized().message("Incorrect password.");
                             }
                             new_password_hash =
-                                Some(UserModel::make_password_hash(new_password.as_str()))
+                                Some(User::make_password_hash(new_password.as_str()))
                         }
                         None => {
                             return forbidden().message("The current passwords needs to be \
@@ -143,7 +143,7 @@ pub fn settings(current_user: UserModel,
 
             let user = diesel::update(users.filter(id.eq(current_user.id)))
                 .set(&changed_user)
-                .get_result::<UserModel>(&*db)
+                .get_result::<User>(&*db)
                 .expect("Failed to update user.");
 
             ok().message("User data changed.").data(json!(&user))

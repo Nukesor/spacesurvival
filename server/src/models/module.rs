@@ -4,8 +4,10 @@ use chrono::NaiveDateTime;
 use schema::modules;
 
 
-#[derive(Debug, Serialize, Deserialize, Queryable)]
-pub struct ModuleModel {
+#[derive(Debug, Serialize, Deserialize, Identifiable, Queryable, Associations)]
+#[belongs_to(pods)]
+#[belongs_to(bases)]
+pub struct Module {
     pub name: String,
     pub id: Uuid,
     pub stationary: bool,

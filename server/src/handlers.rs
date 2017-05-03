@@ -2,7 +2,7 @@ use rocket::Outcome;
 use rocket::http::Status;
 use rocket::request::{self, Request, FromRequest};
 
-use models::user::UserModel;
+use models::user::User;
 use helpers::db::DB;
 use responses::{
     APIResponse,
@@ -45,10 +45,10 @@ fn service_unavailable_handler() -> APIResponse {
     service_unavailable()
 }
 
-impl<'a, 'r> FromRequest<'a, 'r> for UserModel {
+impl<'a, 'r> FromRequest<'a, 'r> for User {
     type Error = ();
 
-    fn from_request(request: &'a Request<'r>) -> request::Outcome<UserModel, ()> {
+    fn from_request(request: &'a Request<'r>) -> request::Outcome<User, ()> {
         let db = <DB as FromRequest>::from_request(request).unwrap();
         let tokens: Vec<_> = request.headers().get("Authorization").collect();
         if tokens.len() != 1 {
@@ -57,7 +57,7 @@ impl<'a, 'r> FromRequest<'a, 'r> for UserModel {
 
         let token = tokens[0];
 
-        match UserModel::get_user_from_auth_token(&token, "loginsalt", &*db) {
+        match User::get_user_from_auth_token(&token, "loginsalt", &*db) {
             Some(user) => Outcome::Success(user),
             None => Outcome::Failure((Status::Unauthorized, ())),
         }

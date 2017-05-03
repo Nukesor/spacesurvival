@@ -1,7 +1,7 @@
 use diesel::prelude::*;
 use rocket_contrib::{JSON, SerdeError};
 
-use models::user::UserModel;
+use models::user::User;
 use schema::users::dsl::*;
 use validation::user::LoginSerializer;
 
@@ -19,7 +19,7 @@ pub fn login(user_in: Result<JSON<LoginSerializer>, SerdeError>, db: DB) -> APIR
             let mut result;
             // Check if the identifier is a nickname.
             result = users.filter(nickname.eq(&user_in.identifier))
-                .first::<UserModel>(&*db);
+                .first::<User>(&*db);
 
             match result {
                 // The identifier is a nickname
@@ -32,7 +32,7 @@ pub fn login(user_in: Result<JSON<LoginSerializer>, SerdeError>, db: DB) -> APIR
                 // Check if the identifier is an email address
                 Err(_) => {
                     result = users.filter(email.eq(&user_in.identifier))
-                        .first::<UserModel>(&*db);
+                        .first::<User>(&*db);
 
                     match result {
                         // There is no such email or nickname.
