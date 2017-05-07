@@ -8,6 +8,7 @@ import Model
 import Model.User exposing (..)
 
 
+view : Model.Model -> List (Html Messages.Msg)
 view model =
     case model.user of
         Registering user ->
@@ -26,13 +27,16 @@ view model =
             []
 
 
+updateNickname : RegisterData -> String -> Messages.Msg
 updateNickname user name =
     Messages.UpdateUser <| Registering { user | nickname = name }
 
 
+updateEmail : RegisterData -> String -> Messages.Msg
 updateEmail user email =
     Messages.UpdateUser <| Registering { user | email = email }
 
 
+updatePassword : RegisterData -> String -> Messages.Msg
 updatePassword user pw =
     Messages.UpdateUser <| Registering { user | password = pw }

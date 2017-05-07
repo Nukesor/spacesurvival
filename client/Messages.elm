@@ -4,7 +4,7 @@ import Animation
 import Model.User exposing (..)
 import Model
 import Http
-import Dict exposing (Dict)
+import Model.Util exposing (..)
 
 
 type Msg
@@ -15,3 +15,4 @@ type Msg
     | UpdateUser User
     | Registered (Result Http.Error LoginData)
     | LoggedIn (Result Http.Error LoggedInData)
+    | ShowBuildDialog Point

@@ -2,6 +2,8 @@ module Model.Grid exposing (..)
 
 import Array
 import List
+import Model.Modules exposing (..)
+import Model.Util exposing (..)
 
 
 type alias Grid =
@@ -10,12 +12,8 @@ type alias Grid =
 
 type alias Slot =
     { position : Point
-    }
-
-
-type alias Point =
-    { x : Int
-    , y : Int
+    , entry : SlotEntry
+    , selectedForBuilding : Bool
     }
 
 

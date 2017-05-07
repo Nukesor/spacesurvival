@@ -5,7 +5,7 @@ import Html exposing (..)
 import Html.Attributes exposing (..)
 import Html.Events exposing (..)
 import Messages
-import GridView exposing (grid)
+import View.Grid exposing (grid)
 import Styles.Background
 import Html.CssHelpers
 import Model.User exposing (..)
@@ -14,6 +14,7 @@ import View.Login
 import View.Register
 
 
+css : Html.CssHelpers.Namespace String class id msg
 css =
     Html.CssHelpers.withNamespace Styles.Background.ns
 
@@ -48,6 +49,7 @@ auth model =
         ]
 
 
+authForm : Model -> List (Html Messages.Msg)
 authForm model =
     case model.user of
         LoggingIn _ ->

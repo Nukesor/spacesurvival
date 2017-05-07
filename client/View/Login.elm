@@ -30,9 +30,11 @@ toRegister user =
     Messages.UpdateUser <| Registering { email = "", nickname = "", password = user.password }
 
 
+updateIdentifier : LoginData -> String -> Messages.Msg
 updateIdentifier user name =
     Messages.UpdateUser <| LoggingIn { user | identifier = name }
 
 
+updatePassword : LoginData -> String -> Messages.Msg
 updatePassword user password =
     Messages.UpdateUser <| LoggingIn { user | password = password }
