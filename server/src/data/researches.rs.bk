@@ -45,11 +45,11 @@ pub fn build_graph(research_list: &HashMap<ResearchTypes, Research>) -> Graph<Re
                     match dependency_node {
                         Some(dependency) => {
                             dependency_graph.add_edge(*dependency, *original_node, level);
-                        }
-                        None => panic!("Unknown dependency {:?}", &dependency_type),
+                        },
+                        None => panic!("Unknown dependency {:?}", &dependency_type)
                     }
                 }
-            }
+            },
             None => (),
         }
     }

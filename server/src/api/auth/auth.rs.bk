@@ -18,8 +18,7 @@ pub fn login(user_in: Result<JSON<LoginSerializer>, SerdeError>, db: DB) -> APIR
         Ok(user_in) => {
             let mut result;
             // Check if the identifier is a nickname.
-            result = users
-                .filter(nickname.eq(&user_in.identifier))
+            result = users.filter(nickname.eq(&user_in.identifier))
                 .first::<User>(&*db);
 
             match result {
@@ -29,11 +28,10 @@ pub fn login(user_in: Result<JSON<LoginSerializer>, SerdeError>, db: DB) -> APIR
                         return unauthorized().message("Password incorrect.");
                     }
                     return ok().data(json!(user.generate_auth_token("loginsalt")));
-                }
+                },
                 // Check if the identifier is an email address
                 Err(_) => {
-                    result = users
-                        .filter(email.eq(&user_in.identifier))
+                    result = users.filter(email.eq(&user_in.identifier))
                         .first::<User>(&*db);
 
                     match result {
@@ -45,7 +43,7 @@ pub fn login(user_in: Result<JSON<LoginSerializer>, SerdeError>, db: DB) -> APIR
                                 return unauthorized().message("Password incorrect.");
                             }
                             return ok().data(json!(user.generate_auth_token("loginsalt")));
-                        }
+                        },
                     }
                 }
             }

@@ -24,7 +24,7 @@ struct UserLoginToken {
     user_id: Uuid,
 }
 
-impl User {
+impl User{
     pub fn make_password_hash(new_password: &str) -> Vec<u8> {
         argon2i_simple(new_password, "loginsalt").to_vec()
     }
@@ -46,7 +46,10 @@ impl User {
                 .unwrap()
     }
 
-    pub fn get_user_from_auth_token(token: &str, salt: &str, db: &PgConnection) -> Option<User> {
+    pub fn get_user_from_auth_token(token: &str,
+                                    salt: &str,
+                                    db: &PgConnection)
+                                    -> Option<User> {
         use schema::users::dsl::*;
 
         let secret = util::get_secret();
@@ -62,9 +65,7 @@ impl User {
 
         let token = decrypted_token.unwrap();
 
-        let user = users
-            .filter(id.eq(token.claims.user_id))
-            .first::<User>(&*db);
+        let user = users.filter(id.eq(token.claims.user_id)).first::<User>(&*db);
         if user.is_err() {
             return None;
         }
