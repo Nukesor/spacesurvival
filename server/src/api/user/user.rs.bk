@@ -14,7 +14,15 @@ use models::user::{User, NewUser, ChangedUser};
 use models::pod::{Pod, NewPod};
 use models::queue::{Queue, NewQueue};
 
-use responses::{APIResponse, ok, created, conflict, bad_request, forbidden, unauthorized};
+use responses::{
+    APIResponse,
+    ok,
+    created,
+    conflict,
+    bad_request,
+    forbidden,
+    unauthorized
+};
 
 
 #[get("/info")]
@@ -46,8 +54,7 @@ pub fn register(user_data: Result<JSON<UserSerializer>, SerdeError>, db: DB) -> 
             }
 
             // Check for existing user email
-            let results = users
-                .filter(email.eq(data.email.clone()))
+            let results = users.filter(email.eq(data.email.clone()))
                 .first::<User>(&*db);
             if results.is_ok() {
                 return conflict().message("Nickname already taken.");
@@ -116,8 +123,8 @@ pub fn settings(current_user: User,
                             if !current_user.verify_password(old_password.as_str()) {
                                 return unauthorized().message("Incorrect password.");
                             }
-                            new_password_hash = Some(User::make_password_hash(new_password
-                                                                                  .as_str()))
+                            new_password_hash =
+                                Some(User::make_password_hash(new_password.as_str()))
                         }
                         None => {
                             return forbidden().message("The current passwords needs to be \

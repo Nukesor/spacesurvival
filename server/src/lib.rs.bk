@@ -14,18 +14,12 @@ extern crate validator;
 extern crate jsonwebtoken;
 extern crate petgraph;
 
-#[macro_use]
-extern crate rocket_contrib;
-#[macro_use]
-extern crate serde_derive;
-#[macro_use]
-extern crate validator_derive;
-#[macro_use]
-extern crate diesel;
-#[macro_use]
-extern crate diesel_codegen;
-#[macro_use]
-extern crate lazy_static;
+#[macro_use] extern crate rocket_contrib;
+#[macro_use] extern crate serde_derive;
+#[macro_use] extern crate validator_derive;
+#[macro_use] extern crate diesel;
+#[macro_use] extern crate diesel_codegen;
+#[macro_use] extern crate lazy_static;
 
 mod schema;
 mod validation;
@@ -49,26 +43,21 @@ pub fn rocket_factory() -> rocket::Rocket {
         .manage(helpers::db::init_db_pool())
         .mount("/", routes![statics::index])
         .mount("/static", routes![statics::static_files])
-        .mount("/api/user/",
-               routes![
+        .mount("/api/user/", routes![
                api::user::user::info,
                api::user::user::register,
                api::user::user::settings,
         ])
-        .mount("/api/auth/",
-               routes![
+        .mount("/api/auth/", routes![
                api::auth::auth::login,
         ])
-        .mount("/api/pod/",
-               routes![
+        .mount("/api/pod/", routes![
                api::pod::pod::add_module_to_queue,
                api::pod::pod::add_research_to_queue,
                api::pod::pod::settings,
         ])
-        .catch(errors![handlers::bad_request_handler,
-                       handlers::unauthorized_handler,
-                       handlers::forbidden_handler,
-                       handlers::not_found_handler,
+        .catch(errors![handlers::bad_request_handler, handlers::unauthorized_handler,
+                       handlers::forbidden_handler, handlers::not_found_handler,
                        handlers::internal_server_error_handler,
                        handlers::service_unavailable_handler])
 }
