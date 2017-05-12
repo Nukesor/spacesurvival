@@ -3,12 +3,10 @@ use std::collections::HashMap;
 
 use diesel::result::Error;
 
-use models::research::Research;
-use models::resource::Resource;
-
 use data::types::*;
 use data::researches::RESEARCH_LIST;
-use helpers::db::DB;
+
+use models::research::Research;
 
 
 pub trait HasDependencies {
@@ -65,43 +63,6 @@ list: &HashMap<T, M>) -> bool{
                     // We found an existing research, check if the level is sufficient.
                     Some(research) => {
                         if research.level < level {
-                            return false;
-                        }
-                    }
-                }
-            }
-            return true;
-        }
-    }
-}
-
-/*
-Generic function which accepts an Enum as type identifier.
-*/
-pub fn check_resources(costs: Option<Vec<(ResourceTypes, i64)>>,
-                       resources: Vec<Resource>,
-                       db: DB)
-                       -> bool {
-
-    match costs {
-        // There are no costs for this module/research
-        None => return true,
-        // There are some costs
-        Some(costs) => {
-            for (ref resource_type, amount) in costs {
-                // Try to get the correct entry from existing resources.
-                let existing = resources
-                    .iter()
-                    .filter(|x| x.name == resource_type.to_string())
-                    .next();
-                match existing {
-                    // There is no resource for this resource_type,
-                    // thereby it's not enough.
-                    None => return false,
-                    // There is a resource for this resource type
-                    // We need to check if we got enough of it.
-                    Some(existing_resource) => {
-                        if existing_resource.amount < amount {
                             return false;
                         }
                     }

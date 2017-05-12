@@ -25,3 +25,11 @@ pub struct NewResource {
     pub pod_id: Option<Uuid>,
     pub base_id: Option<Uuid>,
 }
+
+
+#[derive(AsChangeset)]
+#[table_name="resources"]
+pub struct UpdatedResource {
+    pub amount: Option<i64>,
+    pub max_amount: Option<i64>,
+}

@@ -8,11 +8,13 @@ use helpers::db::DB;
 use validation::pod::PodSettingsSerializer;
 use validation::queue::{QueueAddResearchSerializer, QueueAddModuleSerializer};
 
-use schema::{pods, queue_entries};
-use schema::pods::dsl::*;
-use schema::queues::dsl::*;
-use schema::queue_entries::dsl::*;
+use schema::queue_entries;
+
+use schema::pods::dsl as pods_dsl;
+use schema::queues::dsl as queues_dsl;
+use schema::resources::dsl as resource_dsl;
 use schema::researches::dsl as research_dsl;
+use schema::queue_entries::dsl::*;
 
 use models::pod::{Pod, ChangedPod};
 use models::user::User;
@@ -22,6 +24,7 @@ use models::research::Research;
 use data::helper::{get_research_dependency_strings, dependencies_fulfilled};
 use data::types::{ResearchTypes, ModuleTypes};
 use data::researches::RESEARCH_LIST;
+use data::resources::check_resources;
 
 use responses::{APIResponse, bad_request, created, ok};
 
@@ -37,13 +40,15 @@ pub fn settings(pod_settings: Result<JSON<PodSettingsSerializer>, SerdeError>,
         Err(error) => return bad_request().message(format!("{}", error).as_str()),
         Ok(settings) => {
             // Get current pod
-            let current_pod = pods.filter(user_id.eq(current_user.id))
+            let current_pod = pods_dsl::pods
+                .filter(pods_dsl::user_id.eq(current_user.id))
                 .first::<Pod>(&*db)
                 .unwrap();
 
             // Create changed pod model and push it to the DB
             let changed_pod = ChangedPod { name: settings.name.clone() };
-            let pod = diesel::update(pods.filter(pods::id.eq(current_pod.id)))
+            let pod = diesel::update(
+                    pods_dsl::pods.filter(pods_dsl::id.eq(current_pod.id)))
                 .set(&changed_pod)
                 .get_result::<Pod>(&*db)
                 .expect("Failed to update pod.");
@@ -77,7 +82,8 @@ pub fn add_research_to_queue(queue_entry: Result<JSON<QueueAddResearchSerializer
                     let dependency_strings = get_research_dependency_strings(&research_type);
                     let mut research_level: i32;
                     // Get pod and queue from db
-                    let pod = pods.filter(user_id.eq(current_user.id))
+                    let pod = pods_dsl::pods
+                        .filter(pods_dsl::user_id.eq(current_user.id))
                         .first::<Pod>(&*db)
                         .unwrap();
 
@@ -108,8 +114,8 @@ pub fn add_research_to_queue(queue_entry: Result<JSON<QueueAddResearchSerializer
                         }
                     }
 
-                    let queue = queues
-                        .filter(pod_id.eq(pod.id))
+                    let queue = queues_dsl::queues
+                        .filter(queues_dsl::pod_id.eq(pod.id))
                         .first::<Queue>(&*db)
                         .unwrap();
 
@@ -122,7 +128,24 @@ pub fn add_research_to_queue(queue_entry: Result<JSON<QueueAddResearchSerializer
                         .get_result(&*db)
                         .unwrap_or(0);
 
+                    let pod_resources = resource_dsl::resources
+                        .filter(resource_dsl::pod_id.eq(pod.id))
+                        .get_results(&*db)
+                        .expect("Failed to get user resources.");
+
                     research_level += existing_entries as i32;
+
+                    let all_levels = &RESEARCH_LIST.get(&research_type)
+                        .as_ref().expect("No research in yml for this type.")
+                        .level;
+
+                    if !(all_levels.len() <= research_level as usize) {
+                        return bad_request().message("Already at max level.");
+                    }
+                    let costs = &all_levels[research_level as usize].resources;
+                    if costs.is_some() && !check_resources(costs, pod_resources, &db) {
+                        return bad_request().message("Insufficient resources.");
+                    }
 
                     // Create a new queue entry with the given research type.
                     let new_entry_model = NewQueueEntry {
@@ -158,12 +181,13 @@ pub fn add_module_to_queue(queue_entry: Result<JSON<QueueAddModuleSerializer>, S
         Err(error) => return bad_request().message(format!("{}", error).as_str()),
         Ok(entry) => {
             // Get pod and queue from db
-            let pod = pods.filter(user_id.eq(current_user.id))
+            let pod = pods_dsl::pods
+                .filter(pods_dsl::user_id.eq(current_user.id))
                 .first::<Pod>(&*db)
                 .unwrap();
 
-            let queue = queues
-                .filter(pod_id.eq(pod.id))
+            let queue = queues_dsl::queues
+                .filter(queues_dsl::pod_id.eq(pod.id))
                 .first::<Queue>(&*db)
                 .unwrap();
 

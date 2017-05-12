@@ -26,7 +26,7 @@ impl HasDependencies for Research {
 #[derive(Debug, PartialEq, Deserialize)]
 pub struct Level {
     pub level: i32,
-    pub resources: Vec<(ResourceTypes, i64)>,
+    pub resources: Option<Vec<(ResourceTypes, i64)>>,
 }
 
 pub fn build_graph(research_list: &HashMap<ResearchTypes, Research>) -> Graph<ResearchTypes, i32> {

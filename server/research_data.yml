@@ -4,8 +4,7 @@ PlasmaGenerator:
   level:
     - level: 1
       resources:
-          - ["Water", 200]
-
+          - ["Iron", 200]
 
 EnergyWeapons:
   name: "EnergyWeapons"
