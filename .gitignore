@@ -4,3 +4,4 @@ Cargo.lock
 elm-stuff
 static
 node_modules
+*.bk

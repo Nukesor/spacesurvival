@@ -47,8 +47,7 @@ pub fn settings(pod_settings: Result<JSON<PodSettingsSerializer>, SerdeError>,
 
             // Create changed pod model and push it to the DB
             let changed_pod = ChangedPod { name: settings.name.clone() };
-            let pod = diesel::update(
-                    pods_dsl::pods.filter(pods_dsl::id.eq(current_pod.id)))
+            let pod = diesel::update(pods_dsl::pods.filter(pods_dsl::id.eq(current_pod.id)))
                 .set(&changed_pod)
                 .get_result::<Pod>(&*db)
                 .expect("Failed to update pod.");
@@ -135,9 +134,11 @@ pub fn add_research_to_queue(queue_entry: Result<JSON<QueueAddResearchSerializer
 
                     research_level += existing_entries as i32;
 
-                    let all_levels = &RESEARCH_LIST.get(&research_type)
-                        .as_ref().expect("No research in yml for this type.")
-                        .level;
+                    let all_levels = &RESEARCH_LIST
+                                          .get(&research_type)
+                                          .as_ref()
+                                          .expect("No research in yml for this type.")
+                                          .level;
 
                     if !(all_levels.len() <= research_level as usize) {
                         return bad_request().message("Already at max level.");

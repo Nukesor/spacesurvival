@@ -84,9 +84,8 @@ pub fn update_resource(resource: &Resource, amount: i64, subtract: bool, db: &DB
         max_amount: None,
     };
 
-    diesel::update(resources_dsl::resources.filter(resources_dsl::name
-                                                                      .eq(resource.name.clone())))
-            .set(&updated_resource)
-            .get_result::<Resource>(&**db)
-            .expect("Failed to update resource.");
+    diesel::update(resources_dsl::resources.filter(resources_dsl::name.eq(resource.name.clone())))
+        .set(&updated_resource)
+        .get_result::<Resource>(&**db)
+        .expect("Failed to update resource.");
 }
