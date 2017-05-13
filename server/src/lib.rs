@@ -24,8 +24,6 @@ extern crate validator_derive;
 extern crate diesel;
 #[macro_use]
 extern crate diesel_codegen;
-#[macro_use]
-extern crate lazy_static;
 
 mod schema;
 mod validation;

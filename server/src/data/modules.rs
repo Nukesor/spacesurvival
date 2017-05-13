@@ -1,11 +1,10 @@
-use std::env;
-use std::fs::File;
-use serde_yaml::from_reader;
+use serde_yaml::from_slice;
 use std::collections::HashMap;
 
 use data::types::*;
 use data::components::*;
 
+static MODULE_LIST: &'static [u8] = include_bytes!("../../module_data.yml");
 
 #[derive(Debug, PartialEq, Deserialize)]
 pub struct Module {
@@ -24,26 +23,10 @@ pub struct Level {
 }
 
 
-lazy_static! {
-    pub static ref MODULE_LIST: HashMap<ModuleTypes, Module> = {
-        let p = env::current_dir().unwrap();
-        println!("The current directory is {}", p.display());
-        let file = File::open("./server/module_data.yml");
-        match file {
-            Ok(v) => {
-                let result = from_reader::<File, HashMap<ModuleTypes, Module>>(v);
-                match result {
-                    Ok(v) => {
-                        return v;
-                    },
-                    Err(e) => {
-                        panic!("{:?}", e);
-                    },
-                }
-            },
-            Err(_) => {
-                panic!("Panic mal. Module YAML nicht gefunden!");
-            },
-        }
-    };
+pub fn get_module_list() -> HashMap<ModuleTypes, Module> {
+    let result = from_slice::<HashMap<ModuleTypes, Module>>(MODULE_LIST);
+    match result {
+        Ok(v) => v,
+        Err(e) => panic!("{:?}", e),
+    }
 }

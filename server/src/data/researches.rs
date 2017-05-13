@@ -65,11 +65,7 @@ pub fn build_research_graph() -> Graph<ResearchTypes, i32> {
 pub fn get_research_list() -> HashMap<ResearchTypes, Research> {
     let result = from_slice::<HashMap<ResearchTypes, Research>>(RESEARCH_LIST);
     match result {
-        Ok(v) => {
-            return v;
-        },
-        Err(e) => {
-            panic!("{:?}", e);
-        },
+        Ok(v) => v,
+        Err(e) => panic!("{:?}", e),
     }
 }
