@@ -8,12 +8,13 @@ use models::resource::{Resource, UpdatedResource};
 
 use schema::resources::dsl as resources_dsl;
 
+
 /// This function checks if there are enough resources for a given set
 /// of costs from a research or model entry.  
-/// It also subtracts and updates the resources the specified value from the database.  
+/// It also subtracts and updates the resources the specified value from the database.
 ///
 /// The first parameter is a vector of resources which represent the costs.  
-/// The second parameter is a vector of all `Resource` database models from a pod or a base.
+/// The second parameter is a vector of all `Resource` database models from a pod or a base.  
 pub fn check_resources(costs: &Option<Vec<(ResourceTypes, i64)>>,
                        resources: Vec<Resource>,
                        db: &DB)
@@ -42,15 +43,20 @@ pub fn check_resources(costs: &Option<Vec<(ResourceTypes, i64)>>,
                     }
                 }
             }
-            update_resources(resources, costs, true, db);
+            update_resources(costs, resources, true, db);
             return true;
         }
     }
 }
 
 
-pub fn update_resources(resources: Vec<Resource>,
-                        costs: &Vec<(ResourceTypes, i64)>,
+/// This function updates the resources the specified value from the database.  
+/// Depending on the third parameter the costs will either be added or subtracted.
+///
+/// The first parameter is a vector of resources which represent the costs.  
+/// The second parameter is a vector of all `Resource` database models from a pod or a base.  
+pub fn update_resources(costs: &Vec<(ResourceTypes, i64)>,
+                        resources: Vec<Resource>,
                         subtract: bool,
                         db: &DB) {
 
@@ -72,6 +78,12 @@ pub fn update_resources(resources: Vec<Resource>,
     }
 }
 
+
+/// This function updates a resource in the database.  
+/// Depending on the third parameter the value will either be added or subtracted.
+///
+/// The first parameter is the queried database model.  
+/// The second parameter is the amount to be added or subtracted.  
 pub fn update_resource(resource: &Resource, amount: i64, subtract: bool, db: &DB) {
     let mut new_amount: i64;
     if subtract {
