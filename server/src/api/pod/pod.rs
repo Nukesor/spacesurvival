@@ -1,4 +1,3 @@
-use std::ops::Deref;
 
 use diesel;
 use diesel::prelude::*;
@@ -23,8 +22,8 @@ use models::research::Research;
 
 use data::helper::{get_research_dependency_strings, dependencies_fulfilled};
 use data::types::{ResearchTypes, ModuleTypes};
-use data::researches::RESEARCH_LIST;
 use data::resources::check_resources;
+use data::researches::get_research_list;
 
 use responses::{APIResponse, bad_request, created, ok};
 
@@ -80,6 +79,7 @@ pub fn add_research_to_queue(queue_entry: Result<JSON<QueueAddResearchSerializer
                 Ok(research_type) => {
                     let dependency_strings = get_research_dependency_strings(&research_type);
                     let mut research_level: i32;
+                    let research_list = get_research_list();
                     // Get pod and queue from db
                     let pod = pods_dsl::pods
                         .filter(pods_dsl::user_id.eq(current_user.id))
@@ -105,7 +105,7 @@ pub fn add_research_to_queue(queue_entry: Result<JSON<QueueAddResearchSerializer
 
                             let fulfilled = dependencies_fulfilled(&research_type,
                                                                    dependencies,
-                                                                   RESEARCH_LIST.deref());
+                                                                   &research_list);
                             if !fulfilled {
                                 return bad_request().message("Dependencies not fulfilled.");
                             }
@@ -134,8 +134,7 @@ pub fn add_research_to_queue(queue_entry: Result<JSON<QueueAddResearchSerializer
 
                     research_level += existing_entries as i32;
 
-                    let all_levels = &RESEARCH_LIST
-                                          .get(&research_type)
+                    let all_levels = &research_list.get(&research_type)
                                           .as_ref()
                                           .expect("No research in yml for this type.")
                                           .level;

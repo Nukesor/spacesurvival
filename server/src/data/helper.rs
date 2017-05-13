@@ -4,7 +4,7 @@ use std::collections::HashMap;
 use diesel::result::Error;
 
 use data::types::*;
-use data::researches::RESEARCH_LIST;
+use data::researches::get_research_list;
 
 use models::research::Research;
 
@@ -14,7 +14,7 @@ pub trait HasDependencies {
 }
 
 pub fn get_research_dependency_strings(research_type: &ResearchTypes) -> Vec<String> {
-    let ref research_list = RESEARCH_LIST;
+    let ref research_list = get_research_list();
     let mut dependency_strings = Vec::new();
     let ref dependency_list = research_list
         .get(research_type)

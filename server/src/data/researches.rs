@@ -1,13 +1,14 @@
-use std::fs::File;
 use petgraph::Graph;
 use petgraph::graph::NodeIndex;
 use petgraph::algo::is_cyclic_directed;
 
-use serde_yaml::from_reader;
+use serde_yaml::from_slice;
 use std::collections::HashMap;
 
 use data::types::*;
 use data::helper::HasDependencies;
+
+static RESEARCH_LIST: &'static [u8] = include_bytes!("../../research_data.yml");
 
 
 #[derive(Debug, PartialEq, Deserialize)]
@@ -29,10 +30,11 @@ pub struct Level {
     pub resources: Option<Vec<(ResourceTypes, i64)>>,
 }
 
-pub fn build_graph(research_list: &HashMap<ResearchTypes, Research>) -> Graph<ResearchTypes, i32> {
+pub fn build_research_graph() -> Graph<ResearchTypes, i32> {
+    let research_list = get_research_list();
     let mut dependency_graph = Graph::<ResearchTypes, i32>::new();
     let mut nodes = HashMap::<ResearchTypes, NodeIndex>::new();
-    for (research_type, _) in research_list {
+    for (research_type, _) in &research_list {
         let dependency = dependency_graph.add_node(research_type.clone());
         nodes.insert(research_type.clone(), dependency);
     }
@@ -59,24 +61,15 @@ pub fn build_graph(research_list: &HashMap<ResearchTypes, Research>) -> Graph<Re
     dependency_graph
 }
 
-lazy_static! {
-    pub static ref RESEARCH_LIST: HashMap<ResearchTypes, Research> = {
-        let file = File::open("./server/research_data.yml");
-        match file {
-            Ok(v) => {
-                let result = from_reader::<File, HashMap<ResearchTypes, Research>>(v);
-                match result {
-                    Ok(v) => {
-                        return v;
-                    },
-                    Err(e) => {
-                        panic!("{:?}", e);
-                    },
-                }
-            },
-            Err(_) => {
-                panic!("Panic mal. Research YAML nicht gefunden!");
-            },
-        }
-    };
+
+pub fn get_research_list() -> HashMap<ResearchTypes, Research> {
+    let result = from_slice::<HashMap<ResearchTypes, Research>>(RESEARCH_LIST);
+    match result {
+        Ok(v) => {
+            return v;
+        },
+        Err(e) => {
+            panic!("{:?}", e);
+        },
+    }
 }

@@ -37,13 +37,12 @@ mod helpers;
 mod handlers;
 mod statics;
 
-use data::researches::build_graph;
+use data::researches::build_research_graph;
 
 
 pub fn rocket_factory() -> rocket::Rocket {
-    // Read the research list from yml and check for cycles.
-    let ref research_list = data::researches::RESEARCH_LIST;
-    build_graph(research_list);
+    // Check research graph for cycles.
+    build_research_graph();
 
     rocket::ignite()
         .manage(helpers::db::init_db_pool())
