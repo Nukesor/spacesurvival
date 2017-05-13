@@ -11,10 +11,6 @@ name = "spacesurvival"
 path = "server/src/lib.rs"
 name = "spacelib"
 
-[[test]]
-path = "server/tests/lib.rs"
-name = "spacetest"
-
 [dependencies]
 uuid = { version = "0.4", features = ["use_std", "serde", "v4", "rustc-serialize"] }
 chrono = { version = "0.3", features = ["serde"] }

@@ -25,15 +25,15 @@ extern crate diesel;
 #[macro_use]
 extern crate diesel_codegen;
 
-mod schema;
-mod validation;
-mod models;
-mod data;
-mod responses;
-mod api;
-mod helpers;
-mod handlers;
-mod statics;
+pub mod schema;
+pub mod validation;
+pub mod models;
+pub mod data;
+pub mod responses;
+pub mod api;
+pub mod helpers;
+pub mod handlers;
+pub mod statics;
 
 use data::researches::build_research_graph;
 

@@ -11,6 +11,8 @@ use data::helper::HasDependencies;
 static RESEARCH_LIST: &'static [u8] = include_bytes!("../../research_data.yml");
 
 
+/// This struct is only for deserializing the included `research_data.yml`.  
+/// It shouldn't be used in any other context!
 #[derive(Debug, PartialEq, Deserialize)]
 pub struct Research {
     pub name: ResearchTypes,
@@ -24,12 +26,22 @@ impl HasDependencies for Research {
     }
 }
 
+/// This struct is only for deserializing the included `research_data.yml`.  
+/// It shouldn't be used in any other context!
 #[derive(Debug, PartialEq, Deserialize)]
 pub struct Level {
     pub level: i32,
     pub resources: Option<Vec<(ResourceTypes, i64)>>,
 }
 
+/// This function builds a petgraph graph from the statically included research_data.yml.  
+/// After checking if petgraph is able to create a graph from it, a dependency circle check
+/// will be executed.
+///
+/// # Panics
+/// - If an unknown ResearchType is detected during graph creation.
+/// - If a dependency circle is detected.
+/// - If serde-yml tries to parse invalid yml.
 pub fn build_research_graph() -> Graph<ResearchTypes, i32> {
     let research_list = get_research_list();
     let mut dependency_graph = Graph::<ResearchTypes, i32>::new();
@@ -61,7 +73,15 @@ pub fn build_research_graph() -> Graph<ResearchTypes, i32> {
     dependency_graph
 }
 
-
+/// This function builds builds a HashMap from `research_data.yml`.  
+/// It contains: All researches, their levels, costs per level and research dependencies.  
+///
+/// ```
+/// static RESEARCH_LIST: &'static [u8] = include_bytes!("../../research_data.yml");
+/// ```
+///
+/// # Panics
+/// - If serde-yml tries to parse invalid yml.
 pub fn get_research_list() -> HashMap<ResearchTypes, Research> {
     let result = from_slice::<HashMap<ResearchTypes, Research>>(RESEARCH_LIST);
     match result {

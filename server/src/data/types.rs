@@ -1,5 +1,19 @@
 use std::fmt;
 
+/// Use this macro to generate rust enums which implement the `fmt::Display` trait
+/// and another function `from_str` which gets the correct Type from the enum by it's
+/// string.  
+/// This is achieved by a generic match 
+/// ```
+/// pub fn from_str(name: &str) -> Result<$enumname, ()> {
+///     match name {
+///         $(
+///             stringify!($enumvals) => Ok($enumname::$enumvals),
+///         )*
+///         _ => Err(()),
+///     }
+/// }
+/// ```
 #[macro_export]
 macro_rules! enum_impl {
     ($enumname: ident {
@@ -30,17 +44,26 @@ macro_rules! enum_impl {
     }
 }
 
+/// This enum contains all types of valid researches.
+/// It's used to check against the names in `research_data.yml`, to validate types in requests
+/// and to guarantee database string integrity.
 enum_impl!{ResearchTypes {
     PlasmaGenerator,
     EnergyWeapons,
     MiningEfficiency,
 }}
 
+/// This enum contains all types of valid resources.
+/// It's used to check against the costs in `research_data.yml` and `module_data.yml`,
+/// to validate types in requests and to guarantee database string integrity.
 enum_impl!{ResourceTypes {
     Iron,
     Water,
 }}
 
+/// This enum contains all types of valid modules.
+/// It's used to check against the names in `module_data.yml`, to validate types in requests
+/// and to guarantee database string integrity.
 enum_impl!{ModuleTypes {
     Turret,
     Generator,
