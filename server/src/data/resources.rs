@@ -8,9 +8,12 @@ use models::resource::{Resource, UpdatedResource};
 
 use schema::resources::dsl as resources_dsl;
 
-/*
-Generic function which accepts an Enum as type identifier.
-*/
+/// This function checks if there are enough resources for a given set
+/// of costs from a research or model entry.  
+/// It also subtracts and updates the resources the specified value from the database.  
+///
+/// The first parameter is a vector of resources which represent the costs.  
+/// The second parameter is a vector of all `Resource` database models from a pod or a base.
 pub fn check_resources(costs: &Option<Vec<(ResourceTypes, i64)>>,
                        resources: Vec<Resource>,
                        db: &DB)
@@ -79,12 +82,13 @@ pub fn update_resource(resource: &Resource, amount: i64, subtract: bool, db: &DB
             new_amount = resource.max_amount;
         }
     }
+
     let updated_resource = UpdatedResource {
         amount: Some(new_amount),
         max_amount: None,
     };
 
-    diesel::update(resources_dsl::resources.filter(resources_dsl::name.eq(resource.name.clone())))
+    diesel::update(resources_dsl::resources.filter(resources_dsl::id.eq(resource.id)))
         .set(&updated_resource)
         .get_result::<Resource>(&**db)
         .expect("Failed to update resource.");
