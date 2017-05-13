@@ -3,14 +3,22 @@ use std::collections::HashMap;
 
 use data::types::*;
 use data::components::*;
+use data::helper::HasDependencies;
 
 static MODULE_LIST: &'static [u8] = include_bytes!("../../module_data.yml");
 
 #[derive(Debug, PartialEq, Deserialize)]
 pub struct Module {
     pub name: ModuleTypes,
-    pub dependencies: Option<Vec<ResearchTypes>>,
+    pub dependencies: Option<Vec<(ResearchTypes, i32)>>,
     pub level: Vec<Level>,
+}
+
+
+impl HasDependencies for Module {
+    fn get_dependencies(&self) -> Option<&Vec<(ResearchTypes, i32)>> {
+        self.dependencies.as_ref()
+    }
 }
 
 
