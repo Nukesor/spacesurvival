@@ -9,6 +9,7 @@ use schema::resources;
 use schema::resources::dsl as resources_dsl;
 
 
+/// A model for querying and serializing data from the `resources` table.
 #[derive(Debug, Serialize, Deserialize, Identifiable, Queryable, Associations)]
 #[belongs_to(pods)]
 #[belongs_to(bases)]
@@ -123,6 +124,7 @@ impl Resource {
 }
 
 
+/// A model to create a new database instance of in the resource table.
 #[derive(Insertable)]
 #[table_name="resources"]
 pub struct NewResource {
@@ -133,6 +135,7 @@ pub struct NewResource {
 }
 
 
+/// Changeset for Resources.
 #[derive(AsChangeset)]
 #[table_name="resources"]
 pub struct UpdatedResource {

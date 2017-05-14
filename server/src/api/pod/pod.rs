@@ -1,4 +1,3 @@
-
 use diesel;
 use diesel::prelude::*;
 use rocket_contrib::{JSON, SerdeError};

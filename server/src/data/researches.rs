@@ -13,10 +13,11 @@ static RESEARCH_LIST: &'static [u8] = include_bytes!("../../research_data.yml");
 
 /// This struct is only for deserializing the included `research_data.yml`.  
 /// It shouldn't be used in any other context!
-#[derive(Debug, PartialEq, Deserialize)]
+#[derive(Debug, PartialEq, Deserialize, Serialize)]
 pub struct Research {
     pub name: ResearchTypes,
     pub dependencies: Option<Vec<(ResearchTypes, i32)>>,
+    pub current_level: Option<i32>,
     pub level: Vec<Level>,
 }
 
@@ -28,7 +29,7 @@ impl HasDependencies for Research {
 
 /// This struct is only for deserializing the included `research_data.yml`.  
 /// It shouldn't be used in any other context!
-#[derive(Debug, PartialEq, Deserialize)]
+#[derive(Debug, PartialEq, Deserialize, Serialize)]
 pub struct Level {
     pub level: i32,
     pub resources: Option<Vec<(ResourceTypes, i64)>>,
