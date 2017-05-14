@@ -1,9 +1,10 @@
 use std::fmt;
 
-/// Use this macro to generate rust enums which implement the `fmt::Display` trait
-/// and another function `from_str` which gets the correct Type from the enum by it's
-/// string.  
-/// This is achieved by a generic match 
+/// Use this macro to generate rust enums which implement:  
+/// - The `fmt::Display` trait  
+/// - The function `from_str` which gets the correct Type from the enum by it's
+///    string. This is achieved by a generic match:
+///
 /// ```
 /// pub fn from_str(name: &str) -> Result<$enumname, ()> {
 ///     match name {

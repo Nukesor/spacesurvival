@@ -3,7 +3,7 @@ use std::collections::HashMap;
 
 use data::types::*;
 use data::components::*;
-use data::helper::HasDependencies;
+use data::HasDependencies;
 
 static MODULE_LIST: &'static [u8] = include_bytes!("../../module_data.yml");
 

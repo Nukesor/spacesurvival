@@ -6,7 +6,7 @@ use serde_yaml::from_slice;
 use std::collections::HashMap;
 
 use data::types::*;
-use data::helper::HasDependencies;
+use data::HasDependencies;
 
 static RESEARCH_LIST: &'static [u8] = include_bytes!("../../research_data.yml");
 

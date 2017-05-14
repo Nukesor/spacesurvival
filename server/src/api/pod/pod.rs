@@ -19,10 +19,10 @@ use models::pod::{Pod, ChangedPod};
 use models::user::User;
 use models::queue::{QueueEntry, Queue, NewQueueEntry};
 use models::research::Research;
+use models::resource::Resource;
 
 use data::helper::{get_research_dependency_strings, dependencies_fulfilled};
 use data::types::{ResearchTypes, ModuleTypes};
-use data::resources::check_resources;
 use data::researches::get_research_list;
 
 use responses::{APIResponse, bad_request, created, ok};
@@ -143,7 +143,7 @@ pub fn add_research_to_queue(queue_entry: Result<JSON<QueueAddResearchSerializer
                         return bad_request().message("Already at max level.");
                     }
                     let costs = &all_levels[research_level as usize].resources;
-                    if costs.is_some() && !check_resources(costs, pod_resources, &db) {
+                    if costs.is_some() && !Resource::check_resources(costs, pod_resources, &db) {
                         return bad_request().message("Insufficient resources.");
                     }
 

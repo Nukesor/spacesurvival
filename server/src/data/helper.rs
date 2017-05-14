@@ -4,16 +4,10 @@ use std::collections::HashMap;
 use diesel::result::Error;
 
 use data::types::*;
+use data::HasDependencies;
 use data::researches::get_research_list;
 
 use models::research::Research;
-
-
-/// A trait we need to build generic functions for module and research dependecy checking.  
-/// It ensures that the inserted HashMap contains elements with a vector of researches.
-pub trait HasDependencies {
-    fn get_dependencies(&self) -> Option<&Vec<(ResearchTypes, i32)>>;
-}
 
 
 /// A helper function returns all research dependencies of a module or research as a `Vec<String>`.  
@@ -38,8 +32,9 @@ pub fn get_research_dependency_strings(research_type: &ResearchTypes) -> Vec<Str
 }
 
 /// A generic function which checks if all dependencies for a module or research are fulfilled.  
+/// 
 /// The first parameter is the type of the module or research that should be checked.  
-/// The second parameter is a list of existing researches (The database model of `Research`).  
+/// The second parameter is a list of existing `Research` (The database model of `researches`).  
 /// The third parameter accepts the respective parsed `MODULE_LIST` or a `RESEARCH_LIST`.  
 pub fn dependencies_fulfilled<T: Eq + Hash, M: HasDependencies>(
     reliant_type: &T,
