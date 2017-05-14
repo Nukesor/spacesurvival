@@ -3,7 +3,9 @@ use std::fmt;
 /// Use this macro to generate rust enums which implement:  
 /// - The `fmt::Display` trait  
 /// - The function `from_str` which gets the correct Type from the enum by it's
-///    string. This is achieved by a generic match:
+///    name from a `str`.
+/// - The function `from_string` which gets the correct Type from the enum by it's
+///    name from a `String`.
 ///
 /// ```
 /// pub fn from_str(name: &str) -> Result<$enumname, ()> {
@@ -34,6 +36,16 @@ macro_rules! enum_impl {
         impl $enumname {
             #[allow(dead_code)]
             pub fn from_str(name: &str) -> Result<$enumname, ()> {
+                match name {
+                    $(
+                        stringify!($enumvals) => Ok($enumname::$enumvals),
+                    )*
+                    _ => Err(()),
+                }
+            }
+            #[allow(dead_code)]
+            pub fn from_string(string_name: &String) -> Result<$enumname, ()> {
+                let name = string_name.as_str();
                 match name {
                     $(
                         stringify!($enumvals) => Ok($enumname::$enumvals),

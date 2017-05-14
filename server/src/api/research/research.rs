@@ -36,7 +36,7 @@ pub fn pod_research(current_user: User, db: DB) -> APIResponse {
     if pod_result.is_ok() {
         let researches = pod_result.unwrap();
             for research in researches {
-                let type_result = ResearchTypes::from_str(research.name.as_str());
+                let type_result = ResearchTypes::from_string(&research.name);
                 if type_result.is_err() {
                     return bad_request().message(format!("Found research {}, but no matching ResearchType!", research.name).as_str());
                 }

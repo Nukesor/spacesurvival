@@ -67,7 +67,7 @@ pub fn add_research_to_queue(queue_entry: Result<JSON<QueueAddResearchSerializer
         Err(error) => return bad_request().message(format!("{}", error).as_str()),
         Ok(entry) => {
             // Check if the given research name maps to a research type.
-            let result = ResearchTypes::from_str(entry.research_name.as_str());
+            let result = ResearchTypes::from_string(&entry.research_name);
             match result {
                 // Early return if we don't know this research name
                 Err(_) => {
@@ -191,7 +191,7 @@ pub fn add_module_to_queue(queue_entry: Result<JSON<QueueAddModuleSerializer>, S
                 .unwrap();
 
             // Check if the given module name maps to a module type.
-            if ModuleTypes::from_str(entry.module_name.as_str()).is_err() {
+            if ModuleTypes::from_string(&entry.module_name).is_err() {
                 return bad_request().message(format!("No such module type `{}`",
                                                      entry.module_name)
                                                      .as_str());
