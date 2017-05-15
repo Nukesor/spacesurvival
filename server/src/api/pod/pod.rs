@@ -133,7 +133,8 @@ pub fn add_research_to_queue(queue_entry: Result<JSON<QueueAddResearchSerializer
 
                     research_level += existing_entries as i32;
 
-                    let all_levels = &research_list.get(&research_type)
+                    let all_levels = &research_list
+                                          .get(&research_type)
                                           .as_ref()
                                           .expect("No research in yml for this type.")
                                           .level;

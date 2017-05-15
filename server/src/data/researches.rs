@@ -11,7 +11,8 @@ use data::HasDependencies;
 static RESEARCH_LIST: &'static [u8] = include_bytes!("../../research_data.yml");
 
 
-/// This struct is only for deserializing the included `research_data.yml`.  
+/// This struct is only for deserializing the included `research_data.yml`.
+///
 /// It shouldn't be used in any other context!
 #[derive(Debug, PartialEq, Deserialize, Serialize)]
 pub struct Research {
@@ -27,7 +28,8 @@ impl HasDependencies for Research {
     }
 }
 
-/// This struct is only for deserializing the included `research_data.yml`.  
+/// This struct is only for deserializing the included `research_data.yml`.
+///
 /// It shouldn't be used in any other context!
 #[derive(Debug, PartialEq, Deserialize, Serialize)]
 pub struct Level {
@@ -35,7 +37,8 @@ pub struct Level {
     pub resources: Option<Vec<(ResourceTypes, i64)>>,
 }
 
-/// This function builds a petgraph graph from the statically included research_data.yml.  
+/// This function builds a petgraph graph from the statically included research_data.yml.
+///
 /// After checking if petgraph is able to create a graph from it, a dependency circle check
 /// will be executed.
 ///
@@ -74,8 +77,8 @@ pub fn build_research_graph() -> Graph<ResearchTypes, i32> {
     dependency_graph
 }
 
-/// This function builds builds a HashMap from `research_data.yml`.  
-/// It contains: All researches, their levels, costs per level and research dependencies.  
+/// This function builds builds a HashMap from `research_data.yml`.
+/// It contains: All researches, their levels, costs per level and research dependencies.
 ///
 /// ```
 /// static RESEARCH_LIST: &'static [u8] = include_bytes!("../../research_data.yml");

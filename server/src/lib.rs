@@ -70,7 +70,6 @@ pub fn rocket_factory() -> rocket::Rocket {
                routes![
                api::research::research::pod_research,
         ])
-
         .catch(errors![handlers::bad_request_handler,
                        handlers::unauthorized_handler,
                        handlers::forbidden_handler,

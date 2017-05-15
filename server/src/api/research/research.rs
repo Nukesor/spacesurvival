@@ -16,7 +16,7 @@ use responses::{APIResponse, bad_request, ok};
 
 /// The user needs to be logged in to access this route!
 ///
-/// This route returns the list of all researches and their levels/costs, 
+/// This route returns the list of all researches and their levels/costs,
 /// as well as the current level of the research for the pod of the current user.
 #[get("/pod")]
 pub fn pod_research(current_user: User, db: DB) -> APIResponse {
@@ -35,19 +35,22 @@ pub fn pod_research(current_user: User, db: DB) -> APIResponse {
 
     if pod_result.is_ok() {
         let researches = pod_result.unwrap();
-            for research in researches {
-                let type_result = ResearchTypes::from_string(&research.name);
-                if type_result.is_err() {
-                    return bad_request().message(format!("Found research {}, but no matching ResearchType!", research.name).as_str());
-                }
-                let research_type = type_result.unwrap();
-                let list_result = research_list.get_mut(&research_type);
-                if list_result.is_none() {
-                    return bad_request().message(format!("Found type {}, but no matching entry in our research list!", research_type).as_str());
-                }
+        for research in researches {
+            let type_result = ResearchTypes::from_string(&research.name);
+            if type_result.is_err() {
+                return bad_request()
+                           .message(format!("Found research {}, but no matching ResearchType!",
+                                            research.name)
+                                            .as_str());
+            }
+            let research_type = type_result.unwrap();
+            let list_result = research_list.get_mut(&research_type);
+            if list_result.is_none() {
+                return bad_request().message(format!("Found type {}, but no matching entry in our research list!", research_type).as_str());
+            }
 
-                let mut list_entry = list_result.unwrap();
-                list_entry.current_level = Some(research.level);
+            let mut list_entry = list_result.unwrap();
+            list_entry.current_level = Some(research.level);
         }
     }
 

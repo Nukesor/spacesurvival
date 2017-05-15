@@ -26,11 +26,11 @@ pub struct Resource {
 
 impl Resource {
     /// This function checks if there are enough resources for a given set
-    /// of costs from a research or model entry.  
+    /// of costs from a research or model entry.
     /// It also subtracts and updates the resources the specified value from the database.
     ///
-    /// The first parameter is a vector of resources which represent the costs.  
-    /// The second parameter is a vector of all `Resource` database models from a pod or a base.  
+    /// - The first parameter is a vector of resources which represent the costs.
+    /// - The second parameter is a vector of all `Resource` database models from a pod or a base.
     pub fn check_resources(costs: &Option<Vec<(ResourceTypes, i64)>>,
                            resources: Vec<Resource>,
                            db: &DB)
@@ -66,11 +66,12 @@ impl Resource {
     }
 
 
-    /// This function updates the resources the specified value from the database.  
+    /// This function updates the resources the specified value from the database.
     /// Depending on the third parameter the costs will either be added or subtracted.
     ///
-    /// The first parameter is a vector of resources which represent the costs.  
-    /// The second parameter is a vector of all `Resource` database models from a pod or a base.  
+    /// - The first parameter is a vector of resources which represent the costs.
+    /// - The second parameter is a vector of all `Resource` database models from a pod or a base.
+    /// - The third parameter decides if the amount is to be added or subtracted.
     pub fn update_resources(costs: &Vec<(ResourceTypes, i64)>,
                             resources: Vec<Resource>,
                             subtract: bool,
@@ -95,11 +96,10 @@ impl Resource {
     }
 
 
-    /// This function updates a resource in the database.  
-    /// Depending on the third parameter the value will either be added or subtracted.
+    /// This function updates a resource in the database.
     ///
-    /// The first parameter is the queried database model.  
-    /// The second parameter is the amount to be added or subtracted.  
+    /// - The first parameter is the amount to be added or subtracted.
+    /// - The second parameter decides if the amount is to be added or subtracted.
     pub fn update_resource(&self, amount: i64, subtract: bool, db: &DB) {
         let mut new_amount: i64;
         if subtract {

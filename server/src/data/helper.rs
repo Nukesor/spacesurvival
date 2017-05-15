@@ -10,7 +10,8 @@ use data::researches::get_research_list;
 use models::research::Research;
 
 
-/// A helper function returns all research dependencies of a module or research as a `Vec<String>`.  
+/// A helper function returns all research dependencies of a module or research as a `Vec<String>`.
+///
 /// This is helpful for querying researches by their name.
 pub fn get_research_dependency_strings(research_type: &ResearchTypes) -> Vec<String> {
     let ref research_list = get_research_list();
@@ -31,15 +32,15 @@ pub fn get_research_dependency_strings(research_type: &ResearchTypes) -> Vec<Str
     dependency_strings
 }
 
-/// A generic function which checks if all dependencies for a module or research are fulfilled.  
-/// 
-/// The first parameter is the type of the module or research that should be checked.  
-/// The second parameter is a list of existing `Research` (The database model of `researches`).  
-/// The third parameter accepts the respective parsed `MODULE_LIST` or a `RESEARCH_LIST`.  
+/// A generic function which checks if all dependencies for a module or research are fulfilled.
+///
+/// - The first parameter is the type of the module or research that should be checked.
+/// - The second parameter is a list of existing `Research` (The database model of `researches`).
+/// - The third parameter accepts the respective parsed `MODULE_LIST` or a `RESEARCH_LIST`.
 pub fn dependencies_fulfilled<T: Eq + Hash, M: HasDependencies>(
     reliant_type: &T,
     fulfilled_result: Result<Vec<Research>, Error>,
-    list: &HashMap<T, M>) -> bool{
+list: &HashMap<T, M>) -> bool{
     // Get all researches required for the specified type.
     let requirement_list = list.get(reliant_type).as_ref().unwrap().get_dependencies();
     match requirement_list {

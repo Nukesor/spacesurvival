@@ -40,7 +40,8 @@ fn service_unavailable_handler() -> APIResponse {
 
 
 /// This `FromRequest` implementation for the `User` database model tries to get
-/// the current user from the request `OAUTH` token.  
+/// the current user from the request `OAUTH` token.
+///
 /// If there is no active session for this token, we return a `401 Unauthorized`.
 impl<'a, 'r> FromRequest<'a, 'r> for User {
     type Error = ();

@@ -32,8 +32,9 @@ pub struct Level {
     pub generates_energy: Option<GeneratesEnergy>,
 }
 
-/// This function builds builds a HashMap from `module_data.yml`.  
-/// It contains: All modules, their levels, costs per level and research dependencies.  
+/// This function builds builds a HashMap from `module_data.yml`.
+///
+/// It contains: All modules, their levels, costs per level and research dependencies.
 ///
 /// ```
 /// static MODULE_LIST: &'static [u8] = include_bytes!("../../module_data.yml");

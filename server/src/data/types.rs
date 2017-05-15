@@ -1,7 +1,8 @@
 use std::fmt;
 
-/// Use this macro to generate rust enums which implement:  
-/// - The `fmt::Display` trait  
+/// Use this macro to generate rust enums which implement:
+///
+/// - The `fmt::Display` trait
 /// - The function `from_str` which gets the correct Type from the enum by it's
 ///    name from a `str`.
 /// - The function `from_string` which gets the correct Type from the enum by it's

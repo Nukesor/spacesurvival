@@ -9,7 +9,7 @@ use std::env;
 
 pub type Pool = r2d2::Pool<ConnectionManager<PgConnection>>;
 
-/// Generate a new r2d2 Pool for connection management in rocket sessions.  
+/// Generate a new r2d2 Pool for connection management in rocket sessions.
 /// This object will be handed to the rocket `.manage()` managed state handler.
 pub fn init_db_pool() -> Pool {
     let config = r2d2::Config::default();
@@ -19,7 +19,7 @@ pub fn init_db_pool() -> Pool {
 }
 
 
-/// A helper struct to pass the `PooledConnection` from r2d2 to the request function.  
+/// A helper struct to pass the `PooledConnection` from r2d2 to the request function.
 /// It implements the `Deref` trait to easily get the `PgConnection` by using `*`
 pub struct DB(r2d2::PooledConnection<ConnectionManager<PgConnection>>);
 
@@ -32,9 +32,9 @@ impl Deref for DB {
 }
 
 
-/// The implementation of `FromRequest` for `DB`.  
+/// The implementation of `FromRequest` for `DB`.
 /// This function fetches the pool from the managed state of rust and gets a new
-/// `PgConnection` from the `ConnectionManager`.  
+/// `PgConnection` from the `ConnectionManager`.
 /// This connection will then be used during the request and closed afterwards.
 impl<'a, 'r> FromRequest<'a, 'r> for DB {
     type Error = ();
