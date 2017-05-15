@@ -1,7 +1,7 @@
 use rocket::testing::MockRequest;
 use rocket::http::{Status, Method, ContentType};
 
-use spacelib::rocket_factory;
+use ::rocket_factory;
 
 
 describe! auth_tests {

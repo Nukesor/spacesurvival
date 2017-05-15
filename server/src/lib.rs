@@ -1,5 +1,6 @@
 #![feature(plugin)]
 #![plugin(rocket_codegen)]
+#![cfg_attr(test, plugin(stainless))]
 
 extern crate uuid;
 extern crate chrono;
@@ -34,6 +35,9 @@ pub mod api;
 pub mod helpers;
 pub mod handlers;
 pub mod statics;
+
+#[cfg(test)]
+mod tests;
 
 use data::researches::build_research_graph;
 
