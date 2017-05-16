@@ -35,7 +35,7 @@ impl Pod {
         diesel::insert(&new_pod)
             .into(pods::table)
             .get_result::<Pod>(&**db)
-            .expect("Error creating pod")
+            .expect("Error inserting new pod into database.")
     }
 }
 

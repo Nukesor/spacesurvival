@@ -33,7 +33,7 @@ impl Queue {
         diesel::insert(&new_queue)
             .into(queues::table)
             .get_result::<Queue>(&**db)
-            .expect("Error creating pod's queue")
+            .expect("Error inserting new pod queue into database.")
     }
 }
 

@@ -40,7 +40,7 @@ impl User {
         diesel::insert(&new_user)
             .into(users::table)
             .get_result::<User>(&**db)
-            .expect("Error saving new user")
+            .expect("Error inserting new user into database.")
     }
 
     pub fn make_password_hash(new_password: &str) -> Vec<u8> {

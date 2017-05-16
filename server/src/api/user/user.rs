@@ -4,6 +4,7 @@ use diesel::prelude::*;
 use validator::Validate;
 use rocket_contrib::{JSON, SerdeError};
 
+use data::types::ResourceTypes;
 use helpers::db::DB;
 use validation::user::{UserSerializer, UserSettingsSerializer};
 
@@ -12,6 +13,7 @@ use schema::users::dsl::*;
 use models::user::{User, ChangedUser};
 use models::pod::Pod;
 use models::queue::Queue;
+use models::resource::Resource;
 
 use responses::{APIResponse, ok, created, conflict, bad_request, forbidden, unauthorized};
 
@@ -65,6 +67,10 @@ pub fn register(user_data: Result<JSON<UserSerializer>, SerdeError>, db: DB) -> 
             // Create new Pod with queue
             let pod = Pod::new_pod(user.nickname.clone(), user.id, &db);
             Queue::new_pod_queue(pod.id, &db);
+
+            // Create resources for pod
+            Resource::new_pod_resource(ResourceTypes::Iron, pod.id, &db);
+            Resource::new_pod_resource(ResourceTypes::Water, pod.id, &db);
 
             return created().message("User created.").data(json!(&user));
         }

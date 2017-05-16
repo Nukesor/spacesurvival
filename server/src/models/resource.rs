@@ -25,6 +25,24 @@ pub struct Resource {
 
 
 impl Resource {
+    /// This function adds a new pod into the database and returns the model with the
+    /// initialized data.
+    pub fn new_pod_resource(resource: ResourceTypes, pod_id: Uuid, db: &DB) -> Self {
+        let new_queue = NewResource {
+            name: resource.to_string(),
+            amount: 100,
+            max_amount: 1000,
+
+            pod_id: Some(pod_id),
+            base_id: None,
+        };
+
+        diesel::insert(&new_queue)
+            .into(resources::table)
+            .get_result::<Resource>(&**db)
+            .expect("Error inserting new pod resource into database.")
+    }
+
     /// This function checks if there are enough resources for a given set
     /// of costs from a research or model entry.
     /// It also subtracts and updates the resources the specified value from the database.
@@ -129,6 +147,7 @@ impl Resource {
 #[table_name="resources"]
 pub struct NewResource {
     pub name: String,
+    pub amount: i64,
     pub max_amount: i64,
     pub pod_id: Option<Uuid>,
     pub base_id: Option<Uuid>,
