@@ -1,7 +1,11 @@
+use diesel;
+use diesel::prelude::*;
+
 use uuid::Uuid;
 use chrono::NaiveDateTime;
 
 use schema::{pods, modules, researches, resources};
+use helpers::db::DB;
 
 
 #[derive(Debug, Serialize, Deserialize, Identifiable, Queryable, Associations)]
@@ -19,6 +23,21 @@ pub struct Pod {
     pub updated_at: NaiveDateTime,
 }
 
+
+impl Pod {
+    pub fn new_pod(name: String, user_id: Uuid, db: &DB) -> Self {
+        // New pod
+        let new_pod = NewPod {
+            name: format!("{}'s Pod", name),
+            user_id: user_id,
+        };
+
+        diesel::insert(&new_pod)
+            .into(pods::table)
+            .get_result::<Pod>(&**db)
+            .expect("Error creating pod")
+    }
+}
 
 #[derive(Insertable)]
 #[table_name="pods"]

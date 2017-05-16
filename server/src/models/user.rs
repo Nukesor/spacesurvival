@@ -1,12 +1,15 @@
+use diesel;
+use diesel::prelude::*;
+use diesel::pg::PgConnection;
+
 use uuid::Uuid;
 use chrono::NaiveDateTime;
-use jsonwebtoken::{encode, decode, Header, Algorithm};
 use argon2rs::argon2i_simple;
-use diesel::pg::PgConnection;
-use diesel::prelude::*;
+use jsonwebtoken::{encode, decode, Header, Algorithm};
 
 use schema::users;
 use helpers::util;
+use helpers::db::DB;
 
 #[derive(Debug, Serialize, Deserialize, Identifiable, Queryable, Associations)]
 pub struct User {
@@ -25,6 +28,21 @@ struct UserLoginToken {
 }
 
 impl User {
+    pub fn new_user(nickname: String, email: String, password_hash: Vec<u8>, db: &DB) -> Self {
+        // New user model for table insertion
+        let new_user = NewUser {
+            nickname: nickname,
+            email: email,
+            password_hash: password_hash,
+        };
+
+        // Insert and return user
+        diesel::insert(&new_user)
+            .into(users::table)
+            .get_result::<User>(&**db)
+            .expect("Error saving new user")
+    }
+
     pub fn make_password_hash(new_password: &str) -> Vec<u8> {
         argon2i_simple(new_password, "loginsalt").to_vec()
     }

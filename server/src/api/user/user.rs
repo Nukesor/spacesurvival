@@ -7,12 +7,11 @@ use rocket_contrib::{JSON, SerdeError};
 use helpers::db::DB;
 use validation::user::{UserSerializer, UserSettingsSerializer};
 
-use schema::{users, pods, queues};
 use schema::users::dsl::*;
 
-use models::user::{User, NewUser, ChangedUser};
-use models::pod::{Pod, NewPod};
-use models::queue::{Queue, NewQueue};
+use models::user::{User, ChangedUser};
+use models::pod::Pod;
+use models::queue::Queue;
 
 use responses::{APIResponse, ok, created, conflict, bad_request, forbidden, unauthorized};
 
@@ -55,40 +54,17 @@ pub fn register(user_data: Result<JSON<UserSerializer>, SerdeError>, db: DB) -> 
             // Create new password hash
             let new_password_hash = User::make_password_hash(data.password.as_str());
 
-            // New user model for table insertion
-            let new_user = NewUser {
-                nickname: data.nickname.clone(),
-                email: data.email.clone(),
-                password_hash: new_password_hash,
-            };
+            // Create new user to get uuid for pod
+            let user = User::new_user(
+                data.nickname.clone(),
+                data.email.clone(),
+                new_password_hash,
+                &db,
+            );
 
-            // Insert user to get id for pod
-            let user = diesel::insert(&new_user)
-                .into(users::table)
-                .get_result::<User>(&*db)
-                .expect("Error saving new user");
-
-            // New pod
-            let new_pod = NewPod {
-                name: format!("{}'s Pod", user.nickname.clone()),
-                user_id: user.id.clone(),
-            };
-
-            let pod = diesel::insert(&new_pod)
-                .into(pods::table)
-                .get_result::<Pod>(&*db)
-                .expect("Error creating pod");
-
-            let new_queue = NewQueue {
-                slots: 2,
-                pod_id: Some(pod.id.clone()),
-                base_id: None,
-            };
-
-            diesel::insert(&new_queue)
-                .into(queues::table)
-                .get_result::<Queue>(&*db)
-                .expect("Error creating pod's queue");
+            // Create new Pod with queue
+            let pod = Pod::new_pod(user.nickname.clone(), user.id, &db);
+            Queue::new_pod_queue(pod.id, &db);
 
             return created().message("User created.").data(json!(&user));
         }

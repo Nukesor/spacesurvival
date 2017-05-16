@@ -1,7 +1,11 @@
+use diesel;
+use diesel::prelude::*;
+
 use uuid::Uuid;
 use chrono::NaiveDateTime;
 
 use schema::{queues, queue_entries};
+use helpers::db::DB;
 
 
 #[derive(Debug, Serialize, Deserialize, Identifiable, Queryable, Associations)]
@@ -17,6 +21,21 @@ pub struct Queue {
     pub updated_at: NaiveDateTime,
 }
 
+
+impl Queue {
+    pub fn new_pod_queue(pod_id: Uuid, db: &DB) -> Self {
+        let new_queue = NewQueue {
+            slots: 2,
+            pod_id: Some(pod_id),
+            base_id: None,
+        };
+
+        diesel::insert(&new_queue)
+            .into(queues::table)
+            .get_result::<Queue>(&**db)
+            .expect("Error creating pod's queue")
+    }
+}
 
 #[derive(Insertable)]
 #[table_name="queues"]
