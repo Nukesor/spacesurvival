@@ -1,5 +1,6 @@
-pub mod user;
 pub mod auth;
 pub mod pod;
-pub mod research;
 pub mod queue;
+pub mod research;
+pub mod resources;
+pub mod user;

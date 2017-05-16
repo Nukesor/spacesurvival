@@ -68,12 +68,17 @@ pub fn rocket_factory() -> rocket::Rocket {
         ])
         .mount("/api/researches/",
                routes![
-               api::research::research::pod_research,
+               api::research::pod::pod_research,
         ])
         .mount("/api/queue/",
                routes![
-               api::queue::queue::pod_queue_entries,
+               api::queue::pod::pod_queue_entries,
         ])
+        .mount("/api/resources/",
+               routes![
+               api::resources::pod::pod_resources,
+        ])
+
         .catch(errors![handlers::bad_request_handler,
                        handlers::unauthorized_handler,
                        handlers::forbidden_handler,
