@@ -28,5 +28,6 @@ css =
             , transform (translate2 (pct -50) (pct -50))
             , top (pct 50)
             , left (pct 50)
+            , padding (px 10)
             ]
         ]
