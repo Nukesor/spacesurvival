@@ -16,7 +16,7 @@ static RESEARCH_LIST: &'static [u8] = include_bytes!("../../research_data.yml");
 /// It shouldn't be used in any other context!
 #[derive(Debug, PartialEq, Deserialize, Serialize)]
 pub struct Research {
-    pub name: ResearchTypes,
+    pub name: String,
     pub dependencies: Option<Vec<(ResearchTypes, i32)>>,
     pub current_level: Option<i32>,
     pub level: Vec<Level>,
