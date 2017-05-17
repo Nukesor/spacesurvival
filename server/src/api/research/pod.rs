@@ -1,6 +1,7 @@
 use diesel;
 use diesel::prelude::*;
 use rocket_contrib::{JSON, SerdeError};
+use uuid::Uuid;
 
 use data::types::*;
 use data::researches::get_research_list;
@@ -30,7 +31,7 @@ use validation::queue::QueueAddResearchSerializer;
 /// This route returns the list of all researches and their levels/costs,
 /// as well as the current level of the research for the pod of the current user.
 #[get("/pod")]
-pub fn pod_research(current_user: User, db: DB) -> APIResponse {
+pub fn get_research_entries(current_user: User, db: DB) -> APIResponse {
 
     let mut research_list = get_research_list();
     // Create changed pod model and push it to the DB
@@ -73,8 +74,8 @@ pub fn pod_research(current_user: User, db: DB) -> APIResponse {
 /// - Checks if dependencies for research are fulfilled
 /// - Checks if there are enough resources
 /// - Removes resources from db
-#[post("/pod/add_research", data = "<queue_entry>", format = "application/json")]
-pub fn add_research_to_queue(queue_entry: Result<JSON<QueueAddResearchSerializer>, SerdeError>,
+#[post("/pod", data = "<queue_entry>", format = "application/json")]
+pub fn add_research_entry(queue_entry: Result<JSON<QueueAddResearchSerializer>, SerdeError>,
                              current_user: User,
                              db: DB)
                              -> APIResponse {
@@ -184,4 +185,74 @@ pub fn add_research_to_queue(queue_entry: Result<JSON<QueueAddResearchSerializer
             }
         }
     }
+}
+
+
+/// Remove research from queue
+#[delete("/pod/<entry_uuid>")]
+pub fn delete_research_entry(entry_uuid: &str, current_user: User, db: DB) -> APIResponse {
+
+    // Parse and check if we got a valid id
+    let result = Uuid::parse_str(entry_uuid);
+    if result.is_err() {
+        return bad_request().message("Got an invalid uuid");
+    }
+    let queue_entry_id = result.unwrap();
+
+    // Get the queue entry
+    let queue_entry_result = queue_entries_dsl::queue_entries
+        .filter(queue_entries_dsl::id.eq(queue_entry_id))
+        .first::<QueueEntry>(&*db);
+    if queue_entry_result.is_err() {
+        return bad_request().message("No queue entry with this id.");
+    }
+    let queue_entry = queue_entry_result.unwrap();
+
+    // Check if we got an research queue entry
+    if queue_entry.research_name.is_none() {
+        return bad_request().message("Queue entry is a model queue entry.");
+    }
+
+    // Check if there already are existing queue entries for this research.
+    // If there are entries with a higher level, we return a bad request.
+    let level = queue_entry.level;
+    let name = queue_entry.research_name.unwrap();
+    let higher_entry = queue_entries_dsl::queue_entries
+        .filter(queue_entries_dsl::queue_id.eq(queue_entry.queue_id))
+        .filter(queue_entries_dsl::research_name.eq(&name))
+        .filter(queue_entries_dsl::level.gt(queue_entry.level))
+        .get_result::<QueueEntry>(&*db);
+    if higher_entry.is_ok() {
+        return bad_request().message("Can't delete. There is an queue entry with a higher level for this research.");
+    }
+
+    // Get all needed info for resource manipulation
+    let research_list = get_research_list();
+
+    let pod = pods_dsl::pods
+        .filter(pods_dsl::user_id.eq(current_user.id))
+        .first::<Pod>(&*db)
+        .unwrap();
+
+    let pod_resources = resources_dsl::resources
+        .filter(resources_dsl::pod_id.eq(pod.id))
+        .get_results::<Resource>(&*db)
+        .expect("Failed to get user resources.");
+
+    // Add resources from research to pod resources
+    let all_levels = &research_list
+        .get(&ResearchTypes::from_string(&name).unwrap()).unwrap().level;
+    let costs_result = &all_levels[level as usize].resources;
+
+    if let Some(ref costs) = *costs_result {
+        Resource::update_resources(costs, pod_resources, false, &db);
+    }
+
+    // Remove queue_entry from database
+    diesel::delete(queue_entries_dsl::queue_entries.filter(
+            queue_entries_dsl::id.eq(queue_entry_id)))
+        .execute(&*db)
+        .expect("Failed to remove queue_entry.");
+
+    ok().message("Resource removed.")
 }
