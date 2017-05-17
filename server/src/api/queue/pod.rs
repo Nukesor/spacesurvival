@@ -24,9 +24,9 @@ pub fn pod_queue_entries(current_user: User, db: DB) -> APIResponse {
         .expect("Failed to get user pod.");
 
     let queue = queues_dsl::queues
-    .filter(queues_dsl::pod_id.eq(pod.id))
-    .first::<Queue>(&*db)
-    .unwrap();
+        .filter(queues_dsl::pod_id.eq(pod.id))
+        .first::<Queue>(&*db)
+        .unwrap();
 
     let queue_entry_result = queue_entry_dsl::queue_entries
         .filter(queue_entry_dsl::queue_id.eq(queue.id))
@@ -35,8 +35,7 @@ pub fn pod_queue_entries(current_user: User, db: DB) -> APIResponse {
     if queue_entry_result.is_ok() {
         let queue_entries = queue_entry_result.unwrap();
         ok().message("Research data.").data(json!(&queue_entries))
-    }
-    else {
+    } else {
         ok().message("Queue is empty.")
     }
 }

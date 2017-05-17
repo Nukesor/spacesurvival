@@ -22,9 +22,9 @@ pub fn pod_resources(current_user: User, db: DB) -> APIResponse {
         .expect("Failed to get user pod.");
 
     let resources = resources_dsl::resources
-    .filter(resources_dsl::pod_id.eq(pod.id))
-    .get_results::<Resource>(&*db)
-    .expect("Failed to get resources from pod.");
+        .filter(resources_dsl::pod_id.eq(pod.id))
+        .get_results::<Resource>(&*db)
+        .expect("Failed to get resources from pod.");
 
     ok().message("Pod Resources.").data(json!(&resources))
 }

@@ -78,7 +78,6 @@ pub fn rocket_factory() -> rocket::Rocket {
                routes![
                api::resources::pod::pod_resources,
         ])
-
         .catch(errors![handlers::bad_request_handler,
                        handlers::unauthorized_handler,
                        handlers::forbidden_handler,

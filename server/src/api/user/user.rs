@@ -57,12 +57,10 @@ pub fn register(user_data: Result<JSON<UserSerializer>, SerdeError>, db: DB) -> 
             let new_password_hash = User::make_password_hash(data.password.as_str());
 
             // Create new user to get uuid for pod
-            let user = User::new_user(
-                data.nickname.clone(),
-                data.email.clone(),
-                new_password_hash,
-                &db,
-            );
+            let user = User::new_user(data.nickname.clone(),
+                                      data.email.clone(),
+                                      new_password_hash,
+                                      &db);
 
             // Create new Pod with queue
             let pod = Pod::new_pod(user.nickname.clone(), user.id, &db);
