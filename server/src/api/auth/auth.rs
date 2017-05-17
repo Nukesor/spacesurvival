@@ -9,6 +9,10 @@ use helpers::db::DB;
 use responses::{APIResponse, ok, unauthorized, bad_request};
 
 
+/// Endpoint for login.
+///
+/// Check if we can login with the credentials.
+/// We try to get the user by searching email and nickname for the given identifier.
 #[post("/login", data = "<user_in>", format = "application/json")]
 pub fn login(user_in: Result<JSON<LoginSerializer>, SerdeError>, db: DB) -> APIResponse {
 
