@@ -12,6 +12,7 @@ import Model.Grid exposing (Grid, Slot)
 import Animations
 import Model.Util exposing (..)
 import Update exposing (..)
+import Dict
 
 
 main : Program Never Model Msg
@@ -33,6 +34,7 @@ init =
           , id = "2"
           }
         ]
+    , researches = Dict.empty
     }
         ! [ Api.Auth.readToken ()
           ]

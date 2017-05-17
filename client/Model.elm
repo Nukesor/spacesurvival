@@ -3,7 +3,9 @@ module Model exposing (..)
 import Model.Grid exposing (..)
 import Model.User exposing (User)
 import Model.Modules exposing (..)
+import Model.Research exposing (..)
 import Animation exposing (..)
+import Dict
 
 
 type alias Model =
@@ -12,6 +14,7 @@ type alias Model =
     , authDialogAnimation : Animation.State
     , authView : AuthView
     , availableModules : List Module
+    , researches : Dict.Dict String Research
     }
 
 
