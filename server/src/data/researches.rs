@@ -19,7 +19,7 @@ pub struct Research {
     pub name: String,
     pub dependencies: Option<Vec<(ResearchTypes, i32)>>,
     pub current_level: Option<i32>,
-    pub level: Vec<Level>,
+    pub levels: Vec<Level>,
 }
 
 impl HasDependencies for Research {

@@ -155,7 +155,7 @@ pub fn add_research_entry(queue_entry: Result<JSON<QueueAddResearchSerializer>, 
                                           .get(&research_type)
                                           .as_ref()
                                           .expect("No research in yml for this type.")
-                                          .level;
+                                          .levels;
 
                     if !(all_levels.len() <= research_level as usize) {
                         return bad_request().message("Already at max level.");
@@ -241,7 +241,7 @@ pub fn delete_research_entry(entry_uuid: &str, current_user: User, db: DB) -> AP
 
     // Add resources from research to pod resources
     let all_levels = &research_list
-        .get(&ResearchTypes::from_string(&name).unwrap()).unwrap().level;
+        .get(&ResearchTypes::from_string(&name).unwrap()).unwrap().levels;
     let costs_result = &all_levels[level as usize].resources;
 
     if let Some(ref costs) = *costs_result {

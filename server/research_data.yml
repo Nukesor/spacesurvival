@@ -1,7 +1,7 @@
 PlasmaGenerator:
   name: "PlasmaGenerator"
   dependencies: null
-  level:
+  levels:
     - level: 1
       resources:
           - ["Iron", 200]
@@ -10,7 +10,7 @@ EnergyWeapons:
   name: "EnergyWeapons"
   dependencies:
       - ["PlasmaGenerator", 2]
-  level:
+  levels:
     - level: 1
       resources:
           - ["Iron", 200]
@@ -19,7 +19,7 @@ MiningEfficiency:
   name: "MiningEfficiency"
   dependencies:
       - ["EnergyWeapons", 2]
-  level:
+  levels:
     - level: 1
       resources:
           - ["Iron", 200]
