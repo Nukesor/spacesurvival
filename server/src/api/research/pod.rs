@@ -68,6 +68,11 @@ pub fn pod_research(current_user: User, db: DB) -> APIResponse {
     ok().message("Research data.").data(json!(&research_list))
 }
 
+/// Add a new research to the queue of the pod
+/// This endpoint:
+/// - Checks if dependencies for research are fulfilled
+/// - Checks if there are enough resources
+/// - Removes resources from db
 #[post("/pod/add_research", data = "<queue_entry>", format = "application/json")]
 pub fn add_research_to_queue(queue_entry: Result<JSON<QueueAddResearchSerializer>, SerdeError>,
                              current_user: User,
