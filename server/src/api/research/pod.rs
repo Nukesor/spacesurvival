@@ -76,9 +76,9 @@ pub fn get_research_entries(current_user: User, db: DB) -> APIResponse {
 /// - Removes resources from db
 #[post("/pod", data = "<queue_entry>", format = "application/json")]
 pub fn add_research_entry(queue_entry: Result<JSON<QueueAddResearchSerializer>, SerdeError>,
-                             current_user: User,
-                             db: DB)
-                             -> APIResponse {
+                          current_user: User,
+                          db: DB)
+                          -> APIResponse {
 
     match queue_entry {
         // Return specific error if invalid JSON has been sent.
@@ -155,7 +155,7 @@ pub fn add_research_entry(queue_entry: Result<JSON<QueueAddResearchSerializer>, 
                                           .get(&research_type)
                                           .as_ref()
                                           .expect("No research in yml for this type.")
-                                          .level;
+                                          .levels;
 
                     if !(all_levels.len() <= research_level as usize) {
                         return bad_request().message("Already at max level.");
@@ -241,7 +241,9 @@ pub fn delete_research_entry(entry_uuid: &str, current_user: User, db: DB) -> AP
 
     // Add resources from research to pod resources
     let all_levels = &research_list
-        .get(&ResearchTypes::from_string(&name).unwrap()).unwrap().level;
+                          .get(&ResearchTypes::from_string(&name).unwrap())
+                          .unwrap()
+                          .levels;
     let costs_result = &all_levels[level as usize].resources;
 
     if let Some(ref costs) = *costs_result {
@@ -249,10 +251,10 @@ pub fn delete_research_entry(entry_uuid: &str, current_user: User, db: DB) -> AP
     }
 
     // Remove queue_entry from database
-    diesel::delete(queue_entries_dsl::queue_entries.filter(
-            queue_entries_dsl::id.eq(queue_entry_id)))
-        .execute(&*db)
-        .expect("Failed to remove queue_entry.");
+    diesel::delete(queue_entries_dsl::queue_entries
+                       .filter(queue_entries_dsl::id.eq(queue_entry_id)))
+            .execute(&*db)
+            .expect("Failed to remove queue_entry.");
 
     ok().message("Resource removed.")
 }
