@@ -1,6 +1,7 @@
 module Main exposing (..)
 
 import Html
+import Api.Auth
 import View exposing (..)
 import Model exposing (..)
 import Model.User exposing (..)
@@ -33,7 +34,8 @@ init =
           }
         ]
     }
-        ! []
+        ! [ Api.Auth.readToken ()
+          ]
 
 
 createGrid : Grid
@@ -52,4 +54,7 @@ createGrid =
 
 subscriptions : Model -> Sub Msg
 subscriptions model =
-    Animation.subscription AnimateModal [ model.authDialogAnimation ]
+    Sub.batch
+        [ Animation.subscription AnimateModal [ model.authDialogAnimation ]
+        , Api.Auth.receiveToken (\token -> Messages.LoggedIn (Ok { token = token }))
+        ]

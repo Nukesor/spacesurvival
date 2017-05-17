@@ -10,6 +10,18 @@
     <audio src="/static/audio/soaring.mp3" autoplay="true"></audio>
     <script src="/static/main.js"></script>
     <script>
-        Elm.Main.fullscreen()
+        var app = Elm.Main.fullscreen()
+
+        app.ports.readToken.subscribe(function() {
+            try {
+                app.ports.receiveToken.send(localStorage.getItem('token'));
+            } catch (e) {
+                // so what
+            }
+        });
+
+        app.ports.saveToken.subscribe(function(token) {
+            localStorage.setItem('token', token);
+        });
     </script>
 </body>

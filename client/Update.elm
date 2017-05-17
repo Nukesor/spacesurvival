@@ -37,10 +37,15 @@ update msg model =
         Messages.LoggedIn result ->
             case Debug.log "login result" result of
                 Ok user ->
-                    { model | user = Model.User.LoggedIn user } ! []
+                    { model | user = Model.User.LoggedIn user }
+                        ! [ Api.Auth.saveToken user.token
+                          ]
 
                 Err err ->
                     model ! []
+
+        Messages.ReadLocalToken user ->
+            { model | user = Model.User.LoggedIn user } ! []
 
         ShowBuildDialog point ->
             { model

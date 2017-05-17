@@ -1,4 +1,4 @@
-module Api.Auth exposing (..)
+port module Api.Auth exposing (..)
 
 import Json.Encode as Encode
 import Json.Decode as Decode
@@ -6,6 +6,15 @@ import Model exposing (..)
 import Model.User exposing (..)
 import Http
 import Messages
+
+
+port readToken : () -> Cmd msg
+
+
+port saveToken : String -> Cmd msg
+
+
+port receiveToken : (String -> msg) -> Sub msg
 
 
 dataDecoder : Decode.Decoder a -> Decode.Decoder a

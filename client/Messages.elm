@@ -15,4 +15,5 @@ type Msg
     | UpdateUser User
     | Registered (Result Http.Error LoginData)
     | LoggedIn (Result Http.Error LoggedInData)
+    | ReadLocalToken LoggedInData
     | ShowBuildDialog Point
