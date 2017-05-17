@@ -15,6 +15,7 @@ use models::user::User;
 use responses::{APIResponse, bad_request, ok};
 
 
+/// Endpoint for setting different values for your pod
 #[post("/settings", data = "<pod_settings>", format = "application/json")]
 pub fn settings(pod_settings: Result<JSON<PodSettingsSerializer>, SerdeError>,
                 current_user: User,

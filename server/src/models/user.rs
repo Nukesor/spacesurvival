@@ -28,6 +28,10 @@ struct UserLoginToken {
 }
 
 impl User {
+    /// Create a new User and inject it into the database.
+    ///
+    /// # Panics
+    /// Panics if there is an error while inserting the User
     pub fn new_user(nickname: String, email: String, password_hash: Vec<u8>, db: &DB) -> Self {
         // New user model for table insertion
         let new_user = NewUser {
@@ -54,8 +58,6 @@ impl User {
 
     pub fn generate_auth_token(&self, salt: &str) -> String {
         let secret = util::get_secret();
-
-        // TODO: This is probably not a good way to do that.
         let combined_secret = secret + salt;
 
         encode(Header::default(),
@@ -68,8 +70,6 @@ impl User {
         use schema::users::dsl::*;
 
         let secret = util::get_secret();
-
-        // TODO: This is probably not a good way to do that.
         let combined_secret = secret + salt;
 
         let decrypted_token =

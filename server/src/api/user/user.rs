@@ -24,6 +24,9 @@ pub fn info(current_user: User) -> APIResponse {
 }
 
 
+/// Endpoint for registering a new User.
+///
+/// Needs a unique nickname, unique email and password.
 #[post("/register", data = "<user_data>", format = "application/json")]
 pub fn register(user_data: Result<JSON<UserSerializer>, SerdeError>, db: DB) -> APIResponse {
 
