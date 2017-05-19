@@ -9,9 +9,9 @@ static MODULE_LIST: &'static [u8] = include_bytes!("../../module_data.yml");
 
 /// This struct is only for deserializing the included `module_data.yml`.
 /// It shouldn't be used in any other context!
-#[derive(Debug, PartialEq, Deserialize)]
+#[derive(Debug, PartialEq, Serialize, Deserialize)]
 pub struct Module {
-    pub name: ModuleTypes,
+    pub name: String,
     pub dependencies: Option<Vec<(ResearchTypes, i32)>>,
     pub level: Vec<Level>,
 }
@@ -24,7 +24,7 @@ impl HasDependencies for Module {
 }
 
 
-#[derive(Debug, PartialEq, Deserialize)]
+#[derive(Debug, PartialEq, Serialize, Deserialize)]
 pub struct Level {
     pub level: i32,
     pub resources: Vec<(ResourceTypes, i64)>,

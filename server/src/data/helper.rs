@@ -6,11 +6,12 @@ use diesel::result::Error;
 use data::types::*;
 use data::HasDependencies;
 use data::researches::get_research_list;
+use data::modules::get_module_list;
 
 use models::research::Research;
 
 
-/// A helper function returns all research dependencies of a module or research as a `Vec<String>`.
+/// A helper function returns all research dependencies of a research as a `Vec<String>`.
 ///
 /// This is helpful for querying researches by their name.
 pub fn get_research_dependency_strings(research_type: &ResearchTypes) -> Vec<String> {
@@ -18,6 +19,28 @@ pub fn get_research_dependency_strings(research_type: &ResearchTypes) -> Vec<Str
     let mut dependency_strings = Vec::new();
     let ref dependency_list = research_list
         .get(research_type)
+        .as_ref()
+        .unwrap()
+        .dependencies;
+    match *dependency_list {
+        None => (),
+        Some(ref dependencies) => {
+            for &(ref dependency, _) in dependencies {
+                dependency_strings.push(dependency.to_string());
+            }
+        }
+    }
+    dependency_strings
+}
+
+/// A helper function returns all research dependencies of a research as a `Vec<String>`.
+///
+/// This is helpful for querying researches by their name.
+pub fn get_module_dependency_strings(module_type: &ModuleTypes) -> Vec<String> {
+    let ref module_list = get_module_list();
+    let mut dependency_strings = Vec::new();
+    let ref dependency_list = module_list
+        .get(module_type)
         .as_ref()
         .unwrap()
         .dependencies;

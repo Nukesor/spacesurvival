@@ -1,15 +1,15 @@
-PlasmaGenerator:
-  name: "PlasmaGenerator"
+Plasma:
+  name: "Plasma"
   dependencies: null
   levels:
     - level: 1
       resources:
-          - ["Iron", 200]
+          - ["Water", 200]
 
 EnergyWeapons:
   name: "EnergyWeapons"
   dependencies:
-      - ["PlasmaGenerator", 2]
+      - ["Plasma", 2]
   levels:
     - level: 1
       resources:

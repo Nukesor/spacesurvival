@@ -31,7 +31,7 @@ use validation::queue::QueueAddResearchSerializer;
 /// This route returns the list of all researches and their levels/costs,
 /// as well as the current level of the research for the pod of the current user.
 #[get("/pod")]
-pub fn get_research_entries(current_user: User, db: DB) -> APIResponse {
+pub fn get_researches(current_user: User, db: DB) -> APIResponse {
 
     let mut research_list = get_research_list();
     // Create changed pod model and push it to the DB
@@ -75,7 +75,7 @@ pub fn get_research_entries(current_user: User, db: DB) -> APIResponse {
 /// - Checks if there are enough resources
 /// - Removes resources from db
 #[post("/pod", data = "<queue_entry>", format = "application/json")]
-pub fn add_research_entry(queue_entry: Result<JSON<QueueAddResearchSerializer>, SerdeError>,
+pub fn start_research(queue_entry: Result<JSON<QueueAddResearchSerializer>, SerdeError>,
                           current_user: User,
                           db: DB)
                           -> APIResponse {
@@ -190,7 +190,7 @@ pub fn add_research_entry(queue_entry: Result<JSON<QueueAddResearchSerializer>, 
 
 /// Remove research from queue
 #[delete("/pod/<entry_uuid>")]
-pub fn delete_research_entry(entry_uuid: &str, current_user: User, db: DB) -> APIResponse {
+pub fn stop_research(entry_uuid: &str, current_user: User, db: DB) -> APIResponse {
 
     // Parse and check if we got a valid id
     let result = Uuid::parse_str(entry_uuid);

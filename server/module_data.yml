@@ -1,5 +1,5 @@
-Turret:
-  name: "Turret"
+LaserTurret:
+  name: "Laser turret"
   dependencies: 
       - "EnergyWeapons"
   level:
@@ -11,3 +11,19 @@ Turret:
         rate: 1
         damage: 10
         range: 100
+
+
+PlasmaGenerator:
+  name: "Plasma Generator"
+  dependencies: 
+      - "EnergyWeapons"
+  level:
+    - level: 1
+      resources:
+          - ["Iron", 200]
+          - ["Water", 100]
+      generates:
+        resources:
+          - ["energy", 200]
+      consumes:
+          - ["Water", 10]update

@@ -62,7 +62,7 @@ macro_rules! enum_impl {
 /// It's used to check against the names in `research_data.yml`, to validate types in requests
 /// and to guarantee database string integrity.
 enum_impl!{ResearchTypes {
-    PlasmaGenerator,
+    Plasma,
     EnergyWeapons,
     MiningEfficiency,
 }}

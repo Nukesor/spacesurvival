@@ -66,9 +66,18 @@ pub fn rocket_factory() -> rocket::Rocket {
         ])
         .mount("/api/researches/",
                routes![
-               api::research::pod::get_research_entries,
-               api::research::pod::add_research_entry,
-               api::research::pod::delete_research_entry,
+               api::research::pod::get_researches,
+               api::research::pod::start_research,
+               api::research::pod::stop_research,
+        ])
+        .mount("/api/modules/",
+               routes![
+               api::module::general::get_info,
+//               api::module::pod::get_modules,
+//               api::module::pod::add_module,
+//               api::module::pod::upgrade_module,
+//               api::module::pod::stop_module_upgrade,
+//               api::module::pod::remove_module,
         ])
         .mount("/api/queue/",
                routes![
