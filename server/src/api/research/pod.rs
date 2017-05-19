@@ -23,7 +23,7 @@ use schema::researches::dsl as research_dsl;
 use schema::queue_entries::dsl as queue_entries_dsl;
 
 use models::queue::{QueueEntry, Queue, NewQueueEntry};
-use validation::queue::QueueAddResearchSerializer;
+use validation::queue::ResearchSerializer;
 
 
 /// The user needs to be logged in to access this route!
@@ -74,13 +74,13 @@ pub fn get_researches(current_user: User, db: DB) -> APIResponse {
 /// - Checks if dependencies for research are fulfilled
 /// - Checks if there are enough resources
 /// - Removes resources from db
-#[post("/pod", data = "<queue_entry>", format = "application/json")]
-pub fn start_research(queue_entry: Result<JSON<QueueAddResearchSerializer>, SerdeError>,
+#[post("/pod", data = "<research_data>", format = "application/json")]
+pub fn start_research(research_data: Result<JSON<ResearchSerializer>, SerdeError>,
                           current_user: User,
                           db: DB)
                           -> APIResponse {
 
-    match queue_entry {
+    match research_data {
         // Return specific error if invalid JSON has been sent.
         Err(error) => return bad_request().message(format!("{}", error).as_str()),
         Ok(entry) => {
