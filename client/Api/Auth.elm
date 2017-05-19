@@ -6,6 +6,7 @@ import Model exposing (..)
 import Model.User exposing (..)
 import Http
 import Messages
+import Api.Util exposing (dataDecoder)
 
 
 port readToken : () -> Cmd msg
@@ -15,11 +16,6 @@ port saveToken : String -> Cmd msg
 
 
 port receiveToken : (String -> msg) -> Sub msg
-
-
-dataDecoder : Decode.Decoder a -> Decode.Decoder a
-dataDecoder =
-    Decode.field "data"
 
 
 registerEncoder : RegisterData -> Encode.Value

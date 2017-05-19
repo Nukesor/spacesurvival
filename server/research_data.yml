@@ -1,5 +1,5 @@
 Plasma:
-  name: "Plasma"
+  name: "Plasma Technology"
   dependencies: null
   levels:
     - level: 1
@@ -7,7 +7,7 @@ Plasma:
           - ["Water", 200]
 
 EnergyWeapons:
-  name: "EnergyWeapons"
+  name: "Energy Weapons"
   dependencies:
       - ["Plasma", 2]
   levels:
@@ -16,7 +16,7 @@ EnergyWeapons:
           - ["Iron", 200]
 
 MiningEfficiency:
-  name: "MiningEfficiency"
+  name: "Mining Efficiency"
   dependencies:
       - ["EnergyWeapons", 2]
   levels:
