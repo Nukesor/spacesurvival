@@ -168,8 +168,9 @@ pub fn start_research(research_data: Result<JSON<ResearchSerializer>, SerdeError
                     // Create a new queue entry with the given research type.
                     let new_entry_model = NewQueueEntry {
                         queue_id: queue.id.clone(),
-                        module_name: None,
                         research_name: Some(entry.research_name.clone()),
+                        module_name: None,
+                        module_id: None,
                         level: research_level,
                     };
 

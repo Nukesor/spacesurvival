@@ -35,8 +35,8 @@ CREATE TABLE resources (
 
 CREATE TABLE modules (
     name VARCHAR(120) not null, 
-    level integer not null default 1,
-    stationary BOOLEAN default FALSE,
+    level integer not null default 0,
+    stationary BOOLEAN not null default FALSE ,
     x_pos integer,
     y_pos integer,
     UNIQUE (name, base_id, pod_id),
@@ -44,6 +44,13 @@ CREATE TABLE modules (
         (stationary is true and x_pos is null and y_pos is null) or
         (stationary is false and x_pos is not null and y_pos is not null)
     ),
+    CHECK (
+        (not(
+                (x_pos is null and y_pos is not null) or
+                (y_pos is null and x_pos is not null)
+        ))
+    ),
+
 
     id UUID PRIMARY KEY default uuid_generate_v4(),
     pod_id UUID references pods(id) on DELETE CASCADE,

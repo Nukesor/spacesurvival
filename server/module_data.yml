@@ -2,7 +2,7 @@ LaserTurret:
   name: "Laser turret"
   dependencies: 
       - "EnergyWeapons"
-  level:
+  levels:
     - level: 1
       resources:
           - ["Iron", 200]
@@ -17,7 +17,7 @@ PlasmaGenerator:
   name: "Plasma Generator"
   dependencies: 
       - "EnergyWeapons"
-  level:
+  levels:
     - level: 1
       resources:
           - ["Iron", 200]

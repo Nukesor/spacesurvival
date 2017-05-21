@@ -13,7 +13,7 @@ static MODULE_LIST: &'static [u8] = include_bytes!("../../module_data.yml");
 pub struct Module {
     pub name: String,
     pub dependencies: Option<Vec<(ResearchTypes, i32)>>,
-    pub level: Vec<Level>,
+    pub levels: Vec<Level>,
 }
 
 
@@ -27,7 +27,7 @@ impl HasDependencies for Module {
 #[derive(Debug, PartialEq, Serialize, Deserialize)]
 pub struct Level {
     pub level: i32,
-    pub resources: Vec<(ResourceTypes, i64)>,
+    pub resources: Option<Vec<(ResourceTypes, i64)>>,
     pub shoots: Option<Shoots>,
     pub generates_energy: Option<GeneratesEnergy>,
 }

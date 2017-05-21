@@ -65,5 +65,6 @@ pub struct NewQueueEntry {
     pub queue_id: Uuid,
     pub research_name: Option<String>,
     pub module_name: Option<String>,
+    pub module_id: Option<Uuid>,
     pub level: i32,
 }

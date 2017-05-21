@@ -9,12 +9,15 @@ use schema::modules;
 #[belongs_to(bases)]
 pub struct Module {
     pub name: String,
-    pub id: Uuid,
+    pub level: i32,
     pub stationary: bool,
     pub x_pos: Option<i32>,
     pub y_pos: Option<i32>,
+
+    pub id: Uuid,
     pub pod_id: Option<Uuid>,
     pub base_id: Option<Uuid>,
+
     pub created_at: NaiveDateTime,
     pub updated_at: NaiveDateTime,
 }
