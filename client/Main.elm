@@ -35,6 +35,7 @@ init =
           }
         ]
     , researches = Dict.empty
+    , buildingAt = Nothing
     }
         ! [ Api.Auth.readToken ()
           ]
@@ -48,7 +49,6 @@ createGrid =
                 (\y ->
                     { position = Point x y
                     , entry = Nothing
-                    , selectedForBuilding = False
                     }
                 )
         )

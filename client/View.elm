@@ -31,7 +31,12 @@ view model =
                     auth model
 
         background =
-            div [ css.class [ Styles.Background.Container ] ] [ div [ css.class [ Styles.Background.Background ] ] [] ]
+            div
+                [ css.class [ Styles.Background.Container ] ]
+                [ div
+                    [ css.class [ Styles.Background.Background ] ]
+                    []
+                ]
     in
         div []
             [ background

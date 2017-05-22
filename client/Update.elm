@@ -5,7 +5,6 @@ import Api.Auth
 import Animation
 import Model exposing (..)
 import Model.User
-import Array
 
 
 update : Msg -> Model -> ( Model, Cmd Msg )
@@ -47,18 +46,8 @@ update msg model =
         Messages.ReadLocalToken user ->
             { model | user = Model.User.LoggedIn user } ! []
 
-        ShowBuildDialog point ->
+        ShowBuildDialog maybePoint ->
             { model
-                | grid =
-                    Array.map
-                        (Array.map
-                            (\slot ->
-                                if slot.position == point then
-                                    { slot | selectedForBuilding = True }
-                                else
-                                    slot
-                            )
-                        )
-                        model.grid
+                | buildingAt = Debug.log "point" maybePoint
             }
                 ! []

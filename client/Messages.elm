@@ -16,4 +16,4 @@ type Msg
     | Registered (Result Http.Error LoginData)
     | LoggedIn (Result Http.Error LoggedInData)
     | ReadLocalToken LoggedInData
-    | ShowBuildDialog Point
+    | ShowBuildDialog (Maybe Point)

@@ -13,7 +13,6 @@ type alias Grid =
 type alias Slot =
     { position : Point
     , entry : SlotEntry
-    , selectedForBuilding : Bool
     }
 
 
@@ -23,3 +22,9 @@ map fn grid =
         |> Array.map (\ys -> Array.toList (Array.map fn ys))
         |> Array.toList
         |> List.concat
+
+
+atPosition : Int -> Int -> Grid -> Maybe Slot
+atPosition x y grid =
+    Array.get x grid
+        |> Maybe.andThen (Array.get y)
