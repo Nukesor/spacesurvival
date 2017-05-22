@@ -11,8 +11,8 @@ import Messages exposing (..)
 import View.BuildDialog
 
 
-grid : Model -> Html.Html Msg
-grid model =
+view : Model -> Html.Html Msg
+view model =
     div []
         [ svg []
             (Grid.map

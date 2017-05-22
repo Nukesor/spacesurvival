@@ -5,7 +5,7 @@ import Html exposing (..)
 import Html.Attributes exposing (..)
 import Html.Events exposing (..)
 import Messages
-import View.Grid exposing (grid)
+import View.Grid
 import Styles.Background
 import Html.CssHelpers
 import Model.User exposing (..)
@@ -25,7 +25,7 @@ view model =
         currentView =
             case model.user of
                 LoggedIn user ->
-                    div [ class "grid-container" ] [ grid model ]
+                    div [ class "grid-container" ] [ View.Grid.view model ]
 
                 _ ->
                     auth model

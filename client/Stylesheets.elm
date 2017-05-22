@@ -14,7 +14,7 @@ fileStructure =
         [ ( "elm.css"
           , Css.File.compile
                 [ Styles.Background.css
-                , View.BuildDialog.css
+                , View.BuildDialog.rules
                 ]
           )
         ]
