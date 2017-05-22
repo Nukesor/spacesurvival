@@ -5,6 +5,7 @@ import Model.User exposing (..)
 import Model
 import Http
 import Model.Util exposing (..)
+import Model.Research
 
 
 type Msg
@@ -17,3 +18,4 @@ type Msg
     | LoggedIn (Result Http.Error LoggedInData)
     | ReadLocalToken LoggedInData
     | ShowBuildDialog (Maybe Point)
+    | ReceiveResearches (Result Http.Error Model.Research.Researches)

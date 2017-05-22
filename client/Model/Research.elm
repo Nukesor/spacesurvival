@@ -1,9 +1,11 @@
 module Model.Research exposing (..)
 
+import Dict
+
 
 type alias Research =
     { name : String
-    , currentLevel : Int
+    , currentLevel : Maybe Int
     , dependencies : List ( ResearchId, Int )
     , levels : List ResearchLevel
     }
@@ -21,3 +23,7 @@ type alias ResearchId =
 
 type alias ResourceId =
     String
+
+
+type alias Researches =
+    Dict.Dict ResearchId Research

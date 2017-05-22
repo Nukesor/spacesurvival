@@ -1,8 +1,9 @@
 module Update exposing (..)
 
-import Messages exposing (..)
-import Api.Auth
 import Animation
+import Api.Auth
+import Api.Research
+import Messages exposing (..)
 import Model exposing (..)
 import Model.User
 
@@ -36,9 +37,14 @@ update msg model =
         Messages.LoggedIn result ->
             case Debug.log "login result" result of
                 Ok user ->
-                    { model | user = Model.User.LoggedIn user }
-                        ! [ Api.Auth.saveToken user.token
-                          ]
+                    let
+                        updatedModel =
+                            { model | user = Model.User.LoggedIn user }
+                    in
+                        updatedModel
+                            ! [ Api.Auth.saveToken user.token
+                              , Api.Research.fetchResearches updatedModel
+                              ]
 
                 Err err ->
                     model ! []
@@ -48,6 +54,14 @@ update msg model =
 
         ShowBuildDialog maybePoint ->
             { model
-                | buildingAt = Debug.log "point" maybePoint
+                | buildingAt = maybePoint
             }
                 ! []
+
+        ReceiveResearches result ->
+            case Debug.log "researches" result of
+                Ok researches ->
+                    { model | researches = researches } ! []
+
+                Err err ->
+                    model ! []
