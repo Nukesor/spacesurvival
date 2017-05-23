@@ -5,7 +5,7 @@ import Api.Auth
 import Api.Research
 import Messages exposing (..)
 import Model exposing (..)
-import Model.User
+import Model.User exposing (LoginData)
 
 
 update : Msg -> Model -> ( Model, Cmd Msg )
@@ -64,4 +64,4 @@ update msg model =
                     { model | researches = researches } ! []
 
                 Err err ->
-                    model ! []
+                    { model | user = Model.User.LoggingIn { identifier = "", password = "" } } ! []

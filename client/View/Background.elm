@@ -1,8 +1,9 @@
-module Styles.Background exposing (..)
+module View.Background exposing (..)
 
 import Css exposing (..)
-import Css.Elements exposing (..)
 import Css.Namespace exposing (namespace)
+import Html exposing (div)
+import Html.CssHelpers exposing (withNamespace)
 
 
 type Classes
@@ -10,11 +11,18 @@ type Classes
     | Container
 
 
-ns =
-    "bg"
+view : Html.Html msg
+view =
+    div
+        [ helpers.class [ Container ] ]
+        [ div
+            [ helpers.class [ Background ] ]
+            []
+        ]
 
 
-css =
+rules : Stylesheet
+rules =
     (stylesheet << namespace ns)
         [ class Background
             [ width <| vw 200
@@ -32,3 +40,13 @@ css =
             , zIndex <| int -1
             ]
         ]
+
+
+ns : String
+ns =
+    "bg"
+
+
+helpers : Html.CssHelpers.Namespace String class id msg
+helpers =
+    withNamespace ns

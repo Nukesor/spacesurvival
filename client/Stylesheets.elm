@@ -1,7 +1,7 @@
 port module Stylesheets exposing (..)
 
 import Css.File exposing (CssFileStructure, CssCompilerProgram)
-import Styles.Background
+import View.Background
 import View.BuildDialog
 
 
@@ -13,7 +13,7 @@ fileStructure =
     Css.File.toFileStructure
         [ ( "elm.css"
           , Css.File.compile
-                [ Styles.Background.css
+                [ View.Background.rules
                 , View.BuildDialog.rules
                 ]
           )

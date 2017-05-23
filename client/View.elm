@@ -6,7 +6,7 @@ import Html.Attributes exposing (..)
 import Html.Events exposing (..)
 import Messages
 import View.Grid
-import Styles.Background
+import View.Background
 import Html.CssHelpers
 import Model.User exposing (..)
 import Animation
@@ -16,7 +16,7 @@ import View.Register
 
 css : Html.CssHelpers.Namespace String class id msg
 css =
-    Html.CssHelpers.withNamespace Styles.Background.ns
+    Html.CssHelpers.withNamespace View.Background.ns
 
 
 view : Model -> Html.Html Messages.Msg
@@ -29,17 +29,9 @@ view model =
 
                 _ ->
                     auth model
-
-        background =
-            div
-                [ css.class [ Styles.Background.Container ] ]
-                [ div
-                    [ css.class [ Styles.Background.Background ] ]
-                    []
-                ]
     in
         div []
-            [ background
+            [ View.Background.view
             , currentView
             ]
 
