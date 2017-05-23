@@ -5,7 +5,7 @@ import Dict
 
 type alias Research =
     { name : String
-    , currentLevel : Maybe Int
+    , currentLevel : Int
     , dependencies : List ( ResearchId, Int )
     , levels : List ResearchLevel
     }

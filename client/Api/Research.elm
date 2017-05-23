@@ -16,15 +16,12 @@ researchesDecoder =
         Decode.dict <|
             Decode.succeed Research
                 |: (Decode.field "name" Decode.string)
-                |: (Decode.field "current_level" (Decode.maybe Decode.int))
+                |: (Decode.field "current_level" Decode.int)
                 |: (Decode.field "dependencies" <|
-                        Decode.oneOf
-                            [ Decode.list <|
-                                Decode.map2 (,)
-                                    (Decode.index 0 Decode.string)
-                                    (Decode.index 1 Decode.int)
-                            , Decode.null []
-                            ]
+                        Decode.list <|
+                            Decode.map2 (,)
+                                (Decode.index 0 Decode.string)
+                                (Decode.index 1 Decode.int)
                    )
                 |: (Decode.field "levels" (Decode.list researchLevelDecoder))
 
