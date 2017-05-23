@@ -62,7 +62,7 @@ pub fn get_researches(current_user: User, db: DB) -> APIResponse {
             }
 
             let mut list_entry = list_result.unwrap();
-            list_entry.current_level = Some(research.level);
+            list_entry.current_level = research.level;
         }
     }
 

@@ -10,6 +10,9 @@ use data::HasDependencies;
 
 static RESEARCH_LIST: &'static [u8] = include_bytes!("../../research_data.yml");
 
+/// Helper function
+fn current_level_default() -> i32 { 0 } 
+
 
 /// This struct is only for deserializing the included `research_data.yml`.
 ///
@@ -18,7 +21,8 @@ static RESEARCH_LIST: &'static [u8] = include_bytes!("../../research_data.yml");
 pub struct Research {
     pub name: String,
     pub dependencies: Option<Vec<(ResearchTypes, i32)>>,
-    pub current_level: Option<i32>,
+    #[serde(default = "current_level_default")]
+    pub current_level: i32,
     pub levels: Vec<Level>,
 }
 
