@@ -3,7 +3,7 @@ use std::collections::HashMap;
 
 use data::types::*;
 use data::components::*;
-use data::HasDependencies;
+use data::{HasDependencies, dependencies_default};
 
 static MODULE_LIST: &'static [u8] = include_bytes!("../../module_data.yml");
 
@@ -12,13 +12,14 @@ static MODULE_LIST: &'static [u8] = include_bytes!("../../module_data.yml");
 #[derive(Debug, PartialEq, Serialize, Deserialize)]
 pub struct Module {
     pub name: String,
-    pub dependencies: Option<Vec<(ResearchTypes, i32)>>,
+    #[serde(default = "dependencies_default")]
+    pub dependencies: Vec<(ResearchTypes, i32)>,
     pub levels: Vec<Level>,
 }
 
 
 impl HasDependencies for Module {
-    fn get_dependencies(&self) -> Option<&Vec<(ResearchTypes, i32)>> {
+    fn get_dependencies(&self) -> &Vec<(ResearchTypes, i32)> {
         self.dependencies.as_ref()
     }
 }

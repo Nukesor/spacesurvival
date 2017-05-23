@@ -1,6 +1,5 @@
 Plasma:
   name: "Plasma Technology"
-  dependencies: null
   levels:
     - level: 1
       resources:

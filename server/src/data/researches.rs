@@ -6,11 +6,11 @@ use serde_yaml::from_slice;
 use std::collections::HashMap;
 
 use data::types::*;
-use data::HasDependencies;
+use data::{HasDependencies, dependencies_default};
 
 static RESEARCH_LIST: &'static [u8] = include_bytes!("../../research_data.yml");
 
-/// Helper function
+/// Helper function to set default value of current_level
 fn current_level_default() -> i32 { 0 } 
 
 
@@ -20,14 +20,15 @@ fn current_level_default() -> i32 { 0 }
 #[derive(Debug, PartialEq, Deserialize, Serialize)]
 pub struct Research {
     pub name: String,
-    pub dependencies: Option<Vec<(ResearchTypes, i32)>>,
+    #[serde(default = "dependencies_default")]
+    pub dependencies: Vec<(ResearchTypes, i32)>,
     #[serde(default = "current_level_default")]
     pub current_level: i32,
     pub levels: Vec<Level>,
 }
 
 impl HasDependencies for Research {
-    fn get_dependencies(&self) -> Option<&Vec<(ResearchTypes, i32)>> {
+    fn get_dependencies(&self) -> &Vec<(ResearchTypes, i32)> {
         self.dependencies.as_ref()
     }
 }
@@ -60,19 +61,16 @@ pub fn build_research_graph() -> Graph<ResearchTypes, i32> {
     }
     for (research_type, research) in research_list {
         let original_node = nodes.get(&research_type).unwrap();
-        match research.dependencies {
-            Some(ref dependencies) => {
-                for &(ref dependency_type, level) in dependencies.iter() {
-                    let dependency_node = nodes.get(dependency_type);
-                    match dependency_node {
-                        Some(dependency) => {
-                            dependency_graph.add_edge(*dependency, *original_node, level);
-                        }
-                        None => panic!("Unknown dependency {:?}", &dependency_type),
+        if research.dependencies.len() != 0 {
+            for &(ref dependency_type, level) in research.dependencies.iter() {
+                let dependency_node = nodes.get(dependency_type);
+                match dependency_node {
+                    Some(dependency) => {
+                        dependency_graph.add_edge(*dependency, *original_node, level);
                     }
+                    None => panic!("Unknown dependency {:?}", &dependency_type),
                 }
             }
-            None => (),
         }
     }
     if is_cyclic_directed(&dependency_graph) {

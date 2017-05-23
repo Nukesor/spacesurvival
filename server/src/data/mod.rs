@@ -10,5 +10,12 @@ use self::types::ResearchTypes;
 ///
 /// It ensures that the inserted HashMap contains elements with a vector of researches.
 pub trait HasDependencies {
-    fn get_dependencies(&self) -> Option<&Vec<(ResearchTypes, i32)>>;
+    fn get_dependencies(&self) -> &Vec<(ResearchTypes, i32)>;
 }
+
+
+/// Helper function to set default value of research dependencies
+fn dependencies_default() -> Vec<(ResearchTypes, i32)> {
+    let dependencies: Vec<(ResearchTypes, i32)> = Vec::new();
+    dependencies
+} 
