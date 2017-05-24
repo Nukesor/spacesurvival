@@ -8,7 +8,7 @@ use data::modules::get_module_list;
 use data::helper::{get_module_dependency_strings, dependencies_fulfilled};
 
 use helpers::db::DB;
-use responses::{APIResponse, bad_request, created};
+use responses::{APIResponse, bad_request, created, ok};
 
 use models::pod::Pod;
 use models::user::User;
@@ -29,47 +29,27 @@ use models::queue::{QueueEntry, Queue, NewQueueEntry};
 use validation::queue::{NewModuleSerializer, UpgradeModuleSerializer};
 
 
-///// The user needs to be logged in to access this route!
-/////
-///// This route returns the list of all modules and their current levels for the pod of the current user.
-//#[get("/pod")]
-//pub fn get_modules(current_user: User, db: DB) -> APIResponse {
-//
-//    let mut module_list = get_module_list();
-//    // Create changed pod model and push it to the DB
-//
-//    let pod = pods_dsl::pods
-//        .filter(pods_dsl::user_id.eq(current_user.id))
-//        .get_result::<Pod>(&*db)
-//        .expect("Failed to get user pod.");
-//
-//    let pod_result = module_dsl::modules
-//        .filter(module_dsl::pod_id.eq(pod.id))
-//        .get_results::<Module>(&*db);
-//
-//    if pod_result.is_ok() {
-//        let modules = pod_result.unwrap();
-//        for module in modules {
-//            let type_result = ModuleTypes::from_string(&module.name);
-//            if type_result.is_err() {
-//                return bad_request()
-//                           .message(format!("Found module {}, but no matching ModuleType!",
-//                                            module.name)
-//                                            .as_str());
-//            }
-//            let module_type = type_result.unwrap();
-//            let list_result = module_list.get_mut(&module_type);
-//            if list_result.is_none() {
-//                return bad_request().message(format!("Found type {}, but no matching entry in our module list!", module_type).as_str());
-//            }
-//
-//            let mut list_entry = list_result.unwrap();
-//            list_entry.current_level = Some(module.level);
-//        }
-//    }
-//
-//    ok().message("Module data.").data(json!(&module_list))
-//}
+/// The user needs to be logged in to access this route!
+///
+/// This route returns the list of all modules and their current levels for the pod of the current user.
+#[get("/pod")]
+pub fn get_modules(current_user: User, db: DB) -> APIResponse {
+
+    let pod = pods_dsl::pods
+        .filter(pods_dsl::user_id.eq(current_user.id))
+        .get_result::<Pod>(&*db)
+        .expect("Failed to get user pod.");
+
+    let module_result = module_dsl::modules
+        .filter(module_dsl::pod_id.eq(pod.id))
+        .get_results::<Module>(&*db);
+
+    if module_result.is_ok() {
+        let modules = module_result.unwrap();
+        return ok().message("Module data.").data(json!(&modules));
+    }
+    ok().message("No module installed.")
+}
 
 /// Add a new module to pod
 ///
