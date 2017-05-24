@@ -54,6 +54,7 @@ rules =
             , top (pct 50)
             , left (pct 50)
             , padding (px 10)
+            , backgroundColor (rgba 0 0 0 0.4)
             ]
         , Css.class Button
             [ padding (Css.rem 0.5)
@@ -69,7 +70,7 @@ rules =
             ]
         , Css.class BuildItem
             [ listStyle none
-            , padding2 (Css.em 1) (zero)
+            , padding2 (Css.em 1) (Css.em 1)
             , cursor pointer
             , hover
                 [ backgroundColor (rgba 200 200 255 0.1)
