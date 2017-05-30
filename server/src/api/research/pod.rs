@@ -177,7 +177,7 @@ pub fn start_research(research_data: Result<JSON<ResearchSerializer>, SerdeError
                     let new_queue_entry = diesel::insert(&new_entry_model)
                         .into(queue_entries::table)
                         .get_result::<QueueEntry>(&*db)
-                        .expect("Failed to update user.");
+                        .expect("Failed to insert new queue entry.");
 
                     created()
                         .message("Queue entry added.")
