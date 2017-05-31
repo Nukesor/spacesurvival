@@ -74,118 +74,117 @@ pub fn get_researches(current_user: User, db: DB) -> APIResponse {
 /// - Checks if dependencies for research are fulfilled
 /// - Checks if there are enough resources
 /// - Removes resources from db
-#[post("/pod", data = "<research_data>", format = "application/json")]
-pub fn start_research(research_data: Result<JSON<ResearchSerializer>, SerdeError>,
+#[post("/pod", data = "<request_data>", format = "application/json")]
+pub fn start_research(request_data: Result<JSON<ResearchSerializer>, SerdeError>,
                           current_user: User,
                           db: DB)
                           -> APIResponse {
 
-    match research_data {
-        // Return specific error if invalid JSON has been sent.
-        Err(error) => return bad_request().message(format!("{}", error).as_str()),
-        Ok(entry) => {
-            // Check if the given research name maps to a research type.
-            let result = ResearchTypes::from_string(&entry.research_name);
-            match result {
-                // Early return if we don't know this research name
-                Err(_) => {
-                    return bad_request().message(format!("No such research type `{}`",
-                                                         entry.research_name)
-                                                         .as_str());
-                }
-                Ok(research_type) => {
-                    let dependency_strings = get_research_dependency_strings(&research_type);
-                    let mut research_level: i32;
-                    let research_list = get_research_list();
-                    // Get pod and queue from db
-                    let pod = pods_dsl::pods
-                        .filter(pods_dsl::user_id.eq(current_user.id))
-                        .first::<Pod>(&*db)
-                        .unwrap();
+    // Unwrap or return specific error if invalid JSON has been sent.
+    if let Err(error) = request_data {
+        return bad_request().message(format!("{}", error).as_str());
+    };
+    let research_data = request_data.unwrap();
 
-                    let research = research_dsl::researches
-                        .filter(research_dsl::pod_id.eq(pod.id))
-                        .filter(research_dsl::name.eq(research_type.to_string()))
-                        .get_result::<Research>(&*db);
-                    match research {
-                        // Research exists, we don't need to check for dependencies
-                        // We just increase the level by 1
-                        Ok(research) => {
-                            research_level = research.level + 1;
-                        }
-                        // The research is not yet here. We need to check for dependencies.
-                        // We just increase the level by 1
-                        Err(_) => {
-                            let dependencies = research_dsl::researches
-                                .filter(research_dsl::name.eq_any(dependency_strings))
-                                .get_results::<Research>(&*db);
+    // Check if the given research name maps to a research type.
+    let research_result = ResearchTypes::from_string(&research_data.research_name);
 
-                            let fulfilled = dependencies_fulfilled(&research_type,
-                                                                   dependencies,
-                                                                   &research_list);
-                            if !fulfilled {
-                                return bad_request().message("Dependencies not fulfilled.");
-                            }
-                            research_level = 1;
-                        }
-                    }
+    // Early return if we don't know this research name
+    if research_result.is_err() {
+        return bad_request().message(format!("No such research type `{}`",
+                                             research_data.research_name)
+                                             .as_str());
+    }
+    let research_type =  research_result.unwrap();
+    let dependency_strings = get_research_dependency_strings(&research_type);
+    let mut research_level: i32;
+    let research_list = get_research_list();
+    // Get pod and queue from db
+    let pod = pods_dsl::pods
+        .filter(pods_dsl::user_id.eq(current_user.id))
+        .first::<Pod>(&*db)
+        .unwrap();
 
-                    let queue = queues_dsl::queues
-                        .filter(queues_dsl::pod_id.eq(pod.id))
-                        .first::<Queue>(&*db)
-                        .unwrap();
+    let research = research_dsl::researches
+        .filter(research_dsl::pod_id.eq(pod.id))
+        .filter(research_dsl::name.eq(research_type.to_string()))
+        .get_result::<Research>(&*db);
 
-                    // Check if there already are existing queue entries for this research.
-                    // In case there are, we increase the level by the amount of existing entries.
-                    let existing_entries: i64 = queue_entries_dsl::queue_entries
-                        .count()
-                        .filter(queue_entries_dsl::queue_id.eq(queue.id))
-                        .filter(queue_entries_dsl::research_name.eq(research_type.to_string()))
-                        .get_result(&*db)
-                        .unwrap_or(0);
+    match research {
+        // Research exists, we don't need to check for dependencies
+        // We just increase the level by 1
+        Ok(research) => {
+            research_level = research.level + 1;
+        }
+        // The research is not yet here. We need to check for dependencies.
+        // We just increase the level by 1
+        Err(_) => {
+            let dependencies = research_dsl::researches
+                .filter(research_dsl::name.eq_any(dependency_strings))
+                .get_results::<Research>(&*db);
 
-                    let pod_resources = resources_dsl::resources
-                        .filter(resources_dsl::pod_id.eq(pod.id))
-                        .get_results(&*db)
-                        .expect("Failed to get user resources.");
-
-                    research_level += existing_entries as i32;
-
-                    let all_levels = &research_list
-                                          .get(&research_type)
-                                          .as_ref()
-                                          .expect("No research in yml for this type.")
-                                          .levels;
-
-                    if !(all_levels.len() <= research_level as usize) {
-                        return bad_request().message("Already at max level.");
-                    }
-                    let costs = &all_levels[research_level as usize].resources;
-                    if costs.is_some() && !Resource::check_resources(costs, pod_resources, &db) {
-                        return bad_request().message("Insufficient resources.");
-                    }
-
-                    // Create a new queue entry with the given research type.
-                    let new_entry_model = NewQueueEntry {
-                        queue_id: queue.id.clone(),
-                        research_name: Some(entry.research_name.clone()),
-                        module_name: None,
-                        module_id: None,
-                        level: research_level,
-                    };
-
-                    let new_queue_entry = diesel::insert(&new_entry_model)
-                        .into(queue_entries::table)
-                        .get_result::<QueueEntry>(&*db)
-                        .expect("Failed to insert new queue entry.");
-
-                    created()
-                        .message("Queue entry added.")
-                        .data(json!(&new_queue_entry))
-                }
+            let fulfilled = dependencies_fulfilled(&research_type,
+                                                   dependencies,
+                                                   &research_list);
+            if !fulfilled {
+                return bad_request().message("Dependencies not fulfilled.");
             }
+            research_level = 1;
         }
     }
+
+    let queue = queues_dsl::queues
+        .filter(queues_dsl::pod_id.eq(pod.id))
+        .first::<Queue>(&*db)
+        .unwrap();
+
+    // Check if there already are existing queue entries for this research.
+    // In case there are, we increase the level by the amount of existing entries.
+    let existing_entries: i64 = queue_entries_dsl::queue_entries
+        .count()
+        .filter(queue_entries_dsl::queue_id.eq(queue.id))
+        .filter(queue_entries_dsl::research_name.eq(research_type.to_string()))
+        .get_result(&*db)
+        .unwrap_or(0);
+
+    let pod_resources = resources_dsl::resources
+        .filter(resources_dsl::pod_id.eq(pod.id))
+        .get_results(&*db)
+        .expect("Failed to get user resources.");
+
+    research_level += existing_entries as i32;
+
+    let all_levels = &research_list
+                          .get(&research_type)
+                          .as_ref()
+                          .expect("No research in yml for this type.")
+                          .levels;
+
+    if !(all_levels.len() <= research_level as usize) {
+        return bad_request().message("Already at max level.");
+    }
+    let costs = &all_levels[research_level as usize].resources;
+    if costs.is_some() && !Resource::check_resources(costs, pod_resources, &db) {
+        return bad_request().message("Insufficient resources.");
+    }
+
+    // Create a new queue entry with the given research type.
+    let new_entry_model = NewQueueEntry {
+        queue_id: queue.id.clone(),
+        research_name: Some(research_data.research_name.clone()),
+        module_name: None,
+        module_id: None,
+        level: research_level,
+    };
+
+    let new_queue_entry = diesel::insert(&new_entry_model)
+        .into(queue_entries::table)
+        .get_result::<QueueEntry>(&*db)
+        .expect("Failed to insert new queue entry.");
+
+    created()
+        .message("Queue entry added.")
+        .data(json!(&new_queue_entry))
 }
 
 
