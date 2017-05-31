@@ -57,140 +57,137 @@ pub fn get_modules(current_user: User, db: DB) -> APIResponse {
 /// - Checks if dependencies for the module are fulfilled
 /// - Checks if there are enough resources
 /// - Removes resources from db
-#[post("/pod/new", data = "<new_module_data>", format = "application/json")]
-pub fn add_module(new_module_data: Result<JSON<NewModuleSerializer>, SerdeError>,
+#[post("/pod/new", data = "<request_data>", format = "application/json")]
+pub fn add_module(request_data: Result<JSON<NewModuleSerializer>, SerdeError>,
                           current_user: User,
                           db: DB)
                           -> APIResponse {
-    match new_module_data {
-        // Return specific error if invalid JSON has been sent.
-        Err(error) => return bad_request().message(format!("{}", error).as_str()),
-        Ok(data) => {
-            // Check if the given module name maps to a module type.
-            let result = ModuleTypes::from_string(&data.module_name);
-            match result {
-                // Early return if we don't know this module name
-                Err(_) => {
-                    return bad_request().message(format!("No such module type `{}`",
-                                                         data.module_name)
-                                                         .as_str());
-                }
-                Ok(module_type) => {
-                    let dependency_strings = get_module_dependency_strings(&module_type);
-                    let module_list = get_module_list();
 
-                    // Get pod and queue from db
-                    let pod = pods_dsl::pods
-                        .filter(pods_dsl::user_id.eq(current_user.id))
-                        .first::<Pod>(&*db)
-                        .unwrap();
+    // Unwrap or return specific error if invalid JSON has been sent.
+    if let Err(error) = request_data {
+        return bad_request().message(format!("{}", error).as_str());
+    };
+    let module_data = request_data.unwrap();
 
-                    let existing_module;
-                    // Check if there already exists a module for this position
-                    // We distinguish between stationary and normal modules.
+    // Check if the given module name maps to a module type.
+    let result = ModuleTypes::from_string(&module_data.module_name);
+    if result.is_err() {
+        return bad_request().message(format!("No such module type `{}`",
+                                             module_data.module_name)
+                                             .as_str());
+    }
+    let module_type = result.unwrap();
+    let dependency_strings = get_module_dependency_strings(&module_type);
+    let module_list = get_module_list();
 
-                    // Stationary modules have unique names and only exists once
-                    // per pod.
-                    if data.stationary {
-                        existing_module = module_dsl::modules
-                            .count()
-                            .filter(module_dsl::pod_id.eq(pod.id))
-                            .filter(module_dsl::name.eq(&data.module_name))
-                            .execute(&*db)
-                            .unwrap_or(0);
-                    }
-                    // Normal modules can exist multiple times. Thereby we just 
-                    // have to check if the requested position is free.
-                    else {
-                        existing_module = module_dsl::modules
-                            .count()
-                            .filter(module_dsl::pod_id.eq(pod.id))
-                            .filter(module_dsl::x_pos.eq(data.position_x))
-                            .filter(module_dsl::y_pos.eq(data.position_y))
-                            .execute(&*db)
-                            .unwrap_or(0);
-                    };
+    // Get pod and queue from db
+    let pod = pods_dsl::pods
+        .filter(pods_dsl::user_id.eq(current_user.id))
+        .first::<Pod>(&*db)
+        .unwrap();
 
-                    // Early return if there already is a module.
-                    if existing_module != 0 {
-                        return bad_request().message("There already is a module at this position.");
-                    }
+    let existing_module;
+    // Check if there already exists a module for this position
+    // We distinguish between stationary and normal modules.
 
-                    // Get the researches the module is depending on
-                    let dependencies = research_dsl::researches
-                        .filter(research_dsl::name.eq_any(dependency_strings))
-                        .get_results::<Research>(&*db);
+    // Stationary modules have unique names and only exists once
+    // per pod.
+    if module_data.stationary {
+        existing_module = module_dsl::modules
+            .count()
+            .filter(module_dsl::pod_id.eq(pod.id))
+            .filter(module_dsl::name.eq(&module_data.module_name))
+            .execute(&*db)
+            .unwrap_or(0);
+    }
+    // Normal modules can exist multiple times. Thereby we just 
+    // have to check if the requested position is free.
+    else {
+        existing_module = module_dsl::modules
+            .count()
+            .filter(module_dsl::pod_id.eq(pod.id))
+            .filter(module_dsl::x_pos.eq(module_data.position_x))
+            .filter(module_dsl::y_pos.eq(module_data.position_y))
+            .execute(&*db)
+            .unwrap_or(0);
+    };
 
-                    // Check if the dependencies are fulfilled.
-                    // If they're not fulfilled, return a bad request.
-                    let fulfilled = dependencies_fulfilled(&module_type,
-                                                           dependencies,
-                                                           &module_list);
-                    if !fulfilled {
-                        return bad_request().message("Dependencies not fulfilled.");
-                    }
+    // Early return if there already is a module.
+    if existing_module != 0 {
+        return bad_request().message("There already is a module at this position.");
+    }
 
-                    let queue = queues_dsl::queues
-                        .filter(queues_dsl::pod_id.eq(pod.id))
-                        .first::<Queue>(&*db)
-                        .unwrap();
+    // Get the researches the module is depending on
+    let dependencies = research_dsl::researches
+        .filter(research_dsl::name.eq_any(dependency_strings))
+        .get_results::<Research>(&*db);
 
-                    // Query all pod resources
-                    let pod_resources = resources_dsl::resources
-                        .filter(resources_dsl::pod_id.eq(pod.id))
-                        .get_results(&*db)
-                        .expect("Failed to get user resources.");
+    // Check if the dependencies are fulfilled.
+    // If they're not fulfilled, return a bad request.
+    let fulfilled = dependencies_fulfilled(&module_type,
+                                           dependencies,
+                                           &module_list);
+    if !fulfilled {
+        return bad_request().message("Dependencies not fulfilled.");
+    }
 
-                    // Get cost for level 1
-                    let costs= &module_list
-                                          .get(&module_type)
-                                          .as_ref()
-                                          .expect("No module in yml for this type.")
-                                          .levels[0].resources;
+    let queue = queues_dsl::queues
+        .filter(queues_dsl::pod_id.eq(pod.id))
+        .first::<Queue>(&*db)
+        .unwrap();
 
-                    if costs.is_some() {
-                        if !Resource::check_resources(&costs, pod_resources, &db) {
-                            return bad_request().message("Insufficient resources.");
-                        }
-                    }
+    // Query all pod resources
+    let pod_resources = resources_dsl::resources
+        .filter(resources_dsl::pod_id.eq(pod.id))
+        .get_results(&*db)
+        .expect("Failed to get user resources.");
 
-                    // Create a new module in the
-                    let new_module = NewModule {
-                        name: data.module_name.clone(),
-                        stationary: data.stationary,
-                        x_pos: data.position_x,
-                        y_pos: data.position_y,
+    // Get cost for level 1
+    let costs= &module_list
+                          .get(&module_type)
+                          .as_ref()
+                          .expect("No module in yml for this type.")
+                          .levels[0].resources;
 
-                        pod_id: Some(pod.id),
-                        base_id: None,
-                    };
-
-                    let module = diesel::insert(&new_module)
-                        .into(modules::table)
-                        .get_result::<Module>(&*db)
-                        .expect("Failed to create module.");
-
-                    // Create a new queue entry with the given module type.
-                    let new_entry_model = NewQueueEntry {
-                        queue_id: queue.id.clone(),
-                        research_name: None,
-                        module_name: Some(module.name),
-                        module_id: Some(module.id),
-                        level: 1,
-                    };
-
-                    let new_queue_entry = diesel::insert(&new_entry_model)
-                        .into(queue_entries::table)
-                        .get_result::<QueueEntry>(&*db)
-                        .expect("Failed to create queue entry.");
-
-                    created()
-                        .message("Queue entry added.")
-                        .data(json!(&new_queue_entry))
-                }
-            }
+    if costs.is_some() {
+        if !Resource::check_resources(&costs, pod_resources, &db) {
+            return bad_request().message("Insufficient resources.");
         }
     }
+
+    // Create a new module in the
+    let new_module = NewModule {
+        name: module_data.module_name.clone(),
+        stationary: module_data.stationary,
+        x_pos: module_data.position_x,
+        y_pos: module_data.position_y,
+
+        pod_id: Some(pod.id),
+        base_id: None,
+    };
+
+    let module = diesel::insert(&new_module)
+        .into(modules::table)
+        .get_result::<Module>(&*db)
+        .expect("Failed to create module.");
+
+    // Create a new queue entry with the given module type.
+    let new_entry_model = NewQueueEntry {
+        queue_id: queue.id.clone(),
+        research_name: None,
+        module_name: Some(module.name),
+        module_id: Some(module.id),
+        level: 1,
+    };
+
+    let new_queue_entry = diesel::insert(&new_entry_model)
+        .into(queue_entries::table)
+        .get_result::<QueueEntry>(&*db)
+        .expect("Failed to create queue entry.");
+
+    created()
+        .message("Queue entry added.")
+        .data(json!(&new_queue_entry))
 }
 
 
