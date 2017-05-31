@@ -21,9 +21,10 @@ use schema::queue_entries;
 use schema::modules::dsl as module_dsl;
 use schema::resources::dsl as resources_dsl;
 use schema::researches::dsl as research_dsl;
+use schema::queue_entries::dsl as queue_entries_dsl;
 
 use models::queue::{QueueEntry, NewQueueEntry};
-use validation::queue::{NewModuleSerializer, UpgradeModuleSerializer};
+use validation::queue::NewModuleSerializer;
 
 
 /// The user needs to be logged in to access this route!
@@ -208,19 +209,20 @@ pub fn remove_module(module_uuid: &str, current_user: User, db: DB) -> APIRespon
 }
 
 /// upgrade module from pod
-#[post("/pod/upgrade/<entry_uuid>")]
-pub fn upgrade_module(entry_uuid: &str, current_user: User, db: DB) -> APIResponse {
-
+#[post("/pod/upgrade/<module_uuid>")]
+pub fn upgrade_module(module_uuid: &str, current_user: User, db: DB) -> APIResponse {
     // Parse and check if we got a valid id
-    let result = Uuid::parse_str(entry_uuid);
+    let result = Uuid::parse_str(module_uuid);
     if result.is_err() {
         return bad_request().message("Got an invalid uuid");
     }
     let module_id = result.unwrap();
+    let pod = current_user.get_pod(&db);
 
     // Get the module
     let module_result = module_dsl::modules
         .filter(module_dsl::id.eq(module_id))
+        .filter(module_dsl::pod_id.eq(pod.id))
         .first::<Module>(&*db);
     if module_result.is_err() {
         return bad_request().message("No module with this id.");
@@ -275,73 +277,65 @@ pub fn upgrade_module(entry_uuid: &str, current_user: User, db: DB) -> APIRespon
 }
 
 
-///// Remove module upgrade from pod queue
-//#[delete("/pod/upgrade/<entry_uuid>")]
-//pub fn stop_module_upgrade(entry_uuid: &str, current_user: User, db: DB) -> APIResponse {
-//
-//    // Parse and check if we got a valid id
-//    let result = Uuid::parse_str(entry_uuid);
-//    if result.is_err() {
-//        return bad_request().message("Got an invalid uuid");
-//    }
-//    let queue_entry_id = result.unwrap();
-//
-//    // Get the queue entry
-//    let queue_entry_result = queue_entries_dsl::queue_entries
-//        .filter(queue_entries_dsl::id.eq(queue_entry_id))
-//        .first::<QueueEntry>(&*db);
-//    if queue_entry_result.is_err() {
-//        return bad_request().message("No queue entry with this id.");
-//    }
-//    let queue_entry = queue_entry_result.unwrap();
-//
-//    // Check if we got an module queue entry
-//    if queue_entry.module_id.is_none() {
-//        return bad_request().message("Queue entry is a model queue entry.");
-//    }
-//
-//    // Check if there already are existing queue entries for this module.
-//    // If there are entries with a higher level, we return a bad request.
-//    let level = queue_entry.level;
-//    let name = queue_entry.module_name.unwrap();
-//    let higher_entry = queue_entries_dsl::queue_entries
-//        .filter(queue_entries_dsl::queue_id.eq(queue_entry.queue_id))
-//        .filter(queue_entries_dsl::module_name.eq(&name))
-//        .filter(queue_entries_dsl::level.gt(queue_entry.level))
-//        .get_result::<QueueEntry>(&*db);
-//    if higher_entry.is_ok() {
-//        return bad_request().message("Can't delete. There is an queue entry with a higher level for this module.");
-//    }
-//
-//    // Get all needed info for resource manipulation
-//    let module_list = get_module_list();
-//
-//    let pod = pods_dsl::pods
-//        .filter(pods_dsl::user_id.eq(current_user.id))
-//        .first::<Pod>(&*db)
-//        .unwrap();
-//
-//    let pod_resources = resources_dsl::resources
-//        .filter(resources_dsl::pod_id.eq(pod.id))
-//        .get_results::<Resource>(&*db)
-//        .expect("Failed to get user resources.");
-//
-//    // Add resources from module to pod resources
-//    let all_levels = &module_list
-//                          .get(&ModuleTypes::from_string(&name).unwrap())
-//                          .unwrap()
-//                          .levels;
-//    let costs_result = &all_levels[level as usize].resources;
-//
-//    if let Some(ref costs) = *costs_result {
-//        Resource::update_resources(costs, pod_resources, false, &db);
-//    }
-//
-//    // Remove queue_entry from database
-//    diesel::delete(queue_entries_dsl::queue_entries
-//                       .filter(queue_entries_dsl::id.eq(queue_entry_id)))
-//            .execute(&*db)
-//            .expect("Failed to remove queue_entry.");
-//
-//    ok().message("Resource removed.")
-//}
+/// Remove module upgrade from pod queue
+#[delete("/pod/upgrade/<module_uuid>")]
+pub fn stop_module_upgrade(module_uuid: &str, current_user: User, db: DB) -> APIResponse {
+    // Parse and check if we got a valid id
+    let result = Uuid::parse_str(module_uuid);
+    if result.is_err() {
+        return bad_request().message("Got an invalid uuid");
+    }
+    let module_id = result.unwrap();
+    let (pod, queue) = current_user.get_pod_and_queue(&db);
+
+    // Get the queue entry
+    let queue_entry_result = queue_entries_dsl::queue_entries
+        .filter(queue_entries_dsl::module_id.eq(module_id))
+        .filter(queue_entries_dsl::queue_id.eq(queue.id))
+        .order(queue_entries_dsl::level.desc())
+        .first::<QueueEntry>(&*db);
+    if queue_entry_result.is_err() {
+        return bad_request().message("No queue entry with this id.");
+    }
+    let queue_entry = queue_entry_result.unwrap();
+
+    let module = module_dsl::modules
+        .filter(module_dsl::id.eq(module_id))
+        .get_result::<Module>(&*db)
+        .expect("Failed to get a module");
+
+    // Get all needed info for resource manipulation
+    let module_list = get_module_list();
+
+    let pod_resources = resources_dsl::resources
+        .filter(resources_dsl::pod_id.eq(pod.id))
+        .get_results::<Resource>(&*db)
+        .expect("Failed to get user resources.");
+
+    // Add resources from module to pod resources
+    let all_levels = &module_list
+                          .get(&ModuleTypes::from_string(&module.name).unwrap())
+                          .unwrap()
+                          .levels;
+    let costs_result = &all_levels[module.level as usize].resources;
+
+    if let Some(ref costs) = *costs_result {
+        Resource::update_resources(costs, pod_resources, false, &db);
+    }
+
+    // Remove queue_entry from database
+    diesel::delete(queue_entries_dsl::queue_entries
+                       .filter(queue_entries_dsl::id.eq(queue_entry.id)))
+            .execute(&*db)
+            .expect("Failed to remove queue_entry.");
+
+    // Remove module if it's just a upgrade dummy.
+    if module.level == 0 {
+        diesel::delete(module_dsl::modules
+                       .filter(module_dsl::id.eq(module.id)))
+            .execute(&*db)
+            .expect("Failed to remove module.");
+    }
+
+    ok().message("Module upgrade stopped.")
+}
