@@ -1,7 +1,6 @@
 use diesel;
 use diesel::prelude::*;
 use rocket_contrib::{JSON, SerdeError};
-use uuid::Uuid;
 
 use data::types::*;
 use data::researches::get_research_list;
@@ -189,50 +188,40 @@ pub fn start_research(request_data: Result<JSON<ResearchSerializer>, SerdeError>
 
 
 /// Remove research from queue
-#[delete("/pod/<entry_uuid>")]
-pub fn stop_research(entry_uuid: &str, current_user: User, db: DB) -> APIResponse {
+#[delete("/pod/<research_name>")]
+pub fn stop_research(research_name: &str, current_user: User, db: DB) -> APIResponse {
 
-    // Parse and check if we got a valid id
-    let result = Uuid::parse_str(entry_uuid);
-    if result.is_err() {
-        return bad_request().message("Got an invalid uuid");
-    }
-    let queue_entry_id = result.unwrap();
-
-    // Get the queue entry
-    let queue_entry_result = queue_entries_dsl::queue_entries
-        .filter(queue_entries_dsl::id.eq(queue_entry_id))
-        .first::<QueueEntry>(&*db);
-    if queue_entry_result.is_err() {
-        return bad_request().message("No queue entry with this id.");
-    }
-    let queue_entry = queue_entry_result.unwrap();
-
-    // Check if we got an research queue entry
-    if queue_entry.research_name.is_none() {
-        return bad_request().message("Queue entry is a model queue entry.");
+    // Check if there is a research for this research_name
+    let research_result = ResearchTypes::from_str(research_name);
+    // Early return if we don't know this research name
+    if research_result.is_err() {
+        return bad_request().message(format!("No such research type `{}`", research_name).as_str());
     }
 
-    // Check if there already are existing queue entries for this research.
-    // If there are entries with a higher level, we return a bad request.
-    let level = queue_entry.level;
-    let name = queue_entry.research_name.unwrap();
-    let higher_entry = queue_entries_dsl::queue_entries
-        .filter(queue_entries_dsl::queue_id.eq(queue_entry.queue_id))
-        .filter(queue_entries_dsl::research_name.eq(&name))
-        .filter(queue_entries_dsl::level.gt(queue_entry.level))
-        .get_result::<QueueEntry>(&*db);
-    if higher_entry.is_ok() {
-        return bad_request().message("Can't delete. There is an queue entry with a higher level for this research.");
-    }
-
-    // Get all needed info for resource manipulation
-    let research_list = get_research_list();
-
+    // Get user pod and pod queue
     let pod = pods_dsl::pods
         .filter(pods_dsl::user_id.eq(current_user.id))
         .first::<Pod>(&*db)
         .unwrap();
+    let queue = queues_dsl::queues
+        .filter(queues_dsl::pod_id.eq(pod.id))
+        .first::<Queue>(&*db)
+        .unwrap();
+
+    // Check if there exists a queue entry for this research and this pod.
+    // Early return if this isn't the case.
+    let research_entry_result = queue_entries_dsl::queue_entries
+        .filter(queue_entries_dsl::queue_id.eq(queue.id))
+        .filter(queue_entries_dsl::research_name.eq(research_name))
+        .order(queue_entries_dsl::level.desc())
+        .get_result::<QueueEntry>(&*db);
+    if research_entry_result.is_ok() {
+        return bad_request().message("Can't delete. There is no queue entry for this research.");
+    }
+    let research_entry = research_entry_result.unwrap();
+
+    // Get all needed info for resource manipulation
+    let research_list = get_research_list();
 
     let pod_resources = resources_dsl::resources
         .filter(resources_dsl::pod_id.eq(pod.id))
@@ -241,10 +230,10 @@ pub fn stop_research(entry_uuid: &str, current_user: User, db: DB) -> APIRespons
 
     // Add resources from research to pod resources
     let all_levels = &research_list
-                          .get(&ResearchTypes::from_string(&name).unwrap())
+                          .get(&ResearchTypes::from_str(research_name).unwrap())
                           .unwrap()
                           .levels;
-    let costs_result = &all_levels[level as usize].resources;
+    let costs_result = &all_levels[research_entry.level as usize].resources;
 
     if let Some(ref costs) = *costs_result {
         Resource::update_resources(costs, pod_resources, false, &db);
@@ -252,7 +241,7 @@ pub fn stop_research(entry_uuid: &str, current_user: User, db: DB) -> APIRespons
 
     // Remove queue_entry from database
     diesel::delete(queue_entries_dsl::queue_entries
-                       .filter(queue_entries_dsl::id.eq(queue_entry_id)))
+                       .filter(queue_entries_dsl::id.eq(research_entry.id)))
             .execute(&*db)
             .expect("Failed to remove queue_entry.");
 
