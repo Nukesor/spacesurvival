@@ -19,7 +19,7 @@ view model =
             , input
                 [ type_ "password", placeholder "Password", onInput (updatePassword user), value user.password ]
                 []
-            , a [ onClick <| Messages.ChangeAuthView Model.Login, href "#" ] [ text "back to login" ]
+            , a [ onClick <| Messages.UpdateUser (LoggingIn { identifier = "", password = "" }), href "#" ] [ text "back to login" ]
             , button [ onClick Messages.Register ] [ text "Sign Up!" ]
             ]
 

@@ -25,7 +25,7 @@ init =
     { grid = createGrid
     , user = LoggingIn { identifier = "", password = "" }
     , authDialogAnimation = Animation.interrupt Animations.dialogAppear Animations.dialogAppearStyle
-    , authView = Model.Login
+    , mainView = GridView
     , availableModules =
         [ { name = "hypercharge capacitor"
           , id = "1"

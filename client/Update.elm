@@ -20,16 +20,13 @@ update msg model =
         Messages.Register ->
             model ! [ Api.Auth.register model ]
 
-        ChangeAuthView view ->
-            { model | authView = view } ! []
-
         UpdateUser user ->
             { model | user = user } ! []
 
         Registered result ->
             case Debug.log "register result" result of
                 Ok user ->
-                    { model | authView = Model.Login, user = Model.User.LoggingIn user } ! []
+                    { model | user = Model.User.LoggingIn user } ! []
 
                 Err _ ->
                     model ! []
@@ -65,3 +62,6 @@ update msg model =
 
                 Err err ->
                     { model | user = Model.User.LoggingIn { identifier = "", password = "" } } ! []
+
+        SetMainView view ->
+            { model | mainView = view } ! []

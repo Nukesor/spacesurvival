@@ -1,6 +1,6 @@
 module Model exposing (..)
 
-import Model.Grid exposing (..)
+import Model.Grid
 import Model.User exposing (User)
 import Model.Modules exposing (..)
 import Model.Research exposing (..)
@@ -10,16 +10,16 @@ import Model.Util
 
 
 type alias Model =
-    { grid : Grid
+    { grid : Model.Grid.Grid
     , user : User
     , authDialogAnimation : Animation.State
-    , authView : AuthView
     , availableModules : List Module
     , researches : Dict.Dict String Research
     , buildingAt : Maybe Model.Util.Point
+    , mainView : MainView
     }
 
 
-type AuthView
-    = Register
-    | Login
+type MainView
+    = GridView
+    | ResearchView

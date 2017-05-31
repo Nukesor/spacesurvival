@@ -13,7 +13,7 @@ import View.BuildDialog
 
 view : Model -> Html.Html Msg
 view model =
-    div []
+    div [ class "grid-container" ]
         [ svg []
             (Grid.map
                 slot

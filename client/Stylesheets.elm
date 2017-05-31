@@ -1,8 +1,10 @@
 port module Stylesheets exposing (..)
 
-import Css.File exposing (CssFileStructure, CssCompilerProgram)
+import Css.File exposing (CssCompilerProgram, CssFileStructure)
 import View.Background
 import View.BuildDialog
+import View.Layout
+import View.MenuBar
 
 
 port files : CssFileStructure -> Cmd msg
@@ -15,6 +17,8 @@ fileStructure =
           , Css.File.compile
                 [ View.Background.rules
                 , View.BuildDialog.rules
+                , View.Layout.rules
+                , View.MenuBar.rules
                 ]
           )
         ]

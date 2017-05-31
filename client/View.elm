@@ -5,13 +5,13 @@ import Html exposing (..)
 import Html.Attributes exposing (..)
 import Html.Events exposing (..)
 import Messages
-import View.Grid
 import View.Background
 import Html.CssHelpers
 import Model.User exposing (..)
 import Animation
 import View.Login
 import View.Register
+import View.Layout
 
 
 css : Html.CssHelpers.Namespace String class id msg
@@ -25,7 +25,7 @@ view model =
         currentView =
             case model.user of
                 LoggedIn user ->
-                    div [ class "grid-container" ] [ View.Grid.view model ]
+                    View.Layout.view model
 
                 _ ->
                     auth model
