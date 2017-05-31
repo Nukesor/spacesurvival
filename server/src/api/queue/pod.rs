@@ -23,7 +23,7 @@ pub fn pod_queue_entries(current_user: User, db: DB) -> APIResponse {
 
     if queue_entry_result.is_ok() {
         let queue_entries = queue_entry_result.unwrap();
-        ok().message("Research data.").data(json!(&queue_entries))
+        ok().message("Queue data.").data(json!(&queue_entries))
     } else {
         ok().message("Queue is empty.")
     }

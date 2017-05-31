@@ -2,6 +2,7 @@ module Messages exposing (..)
 
 import Animation
 import Http
+import Json.Decode
 import Model exposing (MainView)
 import Model.Research
 import Model.User exposing (..)
@@ -19,3 +20,5 @@ type Msg
     | ShowBuildDialog (Maybe Point)
     | ReceiveResearches (Result Http.Error Model.Research.Researches)
     | SetMainView MainView
+    | ReceiveQueue (Result Http.Error Json.Decode.Value)
+    | ReceiveQueueEntry (Result Http.Error Json.Decode.Value)

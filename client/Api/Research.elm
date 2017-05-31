@@ -1,13 +1,12 @@
 module Api.Research exposing (..)
 
 import Api.Util exposing (..)
-import Http exposing (emptyBody, expectJson)
-import Json.Decode as Decode
+import Dict
+import Json.Decode as Decode exposing (value)
 import Json.Decode.Extra exposing ((|:))
 import Messages
+import Model exposing (Model)
 import Model.Research exposing (..)
-import Model.User exposing (User(LoggedIn))
-import Dict
 
 
 researchesDecoder : Decode.Decoder (Dict.Dict String Research)
@@ -38,25 +37,10 @@ researchLevelDecoder =
            )
 
 
-fetchResearches : { a | user : User } -> Cmd Messages.Msg
+fetchResearches : Model -> Cmd Messages.Msg
 fetchResearches model =
-    case model.user of
-        LoggedIn user ->
-            let
-                request =
-                    Http.request
-                        { method = "GET"
-                        , headers =
-                            [ Http.header "Authorization" user.token
-                            ]
-                        , url = "/api/researches/pod"
-                        , expect = expectJson researchesDecoder
-                        , body = emptyBody
-                        , timeout = Nothing
-                        , withCredentials = False
-                        }
-            in
-                Http.send Messages.ReceiveResearches request
+    authenticatedGet model "/api/researches/pod" researchesDecoder Messages.ReceiveResearches
 
-        _ ->
-            Cmd.none
+
+startResearching model key =
+    authenticatedPost model ("/api/researches/pod/" ++ key) value Messages.ReceiveQueueEntry

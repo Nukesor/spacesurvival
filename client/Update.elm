@@ -2,6 +2,7 @@ module Update exposing (..)
 
 import Animation
 import Api.Auth
+import Api.Queue
 import Api.Research
 import Messages exposing (..)
 import Model exposing (..)
@@ -41,6 +42,7 @@ update msg model =
                         updatedModel
                             ! [ Api.Auth.saveToken user.token
                               , Api.Research.fetchResearches updatedModel
+                              , Api.Queue.getQueue updatedModel
                               ]
 
                 Err err ->
@@ -63,5 +65,21 @@ update msg model =
                 Err err ->
                     { model | user = Model.User.LoggingIn { identifier = "", password = "" } } ! []
 
+        ReceiveQueue result ->
+            case Debug.log "queue" result of
+                Ok queue ->
+                    model ! []
+
+                Err err ->
+                    model ! []
+
         SetMainView view ->
             { model | mainView = view } ! []
+
+        ReceiveQueueEntry result ->
+            case Debug.log "queue entry" result of
+                Ok entry ->
+                    model ! []
+
+                Err err ->
+                    model ! []
