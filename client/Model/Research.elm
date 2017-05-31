@@ -27,3 +27,7 @@ type alias ResourceId =
 
 type alias Researches =
     Dict.Dict ResearchId Research
+
+
+availableForQueueing researches =
+    researches
