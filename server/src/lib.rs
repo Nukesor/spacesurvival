@@ -75,7 +75,7 @@ pub fn rocket_factory() -> rocket::Rocket {
                api::module::general::get_info,
                api::module::pod::get_modules,
                api::module::pod::add_module,
-//               api::module::pod::remove_module,
+               api::module::pod::remove_module,
                api::module::pod::upgrade_module,
 //               api::module::pod::stop_module_upgrade,
         ])

@@ -50,6 +50,7 @@ pub fn get_modules(current_user: User, db: DB) -> APIResponse {
 /// - Checks if dependencies for the module are fulfilled
 /// - Checks if there are enough resources
 /// - Removes resources from db
+/// - Creates a new queue entry for this research
 #[post("/pod/new", data = "<request_data>", format = "application/json")]
 pub fn add_module(request_data: Result<JSON<NewModuleSerializer>, SerdeError>,
                           current_user: User,
@@ -175,76 +176,36 @@ pub fn add_module(request_data: Result<JSON<NewModuleSerializer>, SerdeError>,
 }
 
 
-///// Remove module from pod
-//#[delete("/pod/<entry_uuid>")]
-//pub fn remove_module(entry_uuid: &str, current_user: User, db: DB) -> APIResponse {
-//
-//    // Parse and check if we got a valid id
-//    let result = Uuid::parse_str(entry_uuid);
-//    if result.is_err() {
-//        return bad_request().message("Got an invalid uuid");
-//    }
-//    let queue_entry_id = result.unwrap();
-//
-//    // Get the queue entry
-//    let queue_entry_result = queue_entries_dsl::queue_entries
-//        .filter(queue_entries_dsl::id.eq(queue_entry_id))
-//        .first::<QueueEntry>(&*db);
-//    if queue_entry_result.is_err() {
-//        return bad_request().message("No queue entry with this id.");
-//    }
-//    let queue_entry = queue_entry_result.unwrap();
-//
-//    // Check if we got an module queue entry
-//    if queue_entry.module_name.is_none() {
-//        return bad_request().message("Queue entry is a model queue entry.");
-//    }
-//
-//    // Check if there already are existing queue entries for this module.
-//    // If there are entries with a higher level, we return a bad request.
-//    let level = queue_entry.level;
-//    let name = queue_entry.module_name.unwrap();
-//    let higher_entry = queue_entries_dsl::queue_entries
-//        .filter(queue_entries_dsl::queue_id.eq(queue_entry.queue_id))
-//        .filter(queue_entries_dsl::module_name.eq(&name))
-//        .filter(queue_entries_dsl::level.gt(queue_entry.level))
-//        .get_result::<QueueEntry>(&*db);
-//    if higher_entry.is_ok() {
-//        return bad_request().message("Can't delete. There is an queue entry with a higher level for this module.");
-//    }
-//
-//    // Get all needed info for resource manipulation
-//    let module_list = get_module_list();
-//
-//    let pod = pods_dsl::pods
-//        .filter(pods_dsl::user_id.eq(current_user.id))
-//        .first::<Pod>(&*db)
-//        .unwrap();
-//
-//    let pod_resources = resources_dsl::resources
-//        .filter(resources_dsl::pod_id.eq(pod.id))
-//        .get_results::<Resource>(&*db)
-//        .expect("Failed to get user resources.");
-//
-//    // Add resources from module to pod resources
-//    let all_levels = &module_list
-//                          .get(&ModuleTypes::from_string(&name).unwrap())
-//                          .unwrap()
-//                          .levels;
-//    let costs_result = &all_levels[level as usize].resources;
-//
-//    if let Some(ref costs) = *costs_result {
-//        Resource::update_resources(costs, pod_resources, false, &db);
-//    }
-//
-//    // Remove queue_entry from database
-//    diesel::delete(queue_entries_dsl::queue_entries
-//                       .filter(queue_entries_dsl::id.eq(queue_entry_id)))
-//            .execute(&*db)
-//            .expect("Failed to remove queue_entry.");
-//
-//    ok().message("Resource removed.")
-//}
+/// Remove module from pod
+#[delete("/pod/<module_uuid>")]
+pub fn remove_module(module_uuid: &str, current_user: User, db: DB) -> APIResponse {
+    // Parse and check if we got a valid id
+    let result = Uuid::parse_str(module_uuid);
+    if result.is_err() {
+        return bad_request().message("Got an invalid uuid");
+    }
+    let module_id = result.unwrap();
+
+    let pod = current_user.get_pod(&db);
+
+    // Get the module
+    let module_result = module_dsl::modules
+        .filter(module_dsl::id.eq(module_id))
+        .filter(module_dsl::pod_id.eq(pod.id))
+        .first::<Module>(&*db);
+    if module_result.is_err() {
+        return bad_request().message("No module with this id.");
+    }
+    let module = module_result.unwrap();
+
+    // Remove queue_entry from database
+    diesel::delete(module_dsl::modules
+                       .filter(module_dsl::id.eq(module.id)))
+            .execute(&*db)
+            .expect("Failed to remove module.");
+
+    ok().message("Module removed.")
+}
 
 /// upgrade module from pod
 #[post("/pod/upgrade/<entry_uuid>")]
