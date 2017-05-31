@@ -27,10 +27,7 @@ pub fn settings(pod_settings: Result<JSON<PodSettingsSerializer>, SerdeError>,
         Err(error) => return bad_request().message(format!("{}", error).as_str()),
         Ok(settings) => {
             // Get current pod
-            let current_pod = pods_dsl::pods
-                .filter(pods_dsl::user_id.eq(current_user.id))
-                .first::<Pod>(&*db)
-                .unwrap();
+            let current_pod = current_user.get_pod(&db);
 
             // Create changed pod model and push it to the DB
             let changed_pod = ChangedPod { name: settings.name.clone() };

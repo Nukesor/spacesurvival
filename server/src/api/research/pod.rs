@@ -8,20 +8,17 @@ use data::helper::{get_research_dependency_strings, dependencies_fulfilled};
 use helpers::db::DB;
 use responses::{APIResponse, bad_request, created, ok};
 
-use models::pod::Pod;
 use models::user::User;
 use models::research::{Research, NewResearch};
 use models::resource::Resource;
 
 use schema::researches;
 use schema::queue_entries;
-use schema::pods::dsl as pods_dsl;
-use schema::queues::dsl as queues_dsl;
 use schema::resources::dsl as resources_dsl;
 use schema::researches::dsl as research_dsl;
 use schema::queue_entries::dsl as queue_entries_dsl;
 
-use models::queue::{QueueEntry, Queue, NewQueueEntry};
+use models::queue::{QueueEntry, NewQueueEntry};
 
 
 /// The user needs to be logged in to access this route!
@@ -32,19 +29,15 @@ use models::queue::{QueueEntry, Queue, NewQueueEntry};
 pub fn get_researches(current_user: User, db: DB) -> APIResponse {
 
     let mut research_list = get_research_list();
-    // Create changed pod model and push it to the DB
 
-    let pod = pods_dsl::pods
-        .filter(pods_dsl::user_id.eq(current_user.id))
-        .get_result::<Pod>(&*db)
-        .expect("Failed to get user pod.");
-
-    let pod_result = research_dsl::researches
+    // Ger current pod and pod researches
+    let pod = current_user.get_pod(&db);
+    let research_result = research_dsl::researches
         .filter(research_dsl::pod_id.eq(pod.id))
         .get_results::<Research>(&*db);
 
-    if pod_result.is_ok() {
-        let researches = pod_result.unwrap();
+    if research_result.is_ok() {
+        let researches = research_result.unwrap();
         for research in researches {
             let type_result = ResearchTypes::from_string(&research.name);
             if type_result.is_err() {
@@ -91,11 +84,7 @@ pub fn start_research(research_name: &str,
     let mut research_level: i32;
     let research_list = get_research_list();
 
-    // Get pod and queue from db
-    let pod = pods_dsl::pods
-        .filter(pods_dsl::user_id.eq(current_user.id))
-        .first::<Pod>(&*db)
-        .unwrap();
+    let (pod, queue) = current_user.get_pod_and_queue(&db);
 
     let mut research = research_dsl::researches
         .filter(research_dsl::pod_id.eq(pod.id))
@@ -136,12 +125,8 @@ pub fn start_research(research_name: &str,
 
             research_level = 1;
         }
-    }
 
-    let queue = queues_dsl::queues
-        .filter(queues_dsl::pod_id.eq(pod.id))
-        .first::<Queue>(&*db)
-        .unwrap();
+    }
 
     // Check if there already are existing queue entries for this research.
     // In case there are, we increase the level by the amount of existing entries.
@@ -206,14 +191,7 @@ pub fn stop_research(research_name: &str, current_user: User, db: DB) -> APIResp
     let research_type = research_type_result.unwrap();
 
     // Get user pod and pod queue
-    let pod = pods_dsl::pods
-        .filter(pods_dsl::user_id.eq(current_user.id))
-        .first::<Pod>(&*db)
-        .unwrap();
-    let queue = queues_dsl::queues
-        .filter(queues_dsl::pod_id.eq(pod.id))
-        .first::<Queue>(&*db)
-        .unwrap();
+    let (pod, queue) = current_user.get_pod_and_queue(&db);
 
     // Check if there exists a queue entry for this research and this pod.
     // Early return if this isn't the case.

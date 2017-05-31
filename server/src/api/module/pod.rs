@@ -10,7 +10,6 @@ use data::helper::{get_module_dependency_strings, dependencies_fulfilled};
 use helpers::db::DB;
 use responses::{APIResponse, bad_request, created, ok};
 
-use models::pod::Pod;
 use models::user::User;
 use models::module::{NewModule,Module};
 use models::research::Research;
@@ -19,13 +18,11 @@ use models::resource::Resource;
 use schema::modules;
 use schema::queue_entries;
 
-use schema::pods::dsl as pods_dsl;
-use schema::queues::dsl as queues_dsl;
 use schema::modules::dsl as module_dsl;
 use schema::resources::dsl as resources_dsl;
 use schema::researches::dsl as research_dsl;
 
-use models::queue::{QueueEntry, Queue, NewQueueEntry};
+use models::queue::{QueueEntry, NewQueueEntry};
 use validation::queue::{NewModuleSerializer, UpgradeModuleSerializer};
 
 
@@ -35,11 +32,7 @@ use validation::queue::{NewModuleSerializer, UpgradeModuleSerializer};
 #[get("/pod")]
 pub fn get_modules(current_user: User, db: DB) -> APIResponse {
 
-    let pod = pods_dsl::pods
-        .filter(pods_dsl::user_id.eq(current_user.id))
-        .get_result::<Pod>(&*db)
-        .expect("Failed to get user pod.");
-
+    let pod = current_user.get_pod(&db);
     let module_result = module_dsl::modules
         .filter(module_dsl::pod_id.eq(pod.id))
         .get_results::<Module>(&*db);
@@ -80,11 +73,7 @@ pub fn add_module(request_data: Result<JSON<NewModuleSerializer>, SerdeError>,
     let dependency_strings = get_module_dependency_strings(&module_type);
     let module_list = get_module_list();
 
-    // Get pod and queue from db
-    let pod = pods_dsl::pods
-        .filter(pods_dsl::user_id.eq(current_user.id))
-        .first::<Pod>(&*db)
-        .unwrap();
+    let (pod, queue) = current_user.get_pod_and_queue(&db);
 
     let existing_module;
     // Check if there already exists a module for this position
@@ -130,11 +119,6 @@ pub fn add_module(request_data: Result<JSON<NewModuleSerializer>, SerdeError>,
     if !fulfilled {
         return bad_request().message("Dependencies not fulfilled.");
     }
-
-    let queue = queues_dsl::queues
-        .filter(queues_dsl::pod_id.eq(pod.id))
-        .first::<Queue>(&*db)
-        .unwrap();
 
     // Query all pod resources
     let pod_resources = resources_dsl::resources
@@ -286,16 +270,7 @@ pub fn upgrade_module(entry_uuid: &str, current_user: User, db: DB) -> APIRespon
     // Get all needed info for resource manipulation
     let module_list = get_module_list();
 
-    let pod = pods_dsl::pods
-        .filter(pods_dsl::user_id.eq(current_user.id))
-        .first::<Pod>(&*db)
-        .unwrap();
-
-    let queue = queues_dsl::queues
-        .filter(queues_dsl::pod_id.eq(pod.id))
-        .first::<Queue>(&*db)
-        .unwrap();
-
+    let (pod, queue) = current_user.get_pod_and_queue(&db);
 
     let pod_resources = resources_dsl::resources
         .filter(resources_dsl::pod_id.eq(pod.id))

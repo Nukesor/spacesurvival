@@ -11,6 +11,11 @@ use schema::users;
 use helpers::util;
 use helpers::db::DB;
 
+use models::pod::Pod;
+use schema::pods::dsl as pods_dsl;
+use models::queue::Queue;
+use schema::queues::dsl as queues_dsl;
+
 #[derive(Debug, Serialize, Deserialize, Identifiable, Queryable, Associations)]
 pub struct User {
     pub id: Uuid,
@@ -45,6 +50,29 @@ impl User {
             .into(users::table)
             .get_result::<User>(&**db)
             .expect("Error inserting new user into database.")
+    }
+
+    pub fn get_pod(&self, db: &DB) -> Pod {
+        // Get pod and queue from db
+        pods_dsl::pods
+            .filter(pods_dsl::user_id.eq(self.id))
+            .first::<Pod>(&**db)
+            .unwrap()
+    }
+
+
+    pub fn get_pod_and_queue(&self, db: &DB) -> (Pod, Queue) {
+        // Get pod and queue from db
+        let pod = pods_dsl::pods
+            .filter(pods_dsl::user_id.eq(self.id))
+            .first::<Pod>(&**db)
+            .unwrap();
+        let queue = queues_dsl::queues
+            .filter(queues_dsl::pod_id.eq(pod.id))
+            .first::<Queue>(&**db)
+            .unwrap();
+
+        (pod, queue)
     }
 
     pub fn make_password_hash(new_password: &str) -> Vec<u8> {
