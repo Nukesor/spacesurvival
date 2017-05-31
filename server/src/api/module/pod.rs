@@ -155,7 +155,7 @@ pub fn add_module(request_data: Result<JSON<NewModuleSerializer>, SerdeError>,
         }
     }
 
-    // Create a new module in the
+    // Create the new module
     let new_module = NewModule {
         name: module_data.module_name.clone(),
         stationary: module_data.stationary,

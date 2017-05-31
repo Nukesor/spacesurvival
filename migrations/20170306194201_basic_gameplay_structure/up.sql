@@ -64,7 +64,7 @@ CREATE TABLE modules (
 
 CREATE TABLE researches (
     name VARCHAR(120) not null,
-    level integer not null default 1,
+    level integer not null default 0,
     UNIQUE (name, base_id, pod_id),
 
     id UUID PRIMARY KEY default uuid_generate_v4(),

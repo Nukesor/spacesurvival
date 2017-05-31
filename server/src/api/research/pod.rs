@@ -1,6 +1,5 @@
 use diesel;
 use diesel::prelude::*;
-use rocket_contrib::{JSON, SerdeError};
 
 use data::types::*;
 use data::researches::get_research_list;
@@ -11,9 +10,10 @@ use responses::{APIResponse, bad_request, created, ok};
 
 use models::pod::Pod;
 use models::user::User;
-use models::research::Research;
+use models::research::{Research, NewResearch};
 use models::resource::Resource;
 
+use schema::researches;
 use schema::queue_entries;
 use schema::pods::dsl as pods_dsl;
 use schema::queues::dsl as queues_dsl;
@@ -22,7 +22,6 @@ use schema::researches::dsl as research_dsl;
 use schema::queue_entries::dsl as queue_entries_dsl;
 
 use models::queue::{QueueEntry, Queue, NewQueueEntry};
-use validation::queue::ResearchSerializer;
 
 
 /// The user needs to be logged in to access this route!
@@ -73,38 +72,32 @@ pub fn get_researches(current_user: User, db: DB) -> APIResponse {
 /// - Checks if dependencies for research are fulfilled
 /// - Checks if there are enough resources
 /// - Removes resources from db
-#[post("/pod", data = "<request_data>", format = "application/json")]
-pub fn start_research(request_data: Result<JSON<ResearchSerializer>, SerdeError>,
+#[post("/pod/<research_name>")]
+pub fn start_research(research_name: &str,
                           current_user: User,
                           db: DB)
                           -> APIResponse {
 
-    // Unwrap or return specific error if invalid JSON has been sent.
-    if let Err(error) = request_data {
-        return bad_request().message(format!("{}", error).as_str());
-    };
-    let research_data = request_data.unwrap();
-
     // Check if the given research name maps to a research type.
-    let research_result = ResearchTypes::from_string(&research_data.research_name);
-
     // Early return if we don't know this research name
+    let research_result = ResearchTypes::from_str(research_name);
     if research_result.is_err() {
-        return bad_request().message(format!("No such research type `{}`",
-                                             research_data.research_name)
-                                             .as_str());
+        return bad_request().message(format!("No such research type `{}`", research_name).as_str());
     }
     let research_type =  research_result.unwrap();
+
+    // Get and set some variables we need for querying and dependency checking.
     let dependency_strings = get_research_dependency_strings(&research_type);
     let mut research_level: i32;
     let research_list = get_research_list();
+
     // Get pod and queue from db
     let pod = pods_dsl::pods
         .filter(pods_dsl::user_id.eq(current_user.id))
         .first::<Pod>(&*db)
         .unwrap();
 
-    let research = research_dsl::researches
+    let mut research = research_dsl::researches
         .filter(research_dsl::pod_id.eq(pod.id))
         .filter(research_dsl::name.eq(research_type.to_string()))
         .get_result::<Research>(&*db);
@@ -116,7 +109,7 @@ pub fn start_research(request_data: Result<JSON<ResearchSerializer>, SerdeError>
             research_level = research.level + 1;
         }
         // The research is not yet here. We need to check for dependencies.
-        // We just increase the level by 1
+        // We also create a new research object in the database with level 0.
         Err(_) => {
             let dependencies = research_dsl::researches
                 .filter(research_dsl::name.eq_any(dependency_strings))
@@ -128,6 +121,19 @@ pub fn start_research(request_data: Result<JSON<ResearchSerializer>, SerdeError>
             if !fulfilled {
                 return bad_request().message("Dependencies not fulfilled.");
             }
+            // Create a new module in the
+            let new_research = NewResearch {
+                name: research_type.to_string(),
+                pod_id: Some(pod.id),
+                base_id: None,
+            };
+
+            research = diesel::insert(&new_research)
+                .into(researches::table)
+                .get_result::<Research>(&*db);
+            
+            research.expect("Failed to create research.");
+
             research_level = 1;
         }
     }
@@ -170,7 +176,7 @@ pub fn start_research(request_data: Result<JSON<ResearchSerializer>, SerdeError>
     // Create a new queue entry with the given research type.
     let new_entry_model = NewQueueEntry {
         queue_id: queue.id.clone(),
-        research_name: Some(research_data.research_name.clone()),
+        research_name: Some(research_name.to_string().clone()),
         module_name: None,
         module_id: None,
         level: research_level,
@@ -192,11 +198,12 @@ pub fn start_research(request_data: Result<JSON<ResearchSerializer>, SerdeError>
 pub fn stop_research(research_name: &str, current_user: User, db: DB) -> APIResponse {
 
     // Check if there is a research for this research_name
-    let research_result = ResearchTypes::from_str(research_name);
+    let research_type_result = ResearchTypes::from_str(research_name);
     // Early return if we don't know this research name
-    if research_result.is_err() {
+    if research_type_result.is_err() {
         return bad_request().message(format!("No such research type `{}`", research_name).as_str());
     }
+    let research_type = research_type_result.unwrap();
 
     // Get user pod and pod queue
     let pod = pods_dsl::pods
@@ -212,7 +219,7 @@ pub fn stop_research(research_name: &str, current_user: User, db: DB) -> APIResp
     // Early return if this isn't the case.
     let research_entry_result = queue_entries_dsl::queue_entries
         .filter(queue_entries_dsl::queue_id.eq(queue.id))
-        .filter(queue_entries_dsl::research_name.eq(research_name))
+        .filter(queue_entries_dsl::research_name.eq(research_type.to_string()))
         .order(queue_entries_dsl::level.desc())
         .get_result::<QueueEntry>(&*db);
     if research_entry_result.is_ok() {
@@ -230,7 +237,7 @@ pub fn stop_research(research_name: &str, current_user: User, db: DB) -> APIResp
 
     // Add resources from research to pod resources
     let all_levels = &research_list
-                          .get(&ResearchTypes::from_str(research_name).unwrap())
+                          .get(&research_type)
                           .unwrap()
                           .levels;
     let costs_result = &all_levels[research_entry.level as usize].resources;
