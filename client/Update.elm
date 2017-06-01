@@ -3,7 +3,7 @@ module Update exposing (..)
 import Animation
 import Api.Auth
 import Api.Queue
-import Api.Research
+import Api.Research exposing (startResearching)
 import Messages exposing (..)
 import Model exposing (..)
 import Model.User exposing (LoginData)
@@ -83,3 +83,6 @@ update msg model =
 
                 Err err ->
                     model ! []
+
+        StartResearching key ->
+            model ! [ startResearching model key ]

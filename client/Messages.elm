@@ -22,3 +22,4 @@ type Msg
     | SetMainView MainView
     | ReceiveQueue (Result Http.Error Json.Decode.Value)
     | ReceiveQueueEntry (Result Http.Error Json.Decode.Value)
+    | StartResearching String

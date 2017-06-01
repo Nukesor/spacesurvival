@@ -5,7 +5,8 @@ import Css.Namespace exposing (namespace)
 import Dict
 import Html exposing (..)
 import Html.CssHelpers
-import Messages
+import Html.Events exposing (onClick)
+import Messages exposing (Msg(StartResearching))
 import Model exposing (Model)
 import Model.Research exposing (Research)
 
@@ -14,16 +15,15 @@ view : Model -> Html Messages.Msg
 view model =
     div []
         [ ul []
-            (List.map
-                researchItem
-                (Dict.values model.researches)
+            (Dict.values
+                (Dict.map researchItem model.researches)
             )
         ]
 
 
-researchItem : Research -> Html Messages.Msg
-researchItem research =
-    li [] [ Html.text research.name ]
+researchItem : String -> Research -> Html Messages.Msg
+researchItem key research =
+    li [] [ Html.text research.name, button [ onClick (StartResearching key) ] [ Html.text "Research!" ] ]
 
 
 rules : Stylesheet
