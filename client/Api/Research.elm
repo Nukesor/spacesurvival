@@ -43,5 +43,6 @@ fetchResearches model =
     authenticatedGet model "/api/researches/pod" researchesDecoder Messages.ReceiveResearches
 
 
+startResearching : Model.Model -> String -> Cmd Messages.Msg
 startResearching model key =
     authenticatedPost model ("/api/researches/pod/" ++ key) value Messages.ReceiveQueueEntry Json.Encode.null
