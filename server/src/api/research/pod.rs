@@ -150,10 +150,11 @@ pub fn start_research(research_name: &str,
                           .expect("No research in yml for this type.")
                           .levels;
 
-    if !(all_levels.len() <= research_level as usize) {
+    if all_levels.len() < research_level as usize {
         return bad_request().message("Already at max level.");
     }
-    let costs = &all_levels[research_level as usize].resources;
+    let level_index: usize = (research_level-1) as usize;
+    let costs = &all_levels[level_index].resources;
     if costs.is_some() && !Resource::check_resources(costs, pod_resources, &db) {
         return bad_request().message("Insufficient resources.");
     }
