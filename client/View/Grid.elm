@@ -1,25 +1,31 @@
 module View.Grid exposing (..)
 
-import Svg exposing (..)
-import Svg.Attributes exposing (..)
-import Svg.Events exposing (..)
-import Model.Grid as Grid exposing (Slot, Grid)
-import Model.Util exposing (..)
-import Model exposing (..)
+import Css exposing (..)
+import Css.Namespace exposing (namespace)
 import Html exposing (..)
+import Html.Attributes
+import Html.CssHelpers
 import Messages exposing (..)
+import Model exposing (..)
+import Model.Grid as Grid exposing (Grid, Slot)
+import Model.Util exposing (..)
+import Svg exposing (..)
+import Svg.Attributes
+import Svg.Events exposing (..)
 import View.BuildDialog
 
 
 view : Model -> Html.Html Msg
 view model =
-    div [ class "grid-container" ]
-        [ svg []
-            (Grid.map
-                slot
-                model.grid
-            )
-        , View.BuildDialog.view model
+    div [ Html.Attributes.class "grid-container", helpers.class [ CenterContainer ] ]
+        [ div [ helpers.class [ Container ] ]
+            [ svg [ Svg.Attributes.width "100%", Svg.Attributes.height "100%" ]
+                (Grid.map
+                    slot
+                    model.grid
+                )
+            , View.BuildDialog.view model
+            ]
         ]
 
 
@@ -30,12 +36,12 @@ slot slot =
             toPercentage slot.position
     in
         image
-            [ xlinkHref "/static/img/grid_slot.svg"
-            , x xp
-            , y yp
-            , width "10%"
-            , height "10%"
-            , class "slot"
+            [ Svg.Attributes.xlinkHref "/static/img/grid_slot.svg"
+            , Svg.Attributes.x xp
+            , Svg.Attributes.y yp
+            , Svg.Attributes.width "10%"
+            , Svg.Attributes.height "10%"
+            , Svg.Attributes.class "slot"
             , onClick (ShowBuildDialog (Just slot.position))
             ]
             []
@@ -44,3 +50,41 @@ slot slot =
 toPercentage : Point -> ( String, String )
 toPercentage point =
     ( (toString <| point.x * 10) ++ "%", (toString <| point.y * 10) ++ "%" )
+
+
+type Classes
+    = Container
+    | CenterContainer
+
+
+rules : Stylesheet
+rules =
+    (stylesheet << namespace ns)
+        [ Css.class Container
+            [ maxWidth (vw 90)
+            , maxHeight (vw 90)
+            , width (vh 90)
+            , height (vh 90)
+            , displayFlex
+            , justifyContent center
+            , alignItems center
+            , padding (pct 3)
+            ]
+        , Css.class CenterContainer
+            [ displayFlex
+            , justifyContent center
+            , alignItems center
+            , width (pct 100)
+            , height (pct 100)
+            ]
+        ]
+
+
+ns : String
+ns =
+    "grid"
+
+
+helpers : Html.CssHelpers.Namespace String class id msg
+helpers =
+    Html.CssHelpers.withNamespace ns

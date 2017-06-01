@@ -3,6 +3,7 @@ port module Stylesheets exposing (..)
 import Css.File exposing (CssCompilerProgram, CssFileStructure)
 import View.Background
 import View.BuildDialog
+import View.Grid
 import View.Layout
 import View.MenuBar
 
@@ -19,6 +20,7 @@ fileStructure =
                 , View.BuildDialog.rules
                 , View.Layout.rules
                 , View.MenuBar.rules
+                , View.Grid.rules
                 ]
           )
         ]
