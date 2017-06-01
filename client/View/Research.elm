@@ -8,15 +8,17 @@ import Html.CssHelpers
 import Html.Events exposing (onClick)
 import Messages exposing (Msg(StartResearching))
 import Model exposing (Model)
-import Model.Research exposing (Research)
+import Model.Research exposing (Research, availableForQueueing)
 
 
 view : Model -> Html Messages.Msg
 view model =
     div []
         [ ul []
-            (Dict.values
-                (Dict.map researchItem model.researches)
+            (model.researches
+                |> Dict.filter (availableForQueueing model.researches)
+                |> Dict.map researchItem
+                |> Dict.values
             )
         ]
 

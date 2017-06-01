@@ -29,5 +29,14 @@ type alias Researches =
     Dict.Dict ResearchId Research
 
 
-availableForQueueing researches =
-    researches
+availableForQueueing researches key research =
+    List.all (dependencyFulfilled researches) research.dependencies
+
+
+dependencyFulfilled researches ( key, level ) =
+    case Dict.get key researches of
+        Just research ->
+            research.currentLevel == level
+
+        Nothing ->
+            Debug.log ("Research not found: " ++ key) False
