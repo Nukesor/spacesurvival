@@ -3,22 +3,22 @@ Plasma:
   levels:
     - level: 1
       resources:
-          - ["Water", 200]
+        - ["Water", 200]
 
 EnergyWeapons:
   name: "Energy Weapons"
   dependencies:
-      - ["Plasma", 2]
+    - ["Plasma", 2]
   levels:
     - level: 1
       resources:
-          - ["Iron", 200]
+        - ["Iron", 200]
 
 MiningEfficiency:
   name: "Mining Efficiency"
   dependencies:
-      - ["EnergyWeapons", 2]
+    - ["EnergyWeapons", 2]
   levels:
     - level: 1
       resources:
-          - ["Iron", 200]
+        - ["Iron", 200]

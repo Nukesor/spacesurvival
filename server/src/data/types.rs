@@ -79,6 +79,6 @@ enum_impl!{ResourceTypes {
 /// It's used to check against the names in `module_data.yml`, to validate types in requests
 /// and to guarantee database string integrity.
 enum_impl!{ModuleTypes {
-    Turret,
-    Generator,
+    LaserTurret,
+    PlasmaGenerator,
 }}

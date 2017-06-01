@@ -30,7 +30,8 @@ pub struct Level {
     pub level: i32,
     pub resources: Option<Vec<(ResourceTypes, i64)>>,
     pub shoots: Option<Shoots>,
-    pub generates_energy: Option<GeneratesEnergy>,
+    pub generates: Option<Vec<(ResourceTypes, i64)>>,
+    pub consumes: Option<Vec<(ResourceTypes, i64)>>,
 }
 
 /// This function builds builds a HashMap from `module_data.yml`.

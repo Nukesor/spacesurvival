@@ -39,11 +39,13 @@ pub mod statics;
 #[cfg(test)]
 mod tests;
 
+use data::modules::get_module_list;
 use data::researches::build_research_graph;
 
 
 pub fn rocket_factory() -> rocket::Rocket {
-    // Check research graph for cycles.
+    // Check if we have valid yml and check research graph for cycles.
+    get_module_list();
     build_research_graph();
 
     rocket::ignite()

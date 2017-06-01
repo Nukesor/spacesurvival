@@ -1,12 +1,12 @@
 LaserTurret:
   name: "Laser turret"
   dependencies: 
-      - "EnergyWeapons"
+    - ["EnergyWeapons", 1]
   levels:
     - level: 1
       resources:
-          - ["Iron", 200]
-          - ["Water", 100]
+        - ["Iron", 200]
+        - ["Water", 100]
       shoots:
         rate: 1
         damage: 10
@@ -16,14 +16,13 @@ LaserTurret:
 PlasmaGenerator:
   name: "Plasma Generator"
   dependencies: 
-      - "EnergyWeapons"
+      - ["EnergyWeapons", 1]
   levels:
     - level: 1
       resources:
-          - ["Iron", 200]
-          - ["Water", 100]
+        - ["Iron", 200]
+        - ["Water", 100]
       generates:
-        resources:
-          - ["energy", 200]
+        - ["Water", 200]
       consumes:
-          - ["Water", 10]update
+        - ["Iron", 10]
