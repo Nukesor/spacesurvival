@@ -4,7 +4,12 @@ use diesel::prelude::*;
 use uuid::Uuid;
 use chrono::NaiveDateTime;
 
+
+use models::resource::Resource;
+
 use schema::{pods, modules, researches, resources};
+use schema::resources::dsl as resources_dsl;
+
 use helpers::db::DB;
 
 
@@ -36,6 +41,13 @@ impl Pod {
             .into(pods::table)
             .get_result::<Pod>(&**db)
             .expect("Error inserting new pod into database.")
+    }
+
+    pub fn get_resources(&self, db: &DB) -> Vec<Resource> {
+        resources_dsl::resources
+            .filter(resources_dsl::pod_id.eq(self.id))
+            .get_results(&**db)
+            .expect("Failed to get user resources.")
     }
 }
 

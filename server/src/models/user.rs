@@ -10,6 +10,9 @@ use jsonwebtoken::{encode, decode, Header, Algorithm};
 use schema::users;
 use helpers::util;
 use helpers::db::DB;
+use data::types::*;
+
+use models::resource::Resource;
 
 use models::pod::Pod;
 use schema::pods::dsl as pods_dsl;
@@ -46,10 +49,20 @@ impl User {
         };
 
         // Insert and return user
-        diesel::insert(&new_user)
+        let user = diesel::insert(&new_user)
             .into(users::table)
             .get_result::<User>(&**db)
-            .expect("Error inserting new user into database.")
+            .expect("Error inserting new user into database.");
+
+        // Create new Pod with queue
+        let pod = Pod::new_pod(user.nickname.clone(), user.id, db);
+        Queue::new_pod_queue(pod.id, db);
+
+        // Create resources for pod
+        Resource::new_pod_resource(ResourceTypes::Iron, pod.id, db);
+        Resource::new_pod_resource(ResourceTypes::Water, pod.id, db);
+
+        user
     }
 
     pub fn get_pod(&self, db: &DB) -> Pod {

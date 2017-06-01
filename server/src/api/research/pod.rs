@@ -14,7 +14,6 @@ use models::resource::Resource;
 
 use schema::researches;
 use schema::queue_entries;
-use schema::resources::dsl as resources_dsl;
 use schema::researches::dsl as research_dsl;
 use schema::queue_entries::dsl as queue_entries_dsl;
 
@@ -137,11 +136,7 @@ pub fn start_research(research_name: &str,
         .get_result(&*db)
         .unwrap_or(0);
 
-    let pod_resources = resources_dsl::resources
-        .filter(resources_dsl::pod_id.eq(pod.id))
-        .get_results(&*db)
-        .expect("Failed to get user resources.");
-
+    let pod_resources = pod.get_resources(&db);
     research_level += existing_entries as i32;
 
     let all_levels = &research_list
@@ -153,8 +148,10 @@ pub fn start_research(research_name: &str,
     if research_level > all_levels.len() as i32 {
         return bad_request().message("Already at max level.");
     }
+
     let level_index: usize = (research_level-1) as usize;
     let costs = &all_levels[level_index].resources;
+
     if costs.is_some() && !Resource::check_resources(costs, pod_resources, &db) {
         return bad_request().message("Insufficient resources.");
     }
@@ -209,10 +206,7 @@ pub fn stop_research(research_name: &str, current_user: User, db: DB) -> APIResp
     // Get all needed info for resource manipulation
     let research_list = get_research_list();
 
-    let pod_resources = resources_dsl::resources
-        .filter(resources_dsl::pod_id.eq(pod.id))
-        .get_results::<Resource>(&*db)
-        .expect("Failed to get user resources.");
+    let pod_resources = pod.get_resources(&db);
 
     // Add resources from research to pod resources
     let all_levels = &research_list

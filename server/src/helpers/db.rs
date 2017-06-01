@@ -31,6 +31,13 @@ impl Deref for DB {
     }
 }
 
+impl DB {
+    pub fn new(pool: r2d2::PooledConnection<ConnectionManager<PgConnection>>) -> DB {
+        DB(pool)
+    }
+}
+
+
 
 /// The implementation of `FromRequest` for `DB`.
 /// This function fetches the pool from the managed state of rust and gets a new

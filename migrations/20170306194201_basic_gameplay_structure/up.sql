@@ -24,7 +24,7 @@ CREATE TABLE resources (
     amount bigint not null,
     max_amount bigint not null,
     UNIQUE (name, base_id, pod_id),
-    CHECK (amount < max_amount),
+    CHECK (amount <= max_amount),
 
     id UUID PRIMARY KEY default uuid_generate_v4(),
     pod_id UUID references pods(id) on DELETE CASCADE,
