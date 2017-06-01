@@ -150,7 +150,7 @@ pub fn start_research(research_name: &str,
                           .expect("No research in yml for this type.")
                           .levels;
 
-    if all_levels.len() < research_level as usize {
+    if research_level > all_levels.len() as i32 {
         return bad_request().message("Already at max level.");
     }
     let level_index: usize = (research_level-1) as usize;
