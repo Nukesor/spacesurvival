@@ -44,6 +44,8 @@ rules =
         (stylesheet << namespace ns)
             [ Css.class Container
                 [ width barWidth
+                , maxWidth (Css.em 10)
+                , minWidth (Css.em 4)
                 , displayFlex
                 , flexDirection column
                 , alignItems center
@@ -51,7 +53,6 @@ rules =
             , Css.class Button
                 [ width (pct 100)
                 , height (Css.em 4)
-                , minWidth (Css.em 4)
                 , margin zero
                 , borderStyle none
                 , backgroundColor (rgba 170 170 204 0.4)

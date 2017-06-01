@@ -44,7 +44,7 @@ rules =
             , flexFlow2 row noWrap
             ]
         , Css.class MainViewContainer
-            [ width (vw 90)
+            [ flexGrow (num 1)
             ]
         ]
 
