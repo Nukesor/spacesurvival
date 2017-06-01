@@ -19,7 +19,6 @@ use schema::modules;
 use schema::queue_entries;
 
 use schema::modules::dsl as module_dsl;
-use schema::resources::dsl as resources_dsl;
 use schema::researches::dsl as research_dsl;
 use schema::queue_entries::dsl as queue_entries_dsl;
 
@@ -73,7 +72,6 @@ pub fn add_module(request_data: Result<JSON<NewModuleSerializer>, SerdeError>,
     }
     let module_type = result.unwrap();
     let dependency_strings = get_module_dependency_strings(&module_type);
-    let module_list = get_module_list();
 
     let (pod, queue) = current_user.get_pod_and_queue(&db);
 
@@ -115,18 +113,13 @@ pub fn add_module(request_data: Result<JSON<NewModuleSerializer>, SerdeError>,
 
     // Check if the dependencies are fulfilled.
     // If they're not fulfilled, return a bad request.
+    let module_list = get_module_list();
     let fulfilled = dependencies_fulfilled(&module_type,
                                            dependencies,
                                            &module_list);
     if !fulfilled {
         return bad_request().message("Dependencies not fulfilled.");
     }
-
-    // Query all pod resources
-    let pod_resources = resources_dsl::resources
-        .filter(resources_dsl::pod_id.eq(pod.id))
-        .get_results(&*db)
-        .expect("Failed to get user resources.");
 
     // Get cost for level 1
     let costs = &module_list
@@ -135,6 +128,8 @@ pub fn add_module(request_data: Result<JSON<NewModuleSerializer>, SerdeError>,
                           .expect("No module in yml for this type.")
                           .levels[0].resources;
 
+    // Check if we have enough resources and subtract them.
+    let pod_resources = pod.get_resources(&db);
     if costs.is_some() && !Resource::check_resources(costs, pod_resources, &db) {
         return bad_request().message("Insufficient resources.");
     }
@@ -149,7 +144,6 @@ pub fn add_module(request_data: Result<JSON<NewModuleSerializer>, SerdeError>,
         pod_id: Some(pod.id),
         base_id: None,
     };
-
     let module = diesel::insert(&new_module)
         .into(modules::table)
         .get_result::<Module>(&*db)
@@ -163,7 +157,6 @@ pub fn add_module(request_data: Result<JSON<NewModuleSerializer>, SerdeError>,
         module_id: Some(module.id),
         level: 1,
     };
-
     let new_queue_entry = diesel::insert(&new_entry_model)
         .into(queue_entries::table)
         .get_result::<QueueEntry>(&*db)
@@ -232,11 +225,7 @@ pub fn upgrade_module(module_uuid: &str, current_user: User, db: DB) -> APIRespo
     let module_list = get_module_list();
 
     let (pod, queue) = current_user.get_pod_and_queue(&db);
-
-    let pod_resources = resources_dsl::resources
-        .filter(resources_dsl::pod_id.eq(pod.id))
-        .get_results::<Resource>(&*db)
-        .expect("Failed to get user resources.");
+    let pod_resources = pod.get_resources(&db);
 
     // Add resources from module to pod resources
     let all_levels = &module_list
@@ -299,6 +288,7 @@ pub fn stop_module_upgrade(module_uuid: &str, current_user: User, db: DB) -> API
     }
     let queue_entry = queue_entry_result.unwrap();
 
+    // Get the module from the queue entry
     let module = module_dsl::modules
         .filter(module_dsl::id.eq(module_id))
         .get_result::<Module>(&*db)
@@ -306,19 +296,14 @@ pub fn stop_module_upgrade(module_uuid: &str, current_user: User, db: DB) -> API
 
     // Get all needed info for resource manipulation
     let module_list = get_module_list();
-
-    let pod_resources = resources_dsl::resources
-        .filter(resources_dsl::pod_id.eq(pod.id))
-        .get_results::<Resource>(&*db)
-        .expect("Failed to get user resources.");
-
-    // Add resources from module to pod resources
     let all_levels = &module_list
                           .get(&ModuleTypes::from_string(&module.name).unwrap())
                           .unwrap()
                           .levels;
     let costs_result = &all_levels[module.level as usize].resources;
 
+    // Refund resources
+    let pod_resources = pod.get_resources(&db);
     if let Some(ref costs) = *costs_result {
         Resource::update_resources(costs, pod_resources, false, &db);
     }
