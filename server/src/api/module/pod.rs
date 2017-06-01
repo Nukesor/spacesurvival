@@ -129,16 +129,14 @@ pub fn add_module(request_data: Result<JSON<NewModuleSerializer>, SerdeError>,
         .expect("Failed to get user resources.");
 
     // Get cost for level 1
-    let costs= &module_list
+    let costs = &module_list
                           .get(&module_type)
                           .as_ref()
                           .expect("No module in yml for this type.")
                           .levels[0].resources;
 
-    if costs.is_some() {
-        if !Resource::check_resources(&costs, pod_resources, &db) {
-            return bad_request().message("Insufficient resources.");
-        }
+    if costs.is_some() && !Resource::check_resources(costs, pod_resources, &db) {
+        return bad_request().message("Insufficient resources.");
     }
 
     // Create the new module
@@ -247,14 +245,16 @@ pub fn upgrade_module(module_uuid: &str, current_user: User, db: DB) -> APIRespo
                           .levels;
 
     // Check if there is a next level.
-    if level >= all_levels.len() as i32 {
+    if level > all_levels.len() as i32 {
         return bad_request().message("Already at max level");
     }
 
-    let costs_result = &all_levels[level as usize].resources;
 
-    if let Some(ref costs) = *costs_result {
-        Resource::update_resources(costs, pod_resources, false, &db);
+    let level_index: usize = (level-1) as usize;
+    let costs = &all_levels[level_index].resources;
+
+    if costs.is_some() && !Resource::check_resources(costs, pod_resources, &db) {
+        return bad_request().message("Insufficient resources.");
     }
 
     // Create a new queue entry with the given research type.
