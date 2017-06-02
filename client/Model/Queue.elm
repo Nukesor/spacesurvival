@@ -8,6 +8,7 @@ type alias ResearchData =
     { createdAt : Date
     , id : String
     , researchId : ResearchId
+    , level : Int
     }
 
 
@@ -16,6 +17,7 @@ type alias ModuleData =
     , id : String
     , moduleId : ResearchId
     , name : String
+    , level : Int
     }
 
 

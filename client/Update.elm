@@ -68,7 +68,7 @@ update msg model =
         ReceiveQueue result ->
             case Debug.log "queue" result of
                 Ok queue ->
-                    model ! []
+                    { model | queue = queue } ! []
 
                 Err err ->
                     model ! []
@@ -79,7 +79,7 @@ update msg model =
         ReceiveQueueEntry result ->
             case Debug.log "queue entry" result of
                 Ok entry ->
-                    model ! []
+                    { model | queue = model.queue ++ [ entry ] } ! []
 
                 Err err ->
                     model ! []

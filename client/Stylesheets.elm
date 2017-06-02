@@ -6,6 +6,7 @@ import View.BuildDialog
 import View.Grid
 import View.Layout
 import View.MenuBar
+import View.Queue
 
 
 port files : CssFileStructure -> Cmd msg
@@ -21,6 +22,7 @@ fileStructure =
                 , View.Layout.rules
                 , View.MenuBar.rules
                 , View.Grid.rules
+                , View.Queue.rules
                 ]
           )
         ]

@@ -15,12 +15,18 @@ queueDecoder =
             Decode.oneOf [ researchDecoder ]
 
 
+queueEntryDecoder =
+    dataDecoder <|
+        Decode.oneOf [ researchDecoder ]
+
+
 researchDecoder : Decode.Decoder Model.Queue.Entry
 researchDecoder =
     (Decode.succeed ResearchData
         |: (Decode.field "created_at" dateDecoder)
         |: (Decode.field "id" Decode.string)
         |: (Decode.field "research_name" Decode.string)
+        |: (Decode.field "level" Decode.int)
     )
         |> Decode.map ResearchEntry
 

@@ -7,6 +7,7 @@ import Html.CssHelpers
 import Html.Events exposing (onClick)
 import Messages exposing (Msg(SetMainView))
 import Model exposing (MainView(GridView), MainView(ResearchView), Model)
+import View.Queue
 
 
 view : Model -> Html.Html Messages.Msg
@@ -14,6 +15,7 @@ view model =
     div [ helpers.class [ Container ] ]
         [ switchButton model.mainView GridView "Base"
         , switchButton model.mainView ResearchView "Research"
+        , View.Queue.view model
         ]
 
 

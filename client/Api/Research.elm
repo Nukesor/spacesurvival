@@ -1,5 +1,6 @@
 module Api.Research exposing (..)
 
+import Api.Queue
 import Api.Util exposing (..)
 import Dict
 import Json.Decode as Decode exposing (value)
@@ -45,4 +46,4 @@ fetchResearches model =
 
 startResearching : Model.Model -> String -> Cmd Messages.Msg
 startResearching model key =
-    authenticatedPost model ("/api/researches/pod/" ++ key) value Messages.ReceiveQueueEntry Json.Encode.null
+    authenticatedPost model ("/api/researches/pod/" ++ key) Api.Queue.queueEntryDecoder Messages.ReceiveQueueEntry Json.Encode.null
