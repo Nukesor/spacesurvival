@@ -29,6 +29,7 @@ rules =
             , height <| vh 200
             , backgroundImage <| url "/static/img/stardust.png"
             , backgroundRepeat repeat
+            , property "animation" "90s cubic-bezier(0.45, 0.05, 0.55, 0.95) infinite bg-shift"
             ]
         , class Container
             [ position absolute
