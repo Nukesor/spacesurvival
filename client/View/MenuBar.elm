@@ -45,7 +45,7 @@ rules =
             [ Css.class Container
                 [ width barWidth
                 , maxWidth (Css.em 10)
-                , minWidth (Css.em 4)
+                , minWidth (Css.em 6)
                 , displayFlex
                 , flexDirection column
                 , alignItems center

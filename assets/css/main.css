@@ -78,7 +78,7 @@ body {
 
 button {
     padding: 0.5rem;
-    min-width: 8em;
+    min-width: 6em;
     background-color: rgba(200, 200, 255, 0.2);
     border: 1px solid #aaaacc;
     cursor: pointer;

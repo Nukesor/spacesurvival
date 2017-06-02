@@ -59,25 +59,29 @@ type Classes
 
 rules : Stylesheet
 rules =
-    (stylesheet << namespace ns)
-        [ Css.class Container
-            [ maxWidth (vw 90)
-            , maxHeight (vw 90)
-            , width (vh 90)
-            , height (vh 90)
-            , displayFlex
-            , justifyContent center
-            , alignItems center
-            , padding (pct 3)
+    let
+        gridSize =
+            80
+    in
+        (stylesheet << namespace ns)
+            [ Css.class Container
+                [ maxWidth (vw gridSize)
+                , maxHeight (vw gridSize)
+                , width (vh gridSize)
+                , height (vh gridSize)
+                , displayFlex
+                , justifyContent center
+                , alignItems center
+                , padding (pct 3)
+                ]
+            , Css.class CenterContainer
+                [ displayFlex
+                , justifyContent center
+                , alignItems center
+                , width (pct 100)
+                , height (pct 100)
+                ]
             ]
-        , Css.class CenterContainer
-            [ displayFlex
-            , justifyContent center
-            , alignItems center
-            , width (pct 100)
-            , height (pct 100)
-            ]
-        ]
 
 
 ns : String
