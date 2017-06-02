@@ -96,8 +96,10 @@ CREATE TABLE queue_entries (
     queue_id UUID references queues(id) on DELETE CASCADE not null,
     module_id UUID references modules(id),
     module_name VARCHAR(120),
+    research_id UUID references researches(id),
     research_name VARCHAR(120),
     level integer not null,
+    finishes_at TIMESTAMP not null,
     CHECK (module_name is not null or research_name is not null),
 
 --    duration INTERVAL not null,

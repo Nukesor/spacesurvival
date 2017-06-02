@@ -1,5 +1,6 @@
 use diesel;
 use diesel::prelude::*;
+use chrono::UTC;
 
 use data::types::*;
 use data::researches::get_research_list;
@@ -85,15 +86,18 @@ pub fn start_research(research_name: &str,
 
     let (pod, queue) = current_user.get_pod_and_queue(&db);
 
-    let mut research = research_dsl::researches
+    let mut research_result = research_dsl::researches
         .filter(research_dsl::pod_id.eq(pod.id))
         .filter(research_dsl::name.eq(research_type.to_string()))
         .get_result::<Research>(&*db);
 
-    match research {
+    let research: Research;
+
+    match research_result {
         // Research exists, we don't need to check for dependencies
         // We just increase the level by 1
         Ok(research) => {
+            research = research;
             research_level = research.level + 1;
         }
         // The research is not yet here. We need to check for dependencies.
@@ -116,11 +120,11 @@ pub fn start_research(research_name: &str,
                 base_id: None,
             };
 
-            research = diesel::insert(&new_research)
+            research_result = diesel::insert(&new_research)
                 .into(researches::table)
                 .get_result::<Research>(&*db);
             
-            research.expect("Failed to create research.");
+            research = research_result.expect("Failed to create research.");
 
             research_level = 1;
         }
@@ -159,10 +163,12 @@ pub fn start_research(research_name: &str,
     // Create a new queue entry with the given research type.
     let new_entry_model = NewQueueEntry {
         queue_id: queue.id.clone(),
+        research_id: Some(research.id.clone()),
         research_name: Some(research_name.to_string().clone()),
         module_name: None,
         module_id: None,
         level: research_level,
+        finishes_at: (UTC::now() + all_levels[level_index].time).naive_utc(),
     };
 
     let new_queue_entry = diesel::insert(&new_entry_model)

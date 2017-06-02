@@ -2,6 +2,8 @@ use petgraph::Graph;
 use petgraph::graph::NodeIndex;
 use petgraph::algo::is_cyclic_directed;
 
+use chrono;
+use chrono::prelude::*;
 use serde_yaml::from_slice;
 use std::collections::HashMap;
 
@@ -40,6 +42,7 @@ impl HasDependencies for Research {
 pub struct Level {
     pub level: i32,
     pub resources: Option<Vec<(ResourceTypes, i64)>>,
+    pub time: chrono::Duration,
 }
 
 /// This function builds a petgraph graph from the statically included research_data.yml.
