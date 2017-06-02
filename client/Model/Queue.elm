@@ -1,6 +1,7 @@
 module Model.Queue exposing (..)
 
 import Model.Research exposing (ResearchId)
+import Time.Date exposing (Date)
 
 
 type alias ResearchData =
