@@ -1,14 +1,31 @@
 module Api.Util exposing (..)
 
+import Html.Attributes exposing (value)
 import Http exposing (emptyBody, expectJson, jsonBody, stringBody)
 import Json.Decode as Decode
 import Model exposing (Model)
 import Model.User exposing (User(LoggedIn))
+import Time.Date as Date exposing (Date)
 
 
 dataDecoder : Decode.Decoder a -> Decode.Decoder a
 dataDecoder =
     Decode.field "data"
+
+
+dateDecoder : Decode.Decoder Date
+dateDecoder =
+    Decode.map (Date.fromISO8601 >> unwrap) Decode.string
+
+
+unwrap : Result String b -> b
+unwrap res =
+    case res of
+        Ok val ->
+            val
+
+        Err err ->
+            Debug.crash err
 
 
 authenticatedGet :
