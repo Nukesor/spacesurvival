@@ -26,14 +26,15 @@ extern crate diesel;
 #[macro_use]
 extern crate diesel_codegen;
 
-pub mod schema;
-pub mod validation;
-pub mod models;
-pub mod data;
-pub mod responses;
 pub mod api;
-pub mod helpers;
+pub mod validation;
+pub mod data;
 pub mod handlers;
+pub mod helpers;
+pub mod models;
+pub mod update;
+pub mod responses;
+pub mod schema;
 pub mod statics;
 
 #[cfg(test)]
@@ -52,10 +53,6 @@ pub fn rocket_factory() -> rocket::Rocket {
         .manage(helpers::db::init_db_pool())
         .mount("/", routes![statics::index])
         .mount("/static", routes![statics::static_files])
-        .mount("/tick",
-               routes![
-               api::update::update::tick,
-        ])
         .mount("/api/auth",
                routes![
                api::auth::auth::login,
