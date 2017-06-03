@@ -99,10 +99,11 @@ CREATE TABLE queue_entries (
     research_id UUID references researches(id),
     research_name VARCHAR(120),
     level integer not null,
+    duration bigint not null,
     CHECK (module_name is not null or research_name is not null),
 
 --    duration INTERVAL not null,
-    finishes_at TIMESTAMP WITH TIME ZONE not null,
+    finishes_at TIMESTAMP WITH TIME ZONE,
     created_at TIMESTAMP WITH TIME ZONE default current_timestamp not null
 );
 

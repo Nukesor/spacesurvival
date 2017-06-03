@@ -10,7 +10,6 @@ use jsonwebtoken::{encode, decode, Header, Algorithm};
 use schema::users;
 use helpers::util;
 use helpers::db::DB;
-use data::types::*;
 
 use models::resource::Resource;
 

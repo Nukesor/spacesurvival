@@ -3,7 +3,6 @@ use diesel::prelude::*;
 use rocket_contrib::{JSON, SerdeError};
 
 use uuid::Uuid;
-use chrono::{UTC, Duration};
 
 use data::types::*;
 use data::modules::get_module_list;
@@ -18,11 +17,10 @@ use models::research::Research;
 use models::resource::Resource;
 
 use schema::modules;
-use schema::queue_entries;
 
 use schema::modules::dsl as module_dsl;
 use schema::researches::dsl as research_dsl;
-use schema::queue_entries::dsl as queue_entries_dsl;
+use schema::queue_entries::dsl as queue_entry_dsl;
 
 use models::queue::{QueueEntry, NewQueueEntry};
 use validation::queue::NewModuleSerializer;
@@ -151,23 +149,18 @@ pub fn add_module(request_data: Result<JSON<NewModuleSerializer>, SerdeError>,
         .expect("Failed to create module.");
 
     // Create a new queue entry with the given module type.
-    let new_entry_model = NewQueueEntry {
+    let new_queue_entry = NewQueueEntry {
         queue_id: queue.id.clone(),
         research_id: None,
         research_name: None,
         module_name: Some(module.name),
         module_id: Some(module.id),
         level: 1,
-        finishes_at: UTC::now() + Duration::seconds(level.time),
+        duration: level.time,
     };
-    let new_queue_entry = diesel::insert(&new_entry_model)
-        .into(queue_entries::table)
-        .get_result::<QueueEntry>(&*db)
-        .expect("Failed to create queue entry.");
+    queue.add_entry(new_queue_entry, &db);
 
-    created()
-        .message("Queue entry added.")
-        .data(json!(&new_queue_entry))
+    created().message("Queue entry added.")
 }
 
 
@@ -250,24 +243,19 @@ pub fn upgrade_module(module_uuid: &str, current_user: User, db: DB) -> APIRespo
     }
 
     // Create a new queue entry with the given research type.
-    let new_entry_model = NewQueueEntry {
+    let new_queue_entry = NewQueueEntry {
         queue_id: queue.id.clone(),
         research_id: None,
         research_name: None,
         module_name: Some(module.name),
         module_id: Some(queue.id.clone()),
         level: level,
-        finishes_at: UTC::now() + Duration::seconds(all_levels[level_index].time),
+        duration: all_levels[level_index].time,
     };
 
-    let new_queue_entry = diesel::insert(&new_entry_model)
-        .into(queue_entries::table)
-        .get_result::<QueueEntry>(&*db)
-        .expect("Failed to insert new queue entry.");
+    queue.add_entry(new_queue_entry, &db);
 
-    created()
-        .message("Queue entry added.")
-        .data(json!(&new_queue_entry))
+    created().message("Queue entry added.")
 }
 
 
@@ -283,10 +271,10 @@ pub fn stop_module_upgrade(module_uuid: &str, current_user: User, db: DB) -> API
     let (pod, queue) = current_user.get_pod_and_queue(&db);
 
     // Get the queue entry
-    let queue_entry_result = queue_entries_dsl::queue_entries
-        .filter(queue_entries_dsl::module_id.eq(module_id))
-        .filter(queue_entries_dsl::queue_id.eq(queue.id))
-        .order(queue_entries_dsl::level.desc())
+    let queue_entry_result = queue_entry_dsl::queue_entries
+        .filter(queue_entry_dsl::module_id.eq(module_id))
+        .filter(queue_entry_dsl::queue_id.eq(queue.id))
+        .order(queue_entry_dsl::level.desc())
         .first::<QueueEntry>(&*db);
     if queue_entry_result.is_err() {
         return bad_request().message("No queue entry with this id.");
@@ -313,11 +301,7 @@ pub fn stop_module_upgrade(module_uuid: &str, current_user: User, db: DB) -> API
         Resource::update_resources(costs, pod_resources, false, &db);
     }
 
-    // Remove queue_entry from database
-    diesel::delete(queue_entries_dsl::queue_entries
-                       .filter(queue_entries_dsl::id.eq(queue_entry.id)))
-            .execute(&*db)
-            .expect("Failed to remove queue_entry.");
+    queue.remove_entry(queue_entry.id, &db);
 
     // Remove module if it's just a upgrade dummy.
     if module.level == 0 {

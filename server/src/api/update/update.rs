@@ -11,7 +11,7 @@ use models::queue::QueueEntry;
 
 use schema::modules::dsl as module_dsl;
 use schema::researches::dsl as research_dsl;
-use schema::queue_entries::dsl as queue_entries_dsl;
+use schema::queue_entries::dsl as queue_entry_dsl;
 
 use responses::{APIResponse, ok};
 
@@ -23,8 +23,8 @@ use responses::{APIResponse, ok};
 #[get("/")]
 pub fn tick(db: DB) -> APIResponse {
 
-    let finished_entries_result = queue_entries_dsl::queue_entries
-        .filter(queue_entries_dsl::finishes_at.lt(UTC::now()))
+    let finished_entries_result = queue_entry_dsl::queue_entries
+        .filter(queue_entry_dsl::finishes_at.lt(UTC::now()))
         .get_results::<QueueEntry>(&*db);
 
     if let Ok(finished_entries) = finished_entries_result {
@@ -47,8 +47,8 @@ pub fn tick(db: DB) -> APIResponse {
                 _ => (),
             }
 
-            diesel::delete(queue_entries_dsl::queue_entries
-                    .filter(queue_entries_dsl::id.eq(entry.id)))
+            diesel::delete(queue_entry_dsl::queue_entries
+                    .filter(queue_entry_dsl::id.eq(entry.id)))
                 .execute(&*db)
                 .expect("Failed to remove queue_entry.");
         }

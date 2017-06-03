@@ -1,6 +1,5 @@
 use diesel;
 use diesel::prelude::*;
-use chrono::{UTC, Duration};
 
 use data::types::*;
 use data::researches::get_research_list;
@@ -14,9 +13,8 @@ use models::research::{Research, NewResearch};
 use models::resource::Resource;
 
 use schema::researches;
-use schema::queue_entries;
 use schema::researches::dsl as research_dsl;
-use schema::queue_entries::dsl as queue_entries_dsl;
+use schema::queue_entries::dsl as queue_entry_dsl;
 
 use models::queue::{QueueEntry, NewQueueEntry};
 
@@ -126,10 +124,10 @@ pub fn start_research(research_name: &str,
 
     // Check if there already are existing queue entries for this research.
     // In case there are, we increase the level by the amount of existing entries.
-    let existing_entries: i64 = queue_entries_dsl::queue_entries
+    let existing_entries: i64 = queue_entry_dsl::queue_entries
         .count()
-        .filter(queue_entries_dsl::queue_id.eq(queue.id))
-        .filter(queue_entries_dsl::research_name.eq(research_type.to_string()))
+        .filter(queue_entry_dsl::queue_id.eq(queue.id))
+        .filter(queue_entry_dsl::research_name.eq(research_type.to_string()))
         .get_result(&*db)
         .unwrap_or(0);
 
@@ -154,24 +152,18 @@ pub fn start_research(research_name: &str,
     }
 
     // Create a new queue entry with the given research type.
-    let new_entry_model = NewQueueEntry {
+    let new_queue_entry = NewQueueEntry {
         queue_id: queue.id.clone(),
         research_id: Some(research.id.clone()),
         research_name: Some(research_name.to_string().clone()),
         module_name: None,
         module_id: None,
         level: research_level,
-        finishes_at: UTC::now() + Duration::seconds(all_levels[level_index].time),
+        duration: all_levels[level_index].time,
     };
+    queue.add_entry(new_queue_entry, &db);
 
-    let new_queue_entry = diesel::insert(&new_entry_model)
-        .into(queue_entries::table)
-        .get_result::<QueueEntry>(&*db)
-        .expect("Failed to insert new queue entry.");
-
-    created()
-        .message("Queue entry added.")
-        .data(json!(&new_queue_entry))
+    created().message("Queue entry added.")
 }
 
 
@@ -192,10 +184,10 @@ pub fn stop_research(research_name: &str, current_user: User, db: DB) -> APIResp
 
     // Check if there exists a queue entry for this research and this pod.
     // Early return if this isn't the case.
-    let research_entry_result = queue_entries_dsl::queue_entries
-        .filter(queue_entries_dsl::queue_id.eq(queue.id))
-        .filter(queue_entries_dsl::research_name.eq(research_type.to_string()))
-        .order(queue_entries_dsl::level.desc())
+    let research_entry_result = queue_entry_dsl::queue_entries
+        .filter(queue_entry_dsl::queue_id.eq(queue.id))
+        .filter(queue_entry_dsl::research_name.eq(research_type.to_string()))
+        .order(queue_entry_dsl::level.desc())
         .get_result::<QueueEntry>(&*db);
     if research_entry_result.is_ok() {
         return bad_request().message("Can't delete. There is no queue entry for this research.");
@@ -219,8 +211,8 @@ pub fn stop_research(research_name: &str, current_user: User, db: DB) -> APIResp
     }
 
     // Remove queue_entry from database
-    diesel::delete(queue_entries_dsl::queue_entries
-                       .filter(queue_entries_dsl::id.eq(research_entry.id)))
+    diesel::delete(queue_entry_dsl::queue_entries
+                       .filter(queue_entry_dsl::id.eq(research_entry.id)))
             .execute(&*db)
             .expect("Failed to remove queue_entry.");
 
