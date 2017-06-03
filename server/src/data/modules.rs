@@ -24,6 +24,7 @@ impl HasDependencies for Module {
     }
 }
 
+fn resource_default() -> Vec<(ResourceTypes, i64)> {Vec::new()}
 
 #[derive(Debug, PartialEq, Serialize, Deserialize)]
 pub struct Level {
@@ -31,8 +32,10 @@ pub struct Level {
     pub resources: Option<Vec<(ResourceTypes, i64)>>,
     pub time: i64,
     pub shoots: Option<Shoots>,
-    pub generates: Option<Vec<(ResourceTypes, i64)>>,
-    pub consumes: Option<Vec<(ResourceTypes, i64)>>,
+    #[serde(default = "resource_default")]
+    pub generates: Vec<(ResourceTypes, i64)>,
+    #[serde(default = "resource_default")]
+    pub consumes: Vec<(ResourceTypes, i64)>,
 }
 
 /// This function builds builds a HashMap from `module_data.yml`.
