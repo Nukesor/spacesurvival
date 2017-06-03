@@ -31,7 +31,7 @@ impl HasDependencies for Module {
 pub struct Level {
     pub level: i32,
     pub resources: Option<Vec<(ResourceTypes, i64)>>,
-    pub time: chrono::Duration,
+    pub time: i64,
     pub shoots: Option<Shoots>,
     pub generates: Option<Vec<(ResourceTypes, i64)>>,
     pub consumes: Option<Vec<(ResourceTypes, i64)>>,

@@ -42,7 +42,7 @@ impl HasDependencies for Research {
 pub struct Level {
     pub level: i32,
     pub resources: Option<Vec<(ResourceTypes, i64)>>,
-    pub time: chrono::Duration,
+    pub time: i64,
 }
 
 /// This function builds a petgraph graph from the statically included research_data.yml.

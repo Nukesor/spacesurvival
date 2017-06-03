@@ -1,6 +1,6 @@
 use diesel;
 use diesel::prelude::*;
-use chrono::UTC;
+use chrono::{UTC, Duration};
 
 use data::types::*;
 use data::researches::get_research_list;
@@ -91,13 +91,13 @@ pub fn start_research(research_name: &str,
         .filter(research_dsl::name.eq(research_type.to_string()))
         .get_result::<Research>(&*db);
 
-    let research: Research;
+    let mut research: Research;
 
     match research_result {
         // Research exists, we don't need to check for dependencies
         // We just increase the level by 1
-        Ok(research) => {
-            research = research;
+        Ok(_) => {
+            research = research_result.unwrap();
             research_level = research.level + 1;
         }
         // The research is not yet here. We need to check for dependencies.
@@ -168,7 +168,7 @@ pub fn start_research(research_name: &str,
         module_name: None,
         module_id: None,
         level: research_level,
-        finishes_at: (UTC::now() + all_levels[level_index].time).naive_utc(),
+        finishes_at: (UTC::now() + Duration::seconds(all_levels[level_index].time)).naive_utc(),
     };
 
     let new_queue_entry = diesel::insert(&new_entry_model)

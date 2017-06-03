@@ -4,6 +4,7 @@ LaserTurret:
     - ["EnergyWeapons", 1]
   levels:
     - level: 1
+      time: 30
       resources:
         - ["Iron", 200]
         - ["Water", 100]
@@ -19,6 +20,7 @@ PlasmaGenerator:
       - ["EnergyWeapons", 1]
   levels:
     - level: 1
+      time: 30
       resources:
         - ["Iron", 200]
         - ["Water", 100]
