@@ -28,21 +28,23 @@ impl Resource {
     /// This function adds a new pod into the database and returns the model with the
     /// initialized data.
     pub fn create_pod_resources(pod_id: Uuid, db: &DB) {
+        let mut resources: Vec<NewResource> = Vec::new();
         for resource in ResourceTypes::iterator() {
-            let new_queue = NewResource {
+            resources.push(NewResource {
                 name: resource.to_string(),
                 amount: 100,
                 max_amount: 5000,
 
                 pod_id: Some(pod_id),
                 base_id: None,
-            };
-
-            diesel::insert(&new_queue)
-                .into(resources::table)
-                .get_result::<Resource>(&**db)
-                .expect("Error inserting new pod resource into database.");
+            });
         }
+
+        diesel::insert(&resources)
+            .into(resources::table)
+            .execute(&**db)
+            .expect("Error inserting new pod resource into database.");
+
     }
 
     /// This function checks if there are enough resources for a given set
