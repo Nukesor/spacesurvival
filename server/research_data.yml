@@ -2,15 +2,15 @@ Plasma:
   name: "Plasma Technology"
   levels:
     - level: 1
-      time: 30
+      time: 5
       resources:
         - ["Water", 200]
     - level: 2
-      time: 60
+      time: 10
       resources:
         - ["Water", 200]
     - level: 3
-      time: 120
+      time: 15
       resources:
         - ["Water", 200]
 
