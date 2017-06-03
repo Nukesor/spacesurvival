@@ -1,16 +1,15 @@
 use diesel;
 use diesel::prelude::*;
-
 use chrono::UTC;
 
 use helpers::db::DB;
 
 use models::module::Module;
-use models::research::Research;
-use models::queue::QueueEntry;
-
 use schema::modules::dsl as module_dsl;
+use models::research::Research;
 use schema::researches::dsl as research_dsl;
+use models::queue::{Queue, QueueEntry};
+use schema::queues::dsl as queue_dsl;
 use schema::queue_entries::dsl as queue_entry_dsl;
 
 use responses::{APIResponse, ok};
@@ -47,10 +46,12 @@ pub fn tick(db: DB) -> APIResponse {
                 _ => (),
             }
 
-            diesel::delete(queue_entry_dsl::queue_entries
-                    .filter(queue_entry_dsl::id.eq(entry.id)))
-                .execute(&*db)
-                .expect("Failed to remove queue_entry.");
+            let queue = queue_dsl::queues
+                .filter(queue_dsl::id.eq(entry.id))
+                .first::<Queue>(&*db)
+                .unwrap();
+
+            queue.remove_entry(entry.id, &db)
         }
     }
     ok().message("Tick successful.")
