@@ -52,19 +52,32 @@ pub fn rocket_factory() -> rocket::Rocket {
         .manage(helpers::db::init_db_pool())
         .mount("/", routes![statics::index])
         .mount("/static", routes![statics::static_files])
+        .mount("/tick/",
+               routes![
+               api::update::update::tick,
+        ])
+        .mount("/api/auth/",
+               routes![
+               api::auth::auth::login,
+        ])
         .mount("/api/user/",
                routes![
                api::user::user::info,
                api::user::user::register,
                api::user::user::settings,
         ])
-        .mount("/api/auth/",
-               routes![
-               api::auth::auth::login,
-        ])
         .mount("/api/pod/",
                routes![
                api::pod::pod::settings,
+        ])
+        .mount("/api/queue/",
+               routes![
+               api::queue::pod::pod_queue_entries,
+        ])
+
+        .mount("/api/resources/",
+               routes![
+               api::resources::pod::pod_resources,
         ])
         .mount("/api/researches/",
                routes![
@@ -80,14 +93,6 @@ pub fn rocket_factory() -> rocket::Rocket {
                api::module::pod::remove_module,
                api::module::pod::upgrade_module,
                api::module::pod::stop_module_upgrade,
-        ])
-        .mount("/api/queue/",
-               routes![
-               api::queue::pod::pod_queue_entries,
-        ])
-        .mount("/api/resources/",
-               routes![
-               api::resources::pod::pod_resources,
         ])
         .catch(errors![handlers::bad_request_handler,
                        handlers::unauthorized_handler,

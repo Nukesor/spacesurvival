@@ -4,4 +4,5 @@ pub mod queue;
 pub mod research;
 pub mod module;
 pub mod resources;
+pub mod update;
 pub mod user;
