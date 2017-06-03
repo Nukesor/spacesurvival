@@ -1,4 +1,13 @@
 use std::fmt;
+use std::slice::Iter;
+
+/// A helper macro to get the length of expressions in a macro
+/// TODO: Remove this, if it's implemented in Rust. Right now they plan to 
+/// to make this a post v1.0 feature.
+macro_rules! count_expr {
+    () => { 0 };
+    ($_e: expr $(, $rest: expr)*) => { 1 + count_expr!($($rest),*) }
+}
 
 /// Use this macro to generate rust enums which implement:
 ///
@@ -7,6 +16,7 @@ use std::fmt;
 ///    name from a `str`.
 /// - The function `from_string` which gets the correct Type from the enum by it's
 ///    name from a `String`.
+/// - An Iterator to iterate over every Type as string. `::iterator()`
 ///
 /// ```
 /// pub fn from_str(name: &str) -> Result<$enumname, ()> {
@@ -53,6 +63,15 @@ macro_rules! enum_impl {
                     )*
                     _ => Err(()),
                 }
+            }
+            #[allow(dead_code)]
+            pub fn iterator() -> Iter<'static, $enumname> {
+                static ITERATOR: [$enumname; count_expr!($($enumvals),+)] = [
+                    $(
+                        $enumname::$enumvals,
+                    )*
+                ];
+                ITERATOR.into_iter()
             }
         }
     }
