@@ -20,14 +20,18 @@ queueItem : Model -> Entry -> Html msg
 queueItem model entry =
     case entry of
         Model.Queue.ResearchEntry researchEntry ->
-            case Dict.get researchEntry.researchId model.researches of
-                Just research ->
-                    li [ helpers.class [ Item ] ]
-                        [ Html.text <| "Lv. " ++ (toString researchEntry.level) ++ " " ++ research.name
-                        ]
+            let
+                name =
+                    case Dict.get researchEntry.researchId model.researches of
+                        Just research ->
+                            research.name
 
-                _ ->
-                    li [] []
+                        _ ->
+                            ""
+            in
+                li [ helpers.class [ Item ] ]
+                    [ Html.text <| "Lv. " ++ (toString researchEntry.level) ++ " " ++ name
+                    ]
 
         _ ->
             li [] []
