@@ -22,7 +22,9 @@ queueItem model entry =
         Model.Queue.ResearchEntry researchEntry ->
             case Dict.get researchEntry.researchId model.researches of
                 Just research ->
-                    li [ helpers.class [ Item ] ] [ Html.text research.name ]
+                    li [ helpers.class [ Item ] ]
+                        [ Html.text <| "Lv. " ++ (toString researchEntry.level) ++ " " ++ research.name
+                        ]
 
                 _ ->
                     li [] []

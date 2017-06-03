@@ -1,13 +1,12 @@
 module Model.Queue exposing (..)
 
-import Model.Research exposing (ResearchId)
 import Time.DateTime exposing (DateTime)
 
 
 type alias ResearchData =
     { createdAt : DateTime
     , id : String
-    , researchId : ResearchId
+    , researchId : String
     , level : Int
     }
 
@@ -15,7 +14,7 @@ type alias ResearchData =
 type alias ModuleData =
     { createdAt : DateTime
     , id : String
-    , moduleId : ResearchId
+    , moduleId : String
     , name : String
     , level : Int
     }
@@ -28,3 +27,17 @@ type Entry
 
 type alias Queue =
     List Entry
+
+
+inQueue : String -> Int -> Queue -> Bool
+inQueue id level queue =
+    List.any
+        (\entry ->
+            case entry of
+                ResearchEntry data ->
+                    data.researchId == id && data.level == level
+
+                _ ->
+                    False
+        )
+        queue
