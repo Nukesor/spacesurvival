@@ -19,6 +19,7 @@ pub fn pod_queue_entries(current_user: User, db: DB) -> APIResponse {
 
     let queue_entry_result = queue_entry_dsl::queue_entries
         .filter(queue_entry_dsl::queue_id.eq(queue.id))
+        .order(queue_entry_dsl::created_at.asc())
         .get_results::<QueueEntry>(&*db);
 
     if queue_entry_result.is_ok() {
