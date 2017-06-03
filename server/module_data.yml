@@ -12,6 +12,25 @@ LaserTurret:
         rate: 1
         damage: 10
         range: 100
+    - level: 2
+      time: 60
+      resources:
+        - ["Iron", 200]
+        - ["Water", 100]
+      shoots:
+        rate: 1
+        damage: 10
+        range: 100
+    - level: 3
+      time: 120
+      resources:
+        - ["Iron", 200]
+        - ["Water", 100]
+      shoots:
+        rate: 1
+        damage: 10
+        range: 100
+
 
 
 PlasmaGenerator:
@@ -20,6 +39,26 @@ PlasmaGenerator:
       - ["EnergyWeapons", 1]
   levels:
     - level: 1
+      time: 30
+      resources:
+        - ["Iron", 200]
+        - ["Water", 100]
+      generates:
+        - ["Water", 200]
+      consumes:
+        - ["Iron", 10]
+
+    - level: 2
+      time: 30
+      resources:
+        - ["Iron", 200]
+        - ["Water", 100]
+      generates:
+        - ["Water", 200]
+      consumes:
+        - ["Iron", 10]
+
+    - level: 3
       time: 30
       resources:
         - ["Iron", 200]
