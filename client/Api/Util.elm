@@ -17,6 +17,11 @@ dateDecoder =
     Decode.map (fromISO8601 >> unwrap) Decode.string
 
 
+pairDecoder : Decode.Decoder a -> Decode.Decoder b -> Decode.Decoder ( a, b )
+pairDecoder a b =
+    Decode.map2 (,) (Decode.index 0 a) (Decode.index 1 b)
+
+
 unwrap : Result String b -> b
 unwrap res =
     case res of

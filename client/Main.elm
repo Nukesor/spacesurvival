@@ -27,13 +27,7 @@ init =
     , authDialogAnimation = Animation.interrupt Animations.dialogAppear Animations.dialogAppearStyle
     , mainView = GridView
     , availableModules =
-        [ { name = "hypercharge capacitor"
-          , id = "1"
-          }
-        , { name = "flux capacitor"
-          , id = "2"
-          }
-        ]
+        Dict.empty
     , researches = Dict.empty
     , buildingAt = Nothing
     , queue = []

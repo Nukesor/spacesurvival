@@ -2,11 +2,12 @@ module View.BuildDialog exposing (..)
 
 import Css exposing (..)
 import Css.Namespace exposing (namespace)
-import Html.CssHelpers
+import Dict
 import Html exposing (..)
+import Html.CssHelpers
 import Html.Events exposing (..)
-import Model
 import Messages
+import Model
 
 
 view : Model.Model -> Html Messages.Msg
@@ -16,12 +17,13 @@ view model =
             div [ helpers.class [ Container ] ]
                 [ ul
                     [ helpers.class [ BuildItemList ] ]
-                    (List.map
-                        (\m ->
-                            li [ helpers.class [ BuildItem ] ]
-                                [ Html.text m.name ]
-                        )
-                        model.availableModules
+                    (model.availableModules
+                        |> Dict.values
+                        |> List.map
+                            (\m ->
+                                li [ helpers.class [ BuildItem ] ]
+                                    [ Html.text m.name ]
+                            )
                     )
                 , cancelButton
                 ]

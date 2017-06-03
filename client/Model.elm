@@ -14,7 +14,7 @@ type alias Model =
     { grid : Model.Grid.Grid
     , user : User
     , authDialogAnimation : Animation.State
-    , availableModules : List Module
+    , availableModules : Modules
     , researches : Dict.Dict String Research
     , buildingAt : Maybe Model.Util.Point
     , mainView : MainView

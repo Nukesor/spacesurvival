@@ -2,6 +2,7 @@ module Update exposing (..)
 
 import Animation
 import Api.Auth
+import Api.Modules
 import Api.Queue
 import Api.Research exposing (startResearching)
 import Messages exposing (..)
@@ -43,6 +44,7 @@ update msg model =
                             ! [ Api.Auth.saveToken user.token
                               , Api.Research.fetchResearches updatedModel
                               , Api.Queue.getQueue updatedModel
+                              , Api.Modules.getAvailableModules updatedModel
                               ]
 
                 Err err ->
@@ -86,3 +88,11 @@ update msg model =
 
         StartResearching key ->
             model ! [ startResearching model key ]
+
+        ReceiveAvailableModules result ->
+            case Debug.log "available modules" result of
+                Ok modules ->
+                    { model | availableModules = modules } ! []
+
+                Err err ->
+                    model ! []

@@ -3,6 +3,7 @@ module Messages exposing (..)
 import Animation
 import Http
 import Model exposing (MainView)
+import Model.Modules exposing (Modules)
 import Model.Queue exposing (Queue)
 import Model.Research
 import Model.User exposing (..)
@@ -23,3 +24,4 @@ type Msg
     | ReceiveQueue (Result Http.Error Queue)
     | ReceiveQueueEntry (Result Http.Error Model.Queue.Entry)
     | StartResearching String
+    | ReceiveAvailableModules (Result Http.Error Modules)
