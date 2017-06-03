@@ -6,13 +6,16 @@ import Json.Decode.Extra exposing ((|:))
 import Messages
 import Model exposing (Model)
 import Model.Modules exposing (Module, ModuleLevel, Shoots)
+import Dict
 
 
+modulesDecoder : Decode.Decoder (Dict.Dict String Module)
 modulesDecoder =
     dataDecoder <|
         Decode.dict moduleDecoder
 
 
+moduleDecoder : Decode.Decoder Module
 moduleDecoder =
     Decode.succeed Module
         |: (Decode.field "name" Decode.string)
@@ -20,6 +23,7 @@ moduleDecoder =
         |: (Decode.field "levels" (Decode.list moduleLevelDecoder))
 
 
+moduleLevelDecoder : Decode.Decoder ModuleLevel
 moduleLevelDecoder =
     Decode.succeed ModuleLevel
         |: (Decode.field "level" Decode.int)
@@ -30,6 +34,7 @@ moduleLevelDecoder =
         |: (Decode.field "time" Decode.int)
 
 
+shootsDecoder : Decode.Decoder Shoots
 shootsDecoder =
     Decode.succeed Shoots
         |: (Decode.field "damage" Decode.int)
@@ -37,9 +42,11 @@ shootsDecoder =
         |: (Decode.field "rate" Decode.int)
 
 
+resourceAmountDecoder : Decode.Decoder ( String, Int )
 resourceAmountDecoder =
     pairDecoder Decode.string Decode.int
 
 
+getAvailableModules : Model -> Cmd Messages.Msg
 getAvailableModules model =
     authenticatedGet model "/api/modules" modulesDecoder Messages.ReceiveAvailableModules
