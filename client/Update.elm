@@ -10,6 +10,7 @@ import Messages exposing (..)
 import Model exposing (..)
 import Model.User exposing (LoginData)
 import Result exposing (withDefault)
+import Time.DateTime
 
 
 update : Msg -> Model -> ( Model, Cmd Msg )
@@ -104,3 +105,6 @@ update msg model =
             Debug.log "resources" result
                 |> Result.map (\resources -> { model | resources = resources } ! [])
                 |> withDefault (model ! [])
+
+        Tick time ->
+            { model | currentDate = Time.DateTime.fromTimestamp time } ! []

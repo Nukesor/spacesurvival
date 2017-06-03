@@ -27,6 +27,7 @@ researchDecoder =
         |: (Decode.field "id" Decode.string)
         |: (Decode.field "research_name" Decode.string)
         |: (Decode.field "level" Decode.int)
+        |: (Decode.field "finishes_at" (Decode.maybe dateDecoder))
     )
         |> Decode.map ResearchEntry
 

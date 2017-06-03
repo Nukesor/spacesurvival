@@ -1,18 +1,21 @@
 module Main exposing (..)
 
-import Html
-import Api.Auth
-import View exposing (..)
-import Model exposing (..)
-import Model.User exposing (..)
-import Messages exposing (..)
 import Animation
-import Array
-import Model.Grid exposing (Grid, Slot)
 import Animations
-import Model.Util exposing (..)
-import Update exposing (..)
+import Api.Auth
+import Array
 import Dict
+import Html
+import Messages exposing (..)
+import Model exposing (..)
+import Model.Grid exposing (Grid, Slot)
+import Model.User exposing (..)
+import Model.Util exposing (..)
+import Task exposing (perform)
+import Time exposing (every, second)
+import Time.DateTime exposing (DateTime, dateTime)
+import Update exposing (..)
+import View exposing (..)
 
 
 main : Program Never Model Msg
@@ -20,7 +23,7 @@ main =
     Html.program { init = init, update = update, subscriptions = subscriptions, view = View.view }
 
 
-init : ( Model, Cmd msg )
+init : ( Model, Cmd Msg )
 init =
     { grid = createGrid
     , user = LoggingIn { identifier = "", password = "" }
@@ -32,8 +35,10 @@ init =
     , buildingAt = Nothing
     , queue = []
     , resources = []
+    , currentDate = dateTime Time.DateTime.zero
     }
         ! [ Api.Auth.readToken ()
+          , perform Tick Time.now
           ]
 
 
@@ -54,5 +59,7 @@ subscriptions : Model -> Sub Msg
 subscriptions model =
     Sub.batch
         [ Animation.subscription AnimateModal [ model.authDialogAnimation ]
-        , Api.Auth.receiveToken (\token -> Messages.LoggedIn (Ok { token = token }))
+        , Api.Auth.receiveToken
+            (\token -> Messages.LoggedIn (Ok { token = token }))
+        , every second Tick
         ]

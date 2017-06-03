@@ -10,6 +10,7 @@ import Model.Research
 import Model.Resources exposing (Resources)
 import Model.User exposing (..)
 import Model.Util exposing (..)
+import Time exposing (Time)
 
 
 type Msg
@@ -28,3 +29,4 @@ type Msg
     | StartResearching String
     | ReceiveAvailableModules (Result Http.Error Modules)
     | ReceiveResources (Result Http.Error Resources)
+    | Tick Time

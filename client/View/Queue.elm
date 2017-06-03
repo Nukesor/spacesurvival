@@ -7,6 +7,7 @@ import Html exposing (..)
 import Html.CssHelpers
 import Model exposing (Model)
 import Model.Queue exposing (Entry)
+import Time.DateTime
 
 
 view model =
@@ -26,11 +27,21 @@ queueItem model entry =
                         Just research ->
                             research.name
 
-                        _ ->
+                        Nothing ->
+                            ""
+
+                timeToCompletion =
+                    case researchEntry.finishesAt of
+                        Just time ->
+                            (toString (Time.DateTime.delta time model.currentDate).seconds)
+
+                        Nothing ->
                             ""
             in
                 li [ helpers.class [ Item ] ]
                     [ Html.text <| "Lv. " ++ (toString researchEntry.level) ++ " " ++ name
+                    , br [] []
+                    , Html.text (timeToCompletion ++ " secs Remaining")
                     ]
 
         _ ->
