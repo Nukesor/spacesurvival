@@ -1,7 +1,9 @@
 use diesel;
 use diesel::prelude::*;
 use rocket_contrib::{JSON, SerdeError};
+
 use uuid::Uuid;
+use chrono::{UTC, Duration};
 
 use data::types::*;
 use data::modules::get_module_list;
@@ -122,15 +124,14 @@ pub fn add_module(request_data: Result<JSON<NewModuleSerializer>, SerdeError>,
     }
 
     // Get cost for level 1
-    let costs = &module_list
-                          .get(&module_type)
-                          .as_ref()
-                          .expect("No module in yml for this type.")
-                          .levels[0].resources;
+    let level = &module_list.get(&module_type)
+          .as_ref()
+          .expect("No module in yml for this type.")
+          .levels[0];
 
     // Check if we have enough resources and subtract them.
     let pod_resources = pod.get_resources(&db);
-    if costs.is_some() && !Resource::check_resources(costs, pod_resources, &db) {
+    if level.resources.is_some() && !Resource::check_resources(&level.resources, pod_resources, &db) {
         return bad_request().message("Insufficient resources.");
     }
 
@@ -152,10 +153,12 @@ pub fn add_module(request_data: Result<JSON<NewModuleSerializer>, SerdeError>,
     // Create a new queue entry with the given module type.
     let new_entry_model = NewQueueEntry {
         queue_id: queue.id.clone(),
+        research_id: None,
         research_name: None,
         module_name: Some(module.name),
         module_id: Some(module.id),
         level: 1,
+        finishes_at: (UTC::now() + Duration::seconds(level.time)).naive_utc(),
     };
     let new_queue_entry = diesel::insert(&new_entry_model)
         .into(queue_entries::table)
@@ -249,10 +252,12 @@ pub fn upgrade_module(module_uuid: &str, current_user: User, db: DB) -> APIRespo
     // Create a new queue entry with the given research type.
     let new_entry_model = NewQueueEntry {
         queue_id: queue.id.clone(),
+        research_id: None,
         research_name: None,
         module_name: Some(module.name),
         module_id: Some(queue.id.clone()),
         level: level,
+        finishes_at: (UTC::now() + Duration::seconds(all_levels[level_index].time)).naive_utc(),
     };
 
     let new_queue_entry = diesel::insert(&new_entry_model)

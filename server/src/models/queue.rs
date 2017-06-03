@@ -53,8 +53,10 @@ pub struct QueueEntry {
     pub queue_id: Uuid,
     pub module_id: Option<Uuid>,
     pub module_name: Option<String>,
+    pub research_id: Option<Uuid>,
     pub research_name: Option<String>,
     pub level: i32,
+    pub finishes_at: NaiveDateTime,
     pub created_at: NaiveDateTime,
 }
 
@@ -63,8 +65,10 @@ pub struct QueueEntry {
 #[table_name="queue_entries"]
 pub struct NewQueueEntry {
     pub queue_id: Uuid,
+    pub research_id: Option<Uuid>,
     pub research_name: Option<String>,
     pub module_name: Option<String>,
     pub module_id: Option<Uuid>,
     pub level: i32,
+    pub finishes_at: NaiveDateTime,
 }

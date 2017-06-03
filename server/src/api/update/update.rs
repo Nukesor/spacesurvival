@@ -20,14 +20,19 @@ pub fn tick(db: DB) -> APIResponse {
         .filter(queue_entries_dsl::finishes_at.lt(UTC::now()))
         .get_results::<QueueEntry>(&*db);
 
-    if let Some(finished_entries) = finfinished_entries_result {
+    if let Some(finished_entries) = finished_entries_result {
         for entry in finished_entries {
             if entry.module_id.is_some() {
-                
+                let module_id = entry.module_id.expect();
             } else if entry.research_name.is_some() {
-                
+                let research_name = entry.research_name.expect();
             }
+
+            diesel::delete(queue_entries_dsl::queue_entries
+                    .filter(queue_entries_dsl::id.eq(entry.id)))
+                .execute(&*db)
+                .expect("Failed to remove queue_entry.");
         }
     }
-    ok().message("Queue entries updated.")
+    ok().message("Tick successful.")
 }

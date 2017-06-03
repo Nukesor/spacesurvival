@@ -2,6 +2,7 @@ Plasma:
   name: "Plasma Technology"
   levels:
     - level: 1
+      time: 30
       resources:
         - ["Water", 200]
 
@@ -11,6 +12,7 @@ EnergyWeapons:
     - ["Plasma", 2]
   levels:
     - level: 1
+      time: 30
       resources:
         - ["Iron", 200]
 
@@ -20,5 +22,6 @@ MiningEfficiency:
     - ["EnergyWeapons", 2]
   levels:
     - level: 1
+      time: 30
       resources:
         - ["Iron", 200]
