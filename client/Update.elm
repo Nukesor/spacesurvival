@@ -3,7 +3,7 @@ module Update exposing (..)
 import Animation
 import Api.Auth
 import Api.Modules
-import Api.Queue
+import Api.Queue exposing (getQueue)
 import Api.Research exposing (startResearching)
 import Api.Resources
 import Messages exposing (..)
@@ -81,10 +81,10 @@ update msg model =
         SetMainView view ->
             { model | mainView = view } ! []
 
-        ReceiveQueueEntry result ->
+        QueueEntryAdded result ->
             case Debug.log "queue entry" result of
-                Ok entry ->
-                    { model | queue = model.queue ++ [ entry ] } ! []
+                Ok _ ->
+                    model ! [ getQueue model ]
 
                 Err err ->
                     model ! []

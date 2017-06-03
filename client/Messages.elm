@@ -2,6 +2,7 @@ module Messages exposing (..)
 
 import Animation
 import Http
+import Json.Decode
 import Model exposing (MainView)
 import Model.Modules exposing (Modules)
 import Model.Queue exposing (Queue)
@@ -23,7 +24,7 @@ type Msg
     | ReceiveResearches (Result Http.Error Model.Research.Researches)
     | SetMainView MainView
     | ReceiveQueue (Result Http.Error Queue)
-    | ReceiveQueueEntry (Result Http.Error Model.Queue.Entry)
+    | QueueEntryAdded (Result Http.Error Json.Decode.Value)
     | StartResearching String
     | ReceiveAvailableModules (Result Http.Error Modules)
     | ReceiveResources (Result Http.Error Resources)
