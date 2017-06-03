@@ -104,6 +104,7 @@ CREATE TABLE queue_entries (
 
 --    duration INTERVAL not null,
     finishes_at TIMESTAMP WITH TIME ZONE,
+    updated_at TIMESTAMP WITH TIME ZONE default current_timestamp not null,
     created_at TIMESTAMP WITH TIME ZONE default current_timestamp not null
 );
 

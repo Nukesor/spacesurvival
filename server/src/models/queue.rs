@@ -75,7 +75,7 @@ impl Queue {
                          .filter(queue_entry_dsl::id.eq(entry.id)))
                     .set(queue_entry_dsl::finishes_at.eq(finishes_at))
                     .execute(&**db)
-                    .expect("Failed to update pod.");
+                    .expect("Failed to update queue entries.");
             }
         }
     }
@@ -103,6 +103,7 @@ pub struct QueueEntry {
     pub level: i32,
     pub duration: i64,
     pub finishes_at: Option<DateTime<UTC>>,
+    pub updated_at: DateTime<UTC>,
     pub created_at: DateTime<UTC>,
 }
 
