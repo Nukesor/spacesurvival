@@ -4,19 +4,17 @@ use diesel::prelude::*;
 use data::types::*;
 use data::researches::get_research_list;
 use data::helper::{get_research_dependency_strings, dependencies_fulfilled};
-
 use helpers::db::DB;
 use responses::{APIResponse, bad_request, created, ok};
 
 use models::user::User;
 use models::research::{Research, NewResearch};
 use models::resource::Resource;
+use models::queue::{QueueEntry, NewQueueEntry};
 
 use schema::researches;
 use schema::researches::dsl as research_dsl;
 use schema::queue_entries::dsl as queue_entry_dsl;
-
-use models::queue::{QueueEntry, NewQueueEntry};
 
 
 /// The user needs to be logged in to access this route!

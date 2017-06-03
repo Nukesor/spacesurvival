@@ -1,10 +1,10 @@
 use diesel;
 use diesel::prelude::*;
-
 use uuid::Uuid;
 use chrono::{DateTime, UTC};
 
 use helpers::db::DB;
+
 use schema::researches;
 use schema::researches::dsl as research_dsl;
 

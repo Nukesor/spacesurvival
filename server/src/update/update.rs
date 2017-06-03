@@ -5,10 +5,11 @@ use chrono::UTC;
 use helpers::db::DB;
 
 use models::module::Module;
-use schema::modules::dsl as module_dsl;
 use models::research::Research;
-use schema::researches::dsl as research_dsl;
 use models::queue::{Queue, QueueEntry};
+
+use schema::modules::dsl as module_dsl;
+use schema::researches::dsl as research_dsl;
 use schema::queues::dsl as queue_dsl;
 use schema::queue_entries::dsl as queue_entry_dsl;
 

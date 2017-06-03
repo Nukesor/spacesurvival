@@ -1,12 +1,12 @@
 use diesel::prelude::*;
 use rocket_contrib::{JSON, SerdeError};
 
-use models::user::User;
-use schema::users::dsl::*;
-use validation::user::LoginSerializer;
-
 use helpers::db::DB;
 use responses::{APIResponse, ok, unauthorized, bad_request};
+use validation::user::LoginSerializer;
+
+use models::user::User;
+use schema::users::dsl::*;
 
 
 /// Endpoint for login.

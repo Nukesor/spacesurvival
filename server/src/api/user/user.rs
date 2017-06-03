@@ -1,17 +1,14 @@
 use diesel;
 use diesel::prelude::*;
-
 use validator::Validate;
 use rocket_contrib::{JSON, SerdeError};
 
 use helpers::db::DB;
 use validation::user::{UserSerializer, UserSettingsSerializer};
-
-use schema::users::dsl::*;
+use responses::{APIResponse, ok, created, conflict, bad_request, forbidden, unauthorized};
 
 use models::user::{User, ChangedUser};
-
-use responses::{APIResponse, ok, created, conflict, bad_request, forbidden, unauthorized};
+use schema::users::dsl::*;
 
 
 #[get("/info")]

@@ -1,6 +1,7 @@
 use diesel::prelude::*;
 
 use helpers::db::DB;
+use responses::{APIResponse, ok};
 
 use models::pod::Pod;
 use models::user::User;
@@ -9,7 +10,6 @@ use models::resource::Resource;
 use schema::pods::dsl as pod_dsl;
 use schema::resources::dsl as resources_dsl;
 
-use responses::{APIResponse, ok};
 
 /// The user needs to be logged in to access this route!
 ///

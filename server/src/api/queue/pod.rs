@@ -1,13 +1,13 @@
 use diesel::prelude::*;
 
 use helpers::db::DB;
+use responses::{APIResponse, ok};
 
 use models::user::User;
 use models::queue::QueueEntry;
 
 use schema::queue_entries::dsl as queue_entry_dsl;
 
-use responses::{APIResponse, ok};
 
 /// The user needs to be logged in to access this route!
 ///

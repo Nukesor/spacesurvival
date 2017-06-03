@@ -1,22 +1,22 @@
 use diesel;
 use diesel::prelude::*;
 use diesel::pg::PgConnection;
-
 use uuid::Uuid;
 use chrono::{DateTime, UTC};
 use argon2rs::argon2i_simple;
 use jsonwebtoken::{encode, decode, Header, Algorithm};
 
-use schema::users;
 use helpers::util;
 use helpers::db::DB;
 
+use models::pod::Pod;
+use models::queue::Queue;
 use models::resource::Resource;
 
-use models::pod::Pod;
+use schema::users;
 use schema::pods::dsl as pods_dsl;
-use models::queue::Queue;
 use schema::queues::dsl as queues_dsl;
+
 
 #[derive(Debug, Serialize, Deserialize, Identifiable, Queryable, Associations)]
 pub struct User {

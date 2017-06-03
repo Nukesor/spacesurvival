@@ -1,12 +1,13 @@
+use std::collections::HashMap;
+
+use serde_yaml::from_slice;
 use petgraph::Graph;
 use petgraph::graph::NodeIndex;
 use petgraph::algo::is_cyclic_directed;
 
-use serde_yaml::from_slice;
-use std::collections::HashMap;
-
 use data::types::*;
 use data::{HasDependencies, dependencies_default};
+
 
 static RESEARCH_LIST: &'static [u8] = include_bytes!("../../research_data.yml");
 

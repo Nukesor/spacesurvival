@@ -1,5 +1,6 @@
-use data::modules::get_module_list;
 use responses::{APIResponse, ok};
+
+use data::modules::get_module_list;
 
 #[get("/")]
 pub fn get_info() -> APIResponse {

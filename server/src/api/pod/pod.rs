@@ -3,16 +3,13 @@ use diesel::prelude::*;
 use rocket_contrib::{JSON, SerdeError};
 
 use helpers::db::DB;
+use responses::{APIResponse, bad_request, ok};
 use validation::pod::PodSettingsSerializer;
-
-
-use schema::pods::dsl as pods_dsl;
 
 use models::pod::{Pod, ChangedPod};
 use models::user::User;
 
-
-use responses::{APIResponse, bad_request, ok};
+use schema::pods::dsl as pods_dsl;
 
 
 /// Endpoint for setting different values for your pod

@@ -1,29 +1,25 @@
 use diesel;
 use diesel::prelude::*;
 use rocket_contrib::{JSON, SerdeError};
-
 use uuid::Uuid;
 
 use data::types::*;
 use data::modules::get_module_list;
 use data::helper::{get_module_dependency_strings, dependencies_fulfilled};
-
 use helpers::db::DB;
 use responses::{APIResponse, bad_request, created, ok};
+use validation::queue::NewModuleSerializer;
 
 use models::user::User;
 use models::module::{NewModule,Module};
 use models::research::Research;
 use models::resource::Resource;
+use models::queue::{QueueEntry, NewQueueEntry};
 
 use schema::modules;
-
 use schema::modules::dsl as module_dsl;
 use schema::researches::dsl as research_dsl;
 use schema::queue_entries::dsl as queue_entry_dsl;
-
-use models::queue::{QueueEntry, NewQueueEntry};
-use validation::queue::NewModuleSerializer;
 
 
 /// The user needs to be logged in to access this route!
