@@ -6,6 +6,7 @@ import Model exposing (MainView)
 import Model.Modules exposing (Modules)
 import Model.Queue exposing (Queue)
 import Model.Research
+import Model.Resources exposing (Resources)
 import Model.User exposing (..)
 import Model.Util exposing (..)
 
@@ -25,3 +26,4 @@ type Msg
     | ReceiveQueueEntry (Result Http.Error Model.Queue.Entry)
     | StartResearching String
     | ReceiveAvailableModules (Result Http.Error Modules)
+    | ReceiveResources (Result Http.Error Resources)

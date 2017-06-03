@@ -6,6 +6,7 @@ import Model.Grid
 import Model.Modules exposing (..)
 import Model.Queue exposing (Queue)
 import Model.Research exposing (..)
+import Model.Resources exposing (Resources)
 import Model.User exposing (User)
 import Model.Util
 
@@ -19,9 +20,11 @@ type alias Model =
     , buildingAt : Maybe Model.Util.Point
     , mainView : MainView
     , queue : Queue
+    , resources : Resources
     }
 
 
 type MainView
     = GridView
     | ResearchView
+    | ResourcesView

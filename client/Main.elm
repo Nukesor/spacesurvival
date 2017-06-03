@@ -31,6 +31,7 @@ init =
     , researches = Dict.empty
     , buildingAt = Nothing
     , queue = []
+    , resources = []
     }
         ! [ Api.Auth.readToken ()
           ]

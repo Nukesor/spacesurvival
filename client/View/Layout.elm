@@ -9,6 +9,7 @@ import Model exposing (..)
 import View.Grid
 import View.MenuBar
 import View.Research
+import View.Resources
 
 
 view : Model.Model -> Html Msg
@@ -27,6 +28,9 @@ mainView viewType =
 
         ResearchView ->
             View.Research.view
+
+        ResourcesView ->
+            View.Resources.view
 
 
 type Classes

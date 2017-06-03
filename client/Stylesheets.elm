@@ -7,6 +7,7 @@ import View.Grid
 import View.Layout
 import View.MenuBar
 import View.Queue
+import View.Resources
 
 
 port files : CssFileStructure -> Cmd msg
@@ -23,6 +24,7 @@ fileStructure =
                 , View.MenuBar.rules
                 , View.Grid.rules
                 , View.Queue.rules
+                , View.Resources.rules
                 ]
           )
         ]

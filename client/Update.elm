@@ -5,9 +5,11 @@ import Api.Auth
 import Api.Modules
 import Api.Queue
 import Api.Research exposing (startResearching)
+import Api.Resources
 import Messages exposing (..)
 import Model exposing (..)
 import Model.User exposing (LoginData)
+import Result exposing (withDefault)
 
 
 update : Msg -> Model -> ( Model, Cmd Msg )
@@ -45,6 +47,7 @@ update msg model =
                               , Api.Research.fetchResearches updatedModel
                               , Api.Queue.getQueue updatedModel
                               , Api.Modules.getAvailableModules updatedModel
+                              , Api.Resources.fetchResources updatedModel
                               ]
 
                 Err err ->
@@ -90,9 +93,14 @@ update msg model =
             model ! [ startResearching model key ]
 
         ReceiveAvailableModules result ->
-            case Debug.log "available modules" result of
+            case result of
                 Ok modules ->
                     { model | availableModules = modules } ! []
 
                 Err err ->
                     model ! []
+
+        ReceiveResources result ->
+            Debug.log "resources" result
+                |> Result.map (\resources -> { model | resources = resources } ! [])
+                |> withDefault (model ! [])
