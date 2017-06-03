@@ -1,11 +1,11 @@
 module Model.Queue exposing (..)
 
 import Model.Research exposing (ResearchId)
-import Time.Date exposing (Date)
+import Time.DateTime exposing (DateTime)
 
 
 type alias ResearchData =
-    { createdAt : Date
+    { createdAt : DateTime
     , id : String
     , researchId : ResearchId
     , level : Int
@@ -13,7 +13,7 @@ type alias ResearchData =
 
 
 type alias ModuleData =
-    { createdAt : Date
+    { createdAt : DateTime
     , id : String
     , moduleId : ResearchId
     , name : String

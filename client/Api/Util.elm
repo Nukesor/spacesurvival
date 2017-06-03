@@ -1,11 +1,10 @@
 module Api.Util exposing (..)
 
-import Html.Attributes exposing (value)
 import Http exposing (emptyBody, expectJson, jsonBody, stringBody)
 import Json.Decode as Decode
 import Model exposing (Model)
 import Model.User exposing (User(LoggedIn))
-import Time.Date as Date exposing (Date)
+import Time.DateTime exposing (DateTime, fromISO8601)
 
 
 dataDecoder : Decode.Decoder a -> Decode.Decoder a
@@ -13,9 +12,9 @@ dataDecoder =
     Decode.field "data"
 
 
-dateDecoder : Decode.Decoder Date
+dateDecoder : Decode.Decoder DateTime
 dateDecoder =
-    Decode.map (Date.fromISO8601 >> unwrap) Decode.string
+    Decode.map (fromISO8601 >> unwrap) Decode.string
 
 
 unwrap : Result String b -> b
