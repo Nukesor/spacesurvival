@@ -1,7 +1,12 @@
+use diesel;
+use diesel::prelude::*;
+
 use uuid::Uuid;
 use chrono::{DateTime, UTC};
 
+use helpers::db::DB;
 use schema::researches;
+use schema::researches::dsl as researches_dsl;
 
 
 #[derive(Debug, Serialize, Deserialize, Identifiable, Queryable, Associations)]
@@ -16,6 +21,17 @@ pub struct Research {
     pub base_id: Option<Uuid>,
     pub created_at: DateTime<UTC>,
     pub updated_at: DateTime<UTC>,
+}
+
+impl Research {
+    /// This function adds a new pod into the database and returns the model with the
+    /// initialized data.
+    pub fn get(id: Uuid, db: &DB) -> Result<Research, diesel::result::Error> {
+      // Get the research from an id
+      researches_dsl::researches
+          .filter(researches_dsl::id.eq(id))
+          .get_result::<Research>(&**db)
+    }
 }
 
 

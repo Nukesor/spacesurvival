@@ -1,9 +1,16 @@
+use diesel;
 use diesel::prelude::*;
-use chrono;::prelude::*;
+
+use chrono::UTC;
 
 use helpers::db::DB;
 
+use models::module::Module;
+use models::research::Research;
 use models::queue::QueueEntry;
+
+use schema::modules::dsl as module_dsl;
+use schema::researches::dsl as research_dsl;
 use schema::queue_entries::dsl as queue_entries_dsl;
 
 use responses::{APIResponse, ok};
@@ -20,12 +27,24 @@ pub fn tick(db: DB) -> APIResponse {
         .filter(queue_entries_dsl::finishes_at.lt(UTC::now()))
         .get_results::<QueueEntry>(&*db);
 
-    if let Some(finished_entries) = finished_entries_result {
+    if let Ok(finished_entries) = finished_entries_result {
         for entry in finished_entries {
-            if entry.module_id.is_some() {
-                let module_id = entry.module_id.expect();
-            } else if entry.research_name.is_some() {
-                let research_name = entry.research_name.expect();
+            match entry {
+                QueueEntry{module_id: Some(module_id), ..} => {
+                    let module = Module::get(module_id, &db).expect("QueueEntry with invalid Module.id");
+                    diesel::update(module_dsl::modules.find(module.id))
+                        .set(module_dsl::level.eq(module.level + 1))
+                        .execute(&*db)
+                        .expect("Failed to update module level.");
+                }
+                QueueEntry{research_id: Some(research_id), ..} => {
+                    let research = Research::get(research_id, &db).expect("QueueEntry with invalid Research.id");
+                    diesel::update(research_dsl::researches.find(research.id))
+                        .set(research_dsl::level.eq(research.level + 1))
+                        .execute(&*db)
+                        .expect("Failed to update module level.");
+                }
+                _ => (),
             }
 
             diesel::delete(queue_entries_dsl::queue_entries

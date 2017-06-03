@@ -5,6 +5,15 @@ Plasma:
       time: 30
       resources:
         - ["Water", 200]
+    - level: 2
+      time: 60
+      resources:
+        - ["Water", 200]
+    - level: 3
+      time: 120
+      resources:
+        - ["Water", 200]
+
 
 EnergyWeapons:
   name: "Energy Weapons"
@@ -15,6 +24,14 @@ EnergyWeapons:
       time: 30
       resources:
         - ["Iron", 200]
+    - level: 2
+      time: 60
+      resources:
+        - ["Iron", 200]
+    - level: 3
+      time: 120
+      resources:
+        - ["Iron", 200]
 
 MiningEfficiency:
   name: "Mining Efficiency"
@@ -23,5 +40,13 @@ MiningEfficiency:
   levels:
     - level: 1
       time: 30
+      resources:
+        - ["Iron", 200]
+    - level: 2
+      time: 60
+      resources:
+        - ["Iron", 200]
+    - level: 3
+      time: 120
       resources:
         - ["Iron", 200]
