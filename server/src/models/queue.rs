@@ -2,7 +2,7 @@ use diesel;
 use diesel::prelude::*;
 
 use uuid::Uuid;
-use chrono::NaiveDateTime;
+use chrono::{DateTime, UTC};
 
 use schema::{queues, queue_entries};
 use helpers::db::DB;
@@ -17,8 +17,8 @@ pub struct Queue {
     pub pod_id: Option<Uuid>,
     pub base_id: Option<Uuid>,
     pub slots: i32,
-    pub created_at: NaiveDateTime,
-    pub updated_at: NaiveDateTime,
+    pub created_at: DateTime<UTC>,
+    pub updated_at: DateTime<UTC>,
 }
 
 
@@ -56,8 +56,8 @@ pub struct QueueEntry {
     pub research_id: Option<Uuid>,
     pub research_name: Option<String>,
     pub level: i32,
-    pub finishes_at: NaiveDateTime,
-    pub created_at: NaiveDateTime,
+    pub finishes_at: DateTime<UTC>,
+    pub created_at: DateTime<UTC>,
 }
 
 
@@ -70,5 +70,5 @@ pub struct NewQueueEntry {
     pub module_name: Option<String>,
     pub module_id: Option<Uuid>,
     pub level: i32,
-    pub finishes_at: NaiveDateTime,
+    pub finishes_at: DateTime<UTC>,
 }

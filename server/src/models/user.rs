@@ -3,7 +3,7 @@ use diesel::prelude::*;
 use diesel::pg::PgConnection;
 
 use uuid::Uuid;
-use chrono::NaiveDateTime;
+use chrono::{DateTime, UTC};
 use argon2rs::argon2i_simple;
 use jsonwebtoken::{encode, decode, Header, Algorithm};
 
@@ -23,11 +23,12 @@ use schema::queues::dsl as queues_dsl;
 pub struct User {
     pub id: Uuid,
     pub nickname: String,
-    pub created_at: NaiveDateTime,
-    pub updated_at: NaiveDateTime,
     pub email: String,
     #[serde(skip_serializing)]
     pub password_hash: Vec<u8>,
+
+    pub created_at: DateTime<UTC>,
+    pub updated_at: DateTime<UTC>,
 }
 
 #[derive(Debug, RustcEncodable, RustcDecodable)]

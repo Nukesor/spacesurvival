@@ -158,7 +158,7 @@ pub fn add_module(request_data: Result<JSON<NewModuleSerializer>, SerdeError>,
         module_name: Some(module.name),
         module_id: Some(module.id),
         level: 1,
-        finishes_at: (UTC::now() + Duration::seconds(level.time)).naive_utc(),
+        finishes_at: UTC::now() + Duration::seconds(level.time),
     };
     let new_queue_entry = diesel::insert(&new_entry_model)
         .into(queue_entries::table)
@@ -257,7 +257,7 @@ pub fn upgrade_module(module_uuid: &str, current_user: User, db: DB) -> APIRespo
         module_name: Some(module.name),
         module_id: Some(queue.id.clone()),
         level: level,
-        finishes_at: (UTC::now() + Duration::seconds(all_levels[level_index].time)).naive_utc(),
+        finishes_at: UTC::now() + Duration::seconds(all_levels[level_index].time),
     };
 
     let new_queue_entry = diesel::insert(&new_entry_model)

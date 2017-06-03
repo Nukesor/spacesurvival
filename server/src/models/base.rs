@@ -1,5 +1,5 @@
 use uuid::Uuid;
-use chrono::NaiveDateTime;
+use chrono::{DateTime, UTC};
 
 use schema::{bases, pods, modules, researches, resources};
 
@@ -12,8 +12,8 @@ use schema::{bases, pods, modules, researches, resources};
 pub struct Base {
     pub name: String,
     pub id: Uuid,
-    pub created_at: NaiveDateTime,
-    pub updated_at: NaiveDateTime,
+    pub created_at: DateTime<UTC>,
+    pub updated_at: DateTime<UTC>,
 }
 
 

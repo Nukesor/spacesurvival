@@ -2,8 +2,8 @@ CREATE TABLE bases (
     name VARCHAR(120) not null, 
     id UUID PRIMARY KEY default uuid_generate_v4(),
 
-    updated_at TIMESTAMP default current_timestamp not null,
-    created_at TIMESTAMP default current_timestamp not null
+    updated_at TIMESTAMP WITH TIME ZONE default current_timestamp not null,
+    created_at TIMESTAMP WITH TIME ZONE default current_timestamp not null
 );
 
 
@@ -14,8 +14,8 @@ CREATE TABLE pods (
     user_id UUID references users(id) not null,
     base_id UUID references bases(id),
 
-    updated_at TIMESTAMP default current_timestamp not null,
-    created_at TIMESTAMP default current_timestamp not null
+    updated_at TIMESTAMP WITH TIME ZONE default current_timestamp not null,
+    created_at TIMESTAMP WITH TIME ZONE default current_timestamp not null
 );
 
 
@@ -57,8 +57,8 @@ CREATE TABLE modules (
     base_id UUID references bases(id) on DELETE CASCADE,
     CHECK (base_id is not null or pod_id is not null),
 
-    updated_at TIMESTAMP default current_timestamp not null,
-    created_at TIMESTAMP default current_timestamp not null
+    updated_at TIMESTAMP WITH TIME ZONE default current_timestamp not null,
+    created_at TIMESTAMP WITH TIME ZONE default current_timestamp not null
 );
 
 
@@ -73,8 +73,8 @@ CREATE TABLE researches (
     CHECK (base_id is not null or pod_id is not null),
 
 
-    updated_at TIMESTAMP default current_timestamp not null,
-    created_at TIMESTAMP default current_timestamp not null
+    updated_at TIMESTAMP WITH TIME ZONE default current_timestamp not null,
+    created_at TIMESTAMP WITH TIME ZONE default current_timestamp not null
 );
 
 
@@ -86,8 +86,8 @@ CREATE TABLE queues (
 
     slots integer not null default 2,
     CHECK (slots > 0),
-    updated_at TIMESTAMP default current_timestamp not null,
-    created_at TIMESTAMP default current_timestamp not null
+    updated_at TIMESTAMP WITH TIME ZONE default current_timestamp not null,
+    created_at TIMESTAMP WITH TIME ZONE default current_timestamp not null
 );
 
 
@@ -99,11 +99,11 @@ CREATE TABLE queue_entries (
     research_id UUID references researches(id),
     research_name VARCHAR(120),
     level integer not null,
-    finishes_at TIMESTAMP not null,
     CHECK (module_name is not null or research_name is not null),
 
 --    duration INTERVAL not null,
-    created_at TIMESTAMP default current_timestamp not null
+    finishes_at TIMESTAMP WITH TIME ZONE not null,
+    created_at TIMESTAMP WITH TIME ZONE default current_timestamp not null
 );
 
 

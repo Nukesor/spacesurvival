@@ -1,5 +1,5 @@
 use uuid::Uuid;
-use chrono::NaiveDateTime;
+use chrono::{DateTime, UTC};
 
 use schema::researches;
 
@@ -14,8 +14,8 @@ pub struct Research {
     pub id: Uuid,
     pub pod_id: Option<Uuid>,
     pub base_id: Option<Uuid>,
-    pub created_at: NaiveDateTime,
-    pub updated_at: NaiveDateTime,
+    pub created_at: DateTime<UTC>,
+    pub updated_at: DateTime<UTC>,
 }
 
 

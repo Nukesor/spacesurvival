@@ -2,7 +2,7 @@ use diesel;
 use diesel::prelude::*;
 
 use uuid::Uuid;
-use chrono::NaiveDateTime;
+use chrono::{DateTime, UTC};
 
 
 use models::resource::Resource;
@@ -24,8 +24,8 @@ pub struct Pod {
     pub id: Uuid,
     pub user_id: Uuid,
     pub base_id: Option<Uuid>,
-    pub created_at: NaiveDateTime,
-    pub updated_at: NaiveDateTime,
+    pub created_at: DateTime<UTC>,
+    pub updated_at: DateTime<UTC>,
 }
 
 

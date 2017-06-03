@@ -161,7 +161,7 @@ pub fn start_research(research_name: &str,
         module_name: None,
         module_id: None,
         level: research_level,
-        finishes_at: (UTC::now() + Duration::seconds(all_levels[level_index].time)).naive_utc(),
+        finishes_at: UTC::now() + Duration::seconds(all_levels[level_index].time),
     };
 
     let new_queue_entry = diesel::insert(&new_entry_model)
