@@ -6,7 +6,7 @@ use chrono::{DateTime, UTC};
 
 use helpers::db::DB;
 use schema::researches;
-use schema::researches::dsl as researches_dsl;
+use schema::researches::dsl as research_dsl;
 
 
 #[derive(Debug, Serialize, Deserialize, Identifiable, Queryable, Associations)]
@@ -28,8 +28,8 @@ impl Research {
     /// initialized data.
     pub fn get(id: Uuid, db: &DB) -> Result<Research, diesel::result::Error> {
       // Get the research from an id
-      researches_dsl::researches
-          .filter(researches_dsl::id.eq(id))
+      research_dsl::researches
+          .filter(research_dsl::id.eq(id))
           .get_result::<Research>(&**db)
     }
 }

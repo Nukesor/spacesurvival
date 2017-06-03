@@ -4,11 +4,16 @@ use diesel::prelude::*;
 use uuid::Uuid;
 use chrono::{DateTime, UTC};
 
-
-use models::resource::Resource;
-
 use schema::{pods, modules, researches, resources};
+
+use models::module::Module;
+use models::resource::Resource;
+use models::research::Research;
+
+use schema::modules::dsl as module_dsl;
 use schema::resources::dsl as resources_dsl;
+use schema::researches::dsl as research_dsl;
+
 
 use helpers::db::DB;
 
@@ -49,6 +54,42 @@ impl Pod {
             .get_results(&**db)
             .expect("Failed to get user resources.")
     }
+
+    pub fn update_resources(&self, db: &DB) {
+        let resources = self.get_resources(db);
+    }
+
+
+    pub fn get_module(&self, id: Uuid, db: &DB) -> Result<Module, diesel::result::Error> {
+      // Get the research from an id
+      module_dsl::modules
+          .filter(module_dsl::id.eq(id))
+          .filter(module_dsl::pod_id.eq(self.id))
+          .get_result::<Module>(&**db)
+    }
+
+
+    pub fn get_modules(&self, db: &DB) -> Result<Vec<Module>, diesel::result::Error> {
+        module_dsl::modules
+            .filter(module_dsl::pod_id.eq(self.id))
+            .get_results::<Module>(&**db)
+    }
+
+
+    pub fn get_researches(&self, db: &DB) -> Vec<Research> {
+        research_dsl::researches
+            .filter(research_dsl::pod_id.eq(self.id))
+            .get_results::<Research>(&**db)
+            .unwrap()
+    }
+    pub fn get_research(&self, name: String, db: &DB) -> Result<Research, diesel::result::Error> {
+        // Get the research from an id
+        research_dsl::researches
+            .filter(research_dsl::pod_id.eq(self.id))
+            .filter(research_dsl::name.eq(name))
+            .get_result::<Research>(&**db)
+    }
+
 }
 
 #[derive(Insertable)]

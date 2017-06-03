@@ -16,6 +16,7 @@ use schema::resources::dsl as resources_dsl;
 pub struct Resource {
     pub name: String,
     pub amount: i64,
+    pub production: i64,
     pub max_amount: i64,
 
     pub id: Uuid,
@@ -135,6 +136,7 @@ impl Resource {
 
         let updated_resource = UpdatedResource {
             amount: Some(new_amount),
+            production: None,
             max_amount: None,
         };
 
@@ -163,5 +165,6 @@ pub struct NewResource {
 #[table_name="resources"]
 pub struct UpdatedResource {
     pub amount: Option<i64>,
+    pub production: Option<i64>,
     pub max_amount: Option<i64>,
 }
