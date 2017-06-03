@@ -60,8 +60,7 @@ impl User {
         Queue::new_pod_queue(pod.id, db);
 
         // Create resources for pod
-        Resource::new_pod_resource(ResourceTypes::Iron, pod.id, db);
-        Resource::new_pod_resource(ResourceTypes::Water, pod.id, db);
+        Resource::create_pod_resources(pod.id, db);
 
         user
     }
