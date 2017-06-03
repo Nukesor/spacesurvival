@@ -91,44 +91,37 @@ pub fn start_research(research_name: &str,
         .filter(research_dsl::name.eq(research_type.to_string()))
         .get_result::<Research>(&*db);
 
-    let mut research: Research;
+    let research: Research;
 
-    match research_result {
-        // Research exists, we don't need to check for dependencies
-        // We just increase the level by 1
-        Ok(_) => {
-            research = research_result.unwrap();
-            research_level = research.level + 1;
+    if research_result.is_ok() {
+        research = research_result.unwrap();
+        research_level = research.level + 1;
+    }
+    else {
+        let dependencies = research_dsl::researches
+            .filter(research_dsl::name.eq_any(dependency_strings))
+            .get_results::<Research>(&*db);
+
+        let fulfilled = dependencies_fulfilled(&research_type,
+                                               dependencies,
+                                               &research_list);
+        if !fulfilled {
+            return bad_request().message("Dependencies not fulfilled.");
         }
-        // The research is not yet here. We need to check for dependencies.
-        // We also create a new research object in the database with level 0.
-        Err(_) => {
-            let dependencies = research_dsl::researches
-                .filter(research_dsl::name.eq_any(dependency_strings))
-                .get_results::<Research>(&*db);
+        // Create a new module in the
+        let new_research = NewResearch {
+            name: research_type.to_string(),
+            pod_id: Some(pod.id),
+            base_id: None,
+        };
 
-            let fulfilled = dependencies_fulfilled(&research_type,
-                                                   dependencies,
-                                                   &research_list);
-            if !fulfilled {
-                return bad_request().message("Dependencies not fulfilled.");
-            }
-            // Create a new module in the
-            let new_research = NewResearch {
-                name: research_type.to_string(),
-                pod_id: Some(pod.id),
-                base_id: None,
-            };
+        research_result = diesel::insert(&new_research)
+            .into(researches::table)
+            .get_result::<Research>(&*db);
+        
+        research = research_result.expect("Failed to create research.");
 
-            research_result = diesel::insert(&new_research)
-                .into(researches::table)
-                .get_result::<Research>(&*db);
-            
-            research = research_result.expect("Failed to create research.");
-
-            research_level = 1;
-        }
-
+        research_level = 1;
     }
 
     // Check if there already are existing queue entries for this research.
