@@ -30,29 +30,24 @@ pub fn get_researches(current_user: User, db: DB) -> APIResponse {
 
     // Ger current pod and pod researches
     let pod = current_user.get_pod(&db);
-    let research_result = research_dsl::researches
-        .filter(research_dsl::pod_id.eq(pod.id))
-        .get_results::<Research>(&*db);
-
-    if research_result.is_ok() {
-        let researches = research_result.unwrap();
-        for research in researches {
-            let type_result = ResearchTypes::from_string(&research.name);
-            if type_result.is_err() {
-                return bad_request()
-                           .message(format!("Found research {}, but no matching ResearchType!",
-                                            research.name)
-                                            .as_str());
-            }
-            let research_type = type_result.unwrap();
-            let list_result = research_list.get_mut(&research_type);
-            if list_result.is_none() {
-                return bad_request().message(format!("Found type {}, but no matching entry in our research list!", research_type).as_str());
-            }
-
-            let mut list_entry = list_result.unwrap();
-            list_entry.current_level = research.level;
+    
+    let researches = pod.get_researches(&db);
+    for research in researches {
+        let type_result = ResearchTypes::from_string(&research.name);
+        if type_result.is_err() {
+            return bad_request()
+                       .message(format!("Found research {}, but no matching ResearchType!",
+                                        research.name)
+                                        .as_str());
         }
+        let research_type = type_result.unwrap();
+        let list_result = research_list.get_mut(&research_type);
+        if list_result.is_none() {
+            return bad_request().message(format!("Found type {}, but no matching entry in our research list!", research_type).as_str());
+        }
+
+        let mut list_entry = list_result.unwrap();
+        list_entry.current_level = research.level;
     }
 
     ok().message("Research data.").data(json!(&research_list))
@@ -84,13 +79,9 @@ pub fn start_research(research_name: &str,
 
     let (pod, queue) = current_user.get_pod_and_queue(&db);
 
-    let mut research_result = research_dsl::researches
-        .filter(research_dsl::pod_id.eq(pod.id))
-        .filter(research_dsl::name.eq(research_type.to_string()))
-        .get_result::<Research>(&*db);
+    let mut research_result = pod.get_research(research_type.to_string(), &db);
 
     let research: Research;
-
     if research_result.is_ok() {
         research = research_result.unwrap();
         research_level = research.level + 1;

@@ -22,6 +22,7 @@ CREATE TABLE pods (
 CREATE TABLE resources (
     name VARCHAR(120) not null, 
     amount bigint not null,
+    production bigint default 0 not null,
     max_amount bigint not null,
     UNIQUE (name, base_id, pod_id),
     CHECK (amount <= max_amount),

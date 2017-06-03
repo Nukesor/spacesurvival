@@ -33,15 +33,13 @@ use validation::queue::NewModuleSerializer;
 pub fn get_modules(current_user: User, db: DB) -> APIResponse {
 
     let pod = current_user.get_pod(&db);
-    let module_result = module_dsl::modules
-        .filter(module_dsl::pod_id.eq(pod.id))
-        .get_results::<Module>(&*db);
+    let module_result = pod.get_modules(&db);
 
     if module_result.is_ok() {
         let modules = module_result.unwrap();
         return ok().message("Module data.").data(json!(&modules));
     }
-    ok().message("No module installed.")
+    ok().message("No modules installed.")
 }
 
 /// Add a new module to pod
@@ -174,25 +172,23 @@ pub fn remove_module(module_uuid: &str, current_user: User, db: DB) -> APIRespon
     }
     let module_id = result.unwrap();
 
+    // Get the module and get it from the pod to ensure this is a request from 
+    // the owner of the module
     let pod = current_user.get_pod(&db);
+    let module_result = pod.get_module(module_id, &db);
 
-    // Get the module
-    let module_result = module_dsl::modules
-        .filter(module_dsl::id.eq(module_id))
-        .filter(module_dsl::pod_id.eq(pod.id))
-        .first::<Module>(&*db);
-    if module_result.is_err() {
+    if let Ok(module) = module_result {
+        // Remove queue_entry from database
+        diesel::delete(module_dsl::modules
+                           .filter(module_dsl::id.eq(module.id)))
+                .execute(&*db)
+                .expect("Failed to remove module.");
+
+        return ok().message("Module removed.");
+    } else {
         return bad_request().message("No module with this id.");
     }
-    let module = module_result.unwrap();
 
-    // Remove queue_entry from database
-    diesel::delete(module_dsl::modules
-                       .filter(module_dsl::id.eq(module.id)))
-            .execute(&*db)
-            .expect("Failed to remove module.");
-
-    ok().message("Module removed.")
 }
 
 /// upgrade module from pod
@@ -204,13 +200,12 @@ pub fn upgrade_module(module_uuid: &str, current_user: User, db: DB) -> APIRespo
         return bad_request().message("Got an invalid uuid");
     }
     let module_id = result.unwrap();
-    let pod = current_user.get_pod(&db);
 
-    // Get the module
-    let module_result = module_dsl::modules
-        .filter(module_dsl::id.eq(module_id))
-        .filter(module_dsl::pod_id.eq(pod.id))
-        .first::<Module>(&*db);
+    // Get the module and get it from the pod to ensure this is a request from 
+    // the owner of the module
+    let pod = current_user.get_pod(&db);
+    let module_result = pod.get_module(module_id, &db);
+
     if module_result.is_err() {
         return bad_request().message("No module with this id.");
     }
@@ -281,11 +276,9 @@ pub fn stop_module_upgrade(module_uuid: &str, current_user: User, db: DB) -> API
     }
     let queue_entry = queue_entry_result.unwrap();
 
-    // Get the module from the queue entry
-    let module = module_dsl::modules
-        .filter(module_dsl::id.eq(module_id))
-        .get_result::<Module>(&*db)
-        .expect("Failed to get a module");
+    // Get the module and get it from the pod to ensure this is a request from 
+    // the owner of the module
+    let module = pod.get_module(module_id, &db).expect("Failed to get a module");
 
     // Get all needed info for resource manipulation
     let module_list = get_module_list();
