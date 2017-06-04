@@ -8,7 +8,7 @@ use models::user::User;
 use models::resource::Resource;
 
 use schema::pods::dsl as pod_dsl;
-use schema::resources::dsl as resources_dsl;
+use schema::resources::dsl as resource_dsl;
 
 
 /// The user needs to be logged in to access this route!
@@ -21,8 +21,8 @@ pub fn pod_resources(current_user: User, db: DB) -> APIResponse {
         .get_result::<Pod>(&*db)
         .expect("Failed to get user pod.");
 
-    let resources = resources_dsl::resources
-        .filter(resources_dsl::pod_id.eq(pod.id))
+    let resources = resource_dsl::resources
+        .filter(resource_dsl::pod_id.eq(pod.id))
         .get_results::<Resource>(&*db)
         .expect("Failed to get resources from pod.");
 

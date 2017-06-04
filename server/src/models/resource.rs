@@ -1,12 +1,13 @@
 use diesel;
 use uuid::Uuid;
 use diesel::prelude::*;
+use chrono::{DateTime, UTC};
 
 use data::types::*;
 use helpers::db::DB;
 
 use schema::resources;
-use schema::resources::dsl as resources_dsl;
+use schema::resources::dsl as resource_dsl;
 
 
 /// A model for querying and serializing data from the `resources` table.
@@ -22,6 +23,9 @@ pub struct Resource {
     pub id: Uuid,
     pub pod_id: Option<Uuid>,
     pub base_id: Option<Uuid>,
+
+    pub created_at: DateTime<UTC>,
+    pub updated_at: DateTime<UTC>,
 }
 
 
@@ -140,7 +144,7 @@ impl Resource {
             max_amount: None,
         };
 
-        diesel::update(resources_dsl::resources.filter(resources_dsl::id.eq(self.id)))
+        diesel::update(resource_dsl::resources.filter(resource_dsl::id.eq(self.id)))
             .set(&updated_resource)
             .get_result::<Resource>(&**db)
             .expect("Failed to update resource.");

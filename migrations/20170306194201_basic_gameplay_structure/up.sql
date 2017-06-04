@@ -30,7 +30,10 @@ CREATE TABLE resources (
     id UUID PRIMARY KEY default uuid_generate_v4(),
     pod_id UUID references pods(id) on DELETE CASCADE,
     base_id UUID references bases(id) on DELETE CASCADE,
-    CHECK (base_id is not null or pod_id is not null)
+    CHECK (base_id is not null or pod_id is not null),
+
+    updated_at TIMESTAMP WITH TIME ZONE default current_timestamp not null,
+    created_at TIMESTAMP WITH TIME ZONE default current_timestamp not null
 );
 
 
@@ -114,5 +117,6 @@ SELECT diesel_manage_updated_at('bases');
 SELECT diesel_manage_updated_at('pods');
 SELECT diesel_manage_updated_at('modules');
 SELECT diesel_manage_updated_at('researches');
+SELECT diesel_manage_updated_at('resources');
 SELECT diesel_manage_updated_at('queues');
 SELECT diesel_manage_updated_at('queue_entries');

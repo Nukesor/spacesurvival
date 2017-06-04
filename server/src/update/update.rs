@@ -4,10 +4,12 @@ use chrono::UTC;
 
 use helpers::db::DB;
 
+use models::pod::Pod;
 use models::module::Module;
 use models::research::Research;
 use models::queue::{Queue, QueueEntry};
 
+use schema::pods::dsl as pods_dsl;
 use schema::modules::dsl as module_dsl;
 use schema::researches::dsl as research_dsl;
 use schema::queues::dsl as queue_dsl;
@@ -31,9 +33,12 @@ pub fn tick(db: &DB) {
                 QueueEntry{module_id: Some(module_id), ..} => {
                     let module = Module::get(module_id, db).expect("QueueEntry with invalid Module.id");
                     diesel::update(module_dsl::modules.find(module.id))
-                        .set(module_dsl::level.eq(module.level + 1))
-                        .execute(&**db)
-                        .expect("Failed to update module level.");
+                        .set(module_dsl::level.eq(module.level + 1));
+                    let pod = pods_dsl::pods
+                        .filter(pods_dsl::user_id.eq(module.id))
+                        .first::<Pod>(&**db)
+                        .unwrap();
+                    pod.update_resources(&db);
                 }
                 QueueEntry{research_id: Some(research_id), ..} => {
                     let research = Research::get(research_id, db).expect("QueueEntry with invalid Research.id");
