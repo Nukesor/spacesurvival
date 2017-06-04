@@ -8,6 +8,7 @@ import Html.CssHelpers
 import Html.Events exposing (onClick)
 import Messages exposing (Msg(StartResearching))
 import Model exposing (Model)
+import Model.Queue exposing (applyQueue)
 import Model.Research exposing (Research, Researches, updateable)
 
 
@@ -26,7 +27,7 @@ researchItem : Model -> String -> Research -> Html Messages.Msg
 researchItem model key research =
     let
         updateButton =
-            if updateable model.queue model.researches research then
+            if updateable (applyQueue model.researches model.queue) key then
                 [ button [ onClick (StartResearching key) ] [ Html.text "Research next level" ] ]
             else
                 []

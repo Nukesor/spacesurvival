@@ -2,7 +2,6 @@ module Model.Research exposing (..)
 
 import Dict
 import List exposing (length)
-import Model.Queue exposing (Queue, inQueue)
 
 
 type alias Research =
@@ -31,8 +30,8 @@ type alias Researches =
     Dict.Dict ResearchId Research
 
 
-atMaxLevel : Queue -> Research -> Bool
-atMaxLevel queue research =
+atMaxLevel : Research -> Bool
+atMaxLevel research =
     let
         maxLevel =
             length research.levels
@@ -41,9 +40,14 @@ atMaxLevel queue research =
             >= maxLevel
 
 
-updateable : Queue -> Researches -> Research -> Bool
-updateable queue researches research =
-    List.all (dependencyFulfilled researches) research.dependencies && not (atMaxLevel queue research)
+updateable : Researches -> String -> Bool
+updateable researches key =
+    case Dict.get key researches of
+        Just research ->
+            List.all (dependencyFulfilled researches) research.dependencies && not (atMaxLevel research)
+
+        _ ->
+            False
 
 
 dependencyFulfilled : Dict.Dict String Research -> ( ResearchId, Int ) -> Bool

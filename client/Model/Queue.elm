@@ -1,12 +1,14 @@
 module Model.Queue exposing (..)
 
+import Dict
+import Model.Research exposing (ResearchId, Researches)
 import Time.DateTime exposing (DateTime)
 
 
 type alias ResearchData =
     { createdAt : DateTime
     , id : String
-    , researchId : String
+    , researchId : ResearchId
     , level : Int
     , finishesAt : Maybe DateTime
     }
@@ -29,6 +31,27 @@ type Entry
 
 type alias Queue =
     List Entry
+
+
+applyQueue : Researches -> Queue -> Researches
+applyQueue researches queue =
+    List.foldl applyQueueEntry researches queue
+
+
+applyQueueEntry : Entry -> Researches -> Researches
+applyQueueEntry entry researches =
+    case entry of
+        ResearchEntry data ->
+            Dict.update data.researchId
+                (Maybe.map
+                    (\research ->
+                        { research | currentLevel = max research.currentLevel data.level }
+                    )
+                )
+                researches
+
+        _ ->
+            researches
 
 
 unfinishedEntries : DateTime -> Queue -> Queue
