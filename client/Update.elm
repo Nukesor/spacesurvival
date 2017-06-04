@@ -48,8 +48,9 @@ update msg model =
                             ! [ Api.Auth.saveToken user.token
                               , Api.Research.fetchResearches updatedModel
                               , Api.Queue.fetchQueue updatedModel
-                              , Api.Modules.getAvailableModules updatedModel
+                              , Api.Modules.fetchAvailableModules updatedModel
                               , Api.Resources.fetchResources updatedModel
+                              , Api.Modules.fetchGridModules updatedModel
                               ]
 
                 Err err ->
@@ -110,7 +111,7 @@ update msg model =
                     model ! []
 
         ReceiveResources result ->
-            Debug.log "resources" result
+            result
                 |> Result.map (\resources -> { model | resources = resources } ! [])
                 |> withDefault (model ! [])
 
@@ -129,3 +130,8 @@ update msg model =
                     | currentDate = Time.DateTime.fromTimestamp time
                 }
                     ! commands
+
+        ReceiveGrid result ->
+            result
+                |> Result.map (\modules -> { model | grid = modules } ! [])
+                |> withDefault (model ! [])

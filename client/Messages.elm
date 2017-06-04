@@ -4,7 +4,8 @@ import Animation
 import Http
 import Json.Decode
 import Model exposing (MainView)
-import Model.Modules exposing (Modules)
+import Model.Grid exposing (Grid)
+import Model.Modules exposing (AvailableModules)
 import Model.Queue exposing (Queue)
 import Model.Research
 import Model.Resources exposing (Resources)
@@ -27,6 +28,7 @@ type Msg
     | ReceiveQueue (Result Http.Error Queue)
     | QueueEntryAdded (Result Http.Error Json.Decode.Value)
     | StartResearching String
-    | ReceiveAvailableModules (Result Http.Error Modules)
+    | ReceiveAvailableModules (Result Http.Error AvailableModules)
     | ReceiveResources (Result Http.Error Resources)
+    | ReceiveGrid (Result Http.Error Grid)
     | Tick Time

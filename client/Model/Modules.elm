@@ -12,11 +12,15 @@ type alias ModuleId =
     String
 
 
-type alias Modules =
-    Dict.Dict String Module
+type alias AvailableModules =
+    Dict.Dict String ModuleType
 
 
 type alias Module =
+    { id : String, level : Int }
+
+
+type alias ModuleType =
     { name : String
     , dependencies : List ( ResearchId, Int )
     , levels : List ModuleLevel

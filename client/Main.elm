@@ -25,7 +25,7 @@ main =
 
 init : ( Model, Cmd Msg )
 init =
-    { grid = createGrid
+    { grid = Model.Grid.empty
     , user = LoggingIn { identifier = "", password = "" }
     , authDialogAnimation = Animation.interrupt Animations.dialogAppear Animations.dialogAppearStyle
     , mainView = GridView
@@ -40,19 +40,6 @@ init =
         ! [ Api.Auth.readToken ()
           , perform Tick Time.now
           ]
-
-
-createGrid : Grid
-createGrid =
-    Array.initialize 10
-        (\x ->
-            Array.initialize 10
-                (\y ->
-                    { position = Point x y
-                    , entry = Nothing
-                    }
-                )
-        )
 
 
 subscriptions : Model -> Sub Msg

@@ -1,23 +1,56 @@
 module Api.Modules exposing (..)
 
 import Api.Util exposing (authenticatedGet, dataDecoder, pairDecoder)
+import Array
+import Dict
 import Json.Decode as Decode
 import Json.Decode.Extra exposing ((|:))
 import Messages
 import Model exposing (Model)
-import Model.Modules exposing (Module, ModuleLevel, Shoots)
-import Dict
+import Model.Grid exposing (Grid, setAtPosition)
+import Model.Modules exposing (Module, ModuleLevel, ModuleType, Shoots)
 
 
-modulesDecoder : Decode.Decoder (Dict.Dict String Module)
+modulesDecoder : Decode.Decoder (Dict.Dict String ModuleType)
 modulesDecoder =
     dataDecoder <|
         Decode.dict moduleDecoder
 
 
-moduleDecoder : Decode.Decoder Module
+gridDecoder : Decode.Decoder Grid
+gridDecoder =
+    dataDecoder <|
+        Decode.map slotsToGrid (Decode.list gridSlotDecoder)
+
+
+slotsToGrid : List GridSlot -> Grid
+slotsToGrid =
+    List.foldl
+        (\slot grid ->
+            setAtPosition slot.x slot.y (Module slot.id slot.level) grid
+        )
+        Model.Grid.empty
+
+
+type alias GridSlot =
+    { level : Int
+    , id : String
+    , x : Int
+    , y : Int
+    }
+
+
+gridSlotDecoder =
+    Decode.succeed GridSlot
+        |: (Decode.field "level" Decode.int)
+        |: (Decode.field "name" Decode.string)
+        |: (Decode.field "x_pos" Decode.int)
+        |: (Decode.field "y_pos" Decode.int)
+
+
+moduleDecoder : Decode.Decoder ModuleType
 moduleDecoder =
-    Decode.succeed Module
+    Decode.succeed ModuleType
         |: (Decode.field "name" Decode.string)
         |: (Decode.field "dependencies" (Decode.list (pairDecoder Decode.string Decode.int)))
         |: (Decode.field "levels" (Decode.list moduleLevelDecoder))
@@ -47,6 +80,11 @@ resourceAmountDecoder =
     pairDecoder Decode.string Decode.int
 
 
-getAvailableModules : Model -> Cmd Messages.Msg
-getAvailableModules model =
+fetchAvailableModules : Model -> Cmd Messages.Msg
+fetchAvailableModules model =
     authenticatedGet model "/api/modules" modulesDecoder Messages.ReceiveAvailableModules
+
+
+fetchGridModules : Model -> Cmd Messages.Msg
+fetchGridModules model =
+    authenticatedGet model "/api/modules/pod" gridDecoder Messages.ReceiveGrid
