@@ -32,6 +32,6 @@ researchDecoder =
         |> Decode.map ResearchEntry
 
 
-getQueue : Model -> Cmd Messages.Msg
-getQueue model =
+fetchQueue : Model -> Cmd Messages.Msg
+fetchQueue model =
     authenticatedGet model "/api/queue/pod" queueDecoder Messages.ReceiveQueue

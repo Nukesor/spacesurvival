@@ -3,8 +3,8 @@ module Update exposing (..)
 import Animation
 import Api.Auth
 import Api.Modules
-import Api.Queue exposing (getQueue)
-import Api.Research exposing (startResearching)
+import Api.Queue exposing (fetchQueue)
+import Api.Research exposing (fetchResearches, startResearching)
 import Api.Resources
 import Messages exposing (..)
 import Model exposing (..)
@@ -47,7 +47,7 @@ update msg model =
                         updatedModel
                             ! [ Api.Auth.saveToken user.token
                               , Api.Research.fetchResearches updatedModel
-                              , Api.Queue.getQueue updatedModel
+                              , Api.Queue.fetchQueue updatedModel
                               , Api.Modules.getAvailableModules updatedModel
                               , Api.Resources.fetchResources updatedModel
                               ]
@@ -75,7 +75,14 @@ update msg model =
         ReceiveQueue result ->
             case Debug.log "queue" result of
                 Ok queue ->
-                    { model | queue = queue } ! []
+                    let
+                        commands =
+                            if queue /= model.queue then
+                                [ fetchResearches model ]
+                            else
+                                []
+                    in
+                        { model | queue = queue } ! commands
 
                 Err err ->
                     model ! []
@@ -86,7 +93,7 @@ update msg model =
         QueueEntryAdded result ->
             case Debug.log "queue entry" result of
                 Ok _ ->
-                    model ! [ getQueue model ]
+                    model ! [ fetchQueue model ]
 
                 Err err ->
                     model ! []
@@ -114,7 +121,7 @@ update msg model =
 
                 commands =
                     if model.queue /= updatedQueue then
-                        [ getQueue model ]
+                        [ fetchQueue model ]
                     else
                         []
             in
