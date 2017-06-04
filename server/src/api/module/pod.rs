@@ -131,6 +131,7 @@ pub fn add_module(request_data: Result<JSON<NewModuleSerializer>, SerdeError>,
     let new_module = NewModule {
         name: module_data.module_name.clone(),
         stationary: module_data.stationary,
+        level: 0,
         x_pos: module_data.position_x,
         y_pos: module_data.position_y,
 
