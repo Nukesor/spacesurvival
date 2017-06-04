@@ -6,7 +6,7 @@ import Dict
 import Html exposing (..)
 import Html.CssHelpers
 import Model exposing (Model)
-import Model.Queue exposing (Entry)
+import Model.Queue exposing (Entry, timeToCompletion)
 import Time.DateTime
 
 
@@ -30,18 +30,16 @@ queueItem model entry =
                         Nothing ->
                             ""
 
-                timeToCompletion =
-                    case researchEntry.finishesAt of
-                        Just time ->
-                            (toString (Time.DateTime.delta time model.currentDate).seconds)
-
-                        Nothing ->
-                            ""
+                remainingTimeString =
+                    timeToCompletion entry model.currentDate
+                        |> Maybe.map toString
+                        |> Maybe.map (\time -> time ++ " secs Remaining")
+                        |> Maybe.withDefault ""
             in
                 li [ helpers.class [ Item ] ]
                     [ Html.text <| "Lv. " ++ (toString researchEntry.level) ++ " " ++ name
                     , br [] []
-                    , Html.text (timeToCompletion ++ " secs Remaining")
+                    , Html.text remainingTimeString
                     ]
 
         _ ->

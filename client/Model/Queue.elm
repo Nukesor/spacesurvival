@@ -31,6 +31,41 @@ type alias Queue =
     List Entry
 
 
+unfinishedEntries : DateTime -> Queue -> Queue
+unfinishedEntries currentDate =
+    List.filter (not << isFinished currentDate)
+
+
+isFinished currentDate entry =
+    timeToCompletion entry currentDate
+        |> Maybe.map (\time -> time <= 0)
+        |> Maybe.withDefault False
+
+
+timeToCompletion : Entry -> DateTime -> Maybe Int
+timeToCompletion entry currentDate =
+    let
+        time =
+            (\data ->
+                Maybe.map
+                    (\finishesAt ->
+                        max (secondsBetween finishesAt currentDate) 0
+                    )
+                    data.finishesAt
+            )
+    in
+        case entry of
+            ResearchEntry data ->
+                time data
+
+            ModuleEntry data ->
+                time data
+
+
+secondsBetween a b =
+    (Time.DateTime.delta a b).seconds
+
+
 inQueue : String -> Int -> Queue -> Bool
 inQueue id level queue =
     List.any

@@ -8,6 +8,7 @@ import Api.Research exposing (startResearching)
 import Api.Resources
 import Messages exposing (..)
 import Model exposing (..)
+import Model.Queue exposing (unfinishedEntries)
 import Model.User exposing (LoginData)
 import Result exposing (withDefault)
 import Time.DateTime
@@ -107,4 +108,17 @@ update msg model =
                 |> withDefault (model ! [])
 
         Tick time ->
-            { model | currentDate = Time.DateTime.fromTimestamp time } ! []
+            let
+                updatedQueue =
+                    unfinishedEntries model.currentDate model.queue
+
+                commands =
+                    if model.queue /= updatedQueue then
+                        [ getQueue model ]
+                    else
+                        []
+            in
+                { model
+                    | currentDate = Time.DateTime.fromTimestamp time
+                }
+                    ! commands
