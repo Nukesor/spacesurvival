@@ -105,9 +105,9 @@ impl Pod {
                 }
 
                 // Calculate consumption
-                for &(ref resource_ref, amount) in &level.generates {
+                for &(ref resource_ref, amount) in &level.consumes {
                     let resource_type = ResourceTypes::from_string(&resource_ref.to_string()).unwrap();
-                    *resources_production.entry(resource_type).or_insert(0) += amount;
+                    *resources_production.entry(resource_type).or_insert(0) -= amount;
                 }
             }
             for resource in resources {

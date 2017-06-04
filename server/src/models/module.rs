@@ -44,6 +44,7 @@ impl Module {
 #[table_name="modules"]
 pub struct NewModule {
     pub name: String,
+    pub level: i32,
     pub stationary: bool,
     pub x_pos: Option<i32>,
     pub y_pos: Option<i32>,
