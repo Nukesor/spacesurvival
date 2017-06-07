@@ -1,14 +1,16 @@
 module Api.Modules exposing (..)
 
-import Api.Util exposing (authenticatedGet, dataDecoder, pairDecoder)
+import Api.Util exposing (authenticatedGet, authenticatedPost, dataDecoder, pairDecoder)
 import Array
 import Dict
 import Json.Decode as Decode
 import Json.Decode.Extra exposing ((|:))
-import Messages
+import Json.Encode as Encode
+import Messages exposing (Msg(QueueEntryAdded))
 import Model exposing (Model)
 import Model.Grid exposing (Grid, setAtPosition)
-import Model.Modules exposing (Module, ModuleLevel, ModuleType, Shoots)
+import Model.Modules exposing (Module, ModuleId, ModuleLevel, ModuleType, Shoots)
+import Model.Util exposing (Point)
 
 
 modulesDecoder : Decode.Decoder (Dict.Dict String ModuleType)
@@ -75,6 +77,16 @@ shootsDecoder =
         |: (Decode.field "rate" Decode.int)
 
 
+newModuleEncoder : String -> Point -> Encode.Value
+newModuleEncoder id point =
+    Encode.object
+        [ ( "module_name", Encode.string id )
+        , ( "stationary", Encode.bool False )
+        , ( "position_x", Encode.int point.x )
+        , ( "position_y", Encode.int point.y )
+        ]
+
+
 resourceAmountDecoder : Decode.Decoder ( String, Int )
 resourceAmountDecoder =
     pairDecoder Decode.string Decode.int
@@ -88,3 +100,12 @@ fetchAvailableModules model =
 fetchGridModules : Model -> Cmd Messages.Msg
 fetchGridModules model =
     authenticatedGet model "/api/modules/pod" gridDecoder Messages.ReceiveGrid
+
+
+startBuilding : Model -> ModuleId -> Point -> Cmd Messages.Msg
+startBuilding model id point =
+    authenticatedPost model
+        "/api/modules/pod/new"
+        Decode.value
+        QueueEntryAdded
+        (newModuleEncoder id point)

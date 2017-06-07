@@ -8,6 +8,8 @@ import Html.CssHelpers
 import Html.Events exposing (..)
 import Messages
 import Model
+import Model.Modules exposing (ModuleType)
+import Model.Util
 
 
 view : Model.Model -> Html Messages.Msg
@@ -18,18 +20,27 @@ view model =
                 [ ul
                     [ helpers.class [ BuildItemList ] ]
                     (model.availableModules
+                        |> Dict.map (buildItem point)
                         |> Dict.values
-                        |> List.map
-                            (\m ->
-                                li [ helpers.class [ BuildItem ] ]
-                                    [ Html.text m.name ]
-                            )
                     )
                 , cancelButton
                 ]
 
         Nothing ->
             div [] []
+
+
+buildItem :
+    Model.Util.Point
+    -> Model.Modules.ModuleId
+    -> ModuleType
+    -> Html Messages.Msg
+buildItem currentPoint id mod =
+    li
+        [ helpers.class [ BuildItem ]
+        , onClick (Messages.StartBuilding id currentPoint)
+        ]
+        [ Html.text mod.name ]
 
 
 cancelButton : Html Messages.Msg

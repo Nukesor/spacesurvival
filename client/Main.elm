@@ -3,14 +3,12 @@ module Main exposing (..)
 import Animation
 import Animations
 import Api.Auth
-import Array
 import Dict
 import Html
 import Messages exposing (..)
 import Model exposing (..)
 import Model.Grid exposing (Grid, Slot)
 import Model.User exposing (..)
-import Model.Util exposing (..)
 import Task exposing (perform)
 import Time exposing (every, second)
 import Time.DateTime exposing (DateTime, dateTime)

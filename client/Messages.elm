@@ -5,7 +5,7 @@ import Http
 import Json.Decode
 import Model exposing (MainView)
 import Model.Grid exposing (Grid)
-import Model.Modules exposing (AvailableModules)
+import Model.Modules exposing (AvailableModules, ModuleId)
 import Model.Queue exposing (Queue)
 import Model.Research
 import Model.Resources exposing (Resources)
@@ -32,3 +32,4 @@ type Msg
     | ReceiveResources (Result Http.Error Resources)
     | ReceiveGrid (Result Http.Error Grid)
     | Tick Time
+    | StartBuilding ModuleId Point

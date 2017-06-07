@@ -2,7 +2,7 @@ module Update exposing (..)
 
 import Animation
 import Api.Auth
-import Api.Modules
+import Api.Modules exposing (startBuilding)
 import Api.Queue exposing (fetchQueue)
 import Api.Research exposing (fetchResearches, startResearching)
 import Api.Resources
@@ -135,3 +135,6 @@ update msg model =
             result
                 |> Result.map (\modules -> { model | grid = modules } ! [])
                 |> withDefault (model ! [])
+
+        StartBuilding id point ->
+            model ! [ startBuilding model id point ]
