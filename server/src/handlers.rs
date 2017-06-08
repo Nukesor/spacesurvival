@@ -55,7 +55,7 @@ impl<'a, 'r> FromRequest<'a, 'r> for User {
 
         let token = tokens[0];
 
-        match User::get_user_from_auth_token(&token, "loginsalt", &*db) {
+        match User::get_user_from_login_token(&token, &*db) {
             Some(user) => Outcome::Success(user),
             None => Outcome::Failure((Status::Unauthorized, ())),
         }

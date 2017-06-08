@@ -12,30 +12,33 @@ path = "server/src/lib.rs"
 name = "spacelib"
 
 [dependencies]
-uuid = { version = "0.4", features = ["use_std", "serde", "v4", "rustc-serialize"] }
+uuid = { version = "0.5", features = ["use_std", "serde", "v4"] }
 chrono = { version = "0.3", features = ["serde"] }
 argon2rs = "0.2"
-stainless = "0.1"
-rocket = { version = "0.2", features = ["testing"]}
-rocket_codegen = "0.2"
-diesel = { version = "0.12", features = ["postgres", "uuid", "chrono", "serde_json"] }
-diesel_codegen = { version = "0.12", features = ["postgres"] }
+rocket = { git = "https://github.com/SergioBenitez/Rocket.git" }
+rocket_codegen = { git = "https://github.com/SergioBenitez/Rocket.git" }
+#rocket = { version = "0.3", features = ["testing"]}
+#rocket_codegen = "0.3"
+diesel = { version = "0.13", features = ["postgres", "uuid", "chrono", "serde_json"] }
+diesel_codegen = { version = "0.13", features = ["postgres"] }
 r2d2 = "0.7"
-r2d2-diesel = "0.12"
-serde = "0.9"
-serde_json = "0.9"
-serde_yaml = "0.6"
-serde_derive = "0.9"
+r2d2-diesel = "0.13"
+serde = "1"
+serde_json = "1"
+serde_yaml = "0.7"
+serde_derive = "1"
 validator = "0.4"
 validator_derive = "0.4"
-jsonwebtoken = "1.1"
-rustc-serialize = "0.3"
-petgraph = "0.4.4"
+petgraph = "0.4"
+ring = "0.9"
 
 [dev-dependencies]
-cargo-update = "0.8"
+quickcheck = "0.4"
+stainless = "0.1"
+parking_lot = {version = "0.4", features = ["nightly"]}
 
 [dependencies.rocket_contrib]
-version = "0.2"
+#version = "0.3"
+git = "https://github.com/SergioBenitez/Rocket.git"
 default-features = false
 features = ["json"]

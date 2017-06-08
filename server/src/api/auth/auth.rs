@@ -13,46 +13,29 @@ use schema::users::dsl::*;
 ///
 /// Check if we can login with the credentials.
 /// We try to get the user by searching email and nickname for the given identifier.
-#[post("/login", data = "<user_in>", format = "application/json")]
-pub fn login(user_in: Result<JSON<LoginSerializer>, SerdeError>, db: DB) -> APIResponse {
+#[post("/login", data = "<user_data>", format = "application/json")]
+pub fn login(user_data: Result<JSON<LoginSerializer>, SerdeError>, db: DB) -> Result<APIResponse, APIResponse> {
 
-    match user_in {
-        // Return specific error if invalid JSON has been sent.
-        Err(error) => return bad_request().message(format!("{}", error).as_str()),
-        Ok(user_in) => {
-            let mut result;
-            // Check if the identifier is a nickname.
-            result = users
-                .filter(nickname.eq(&user_in.identifier))
-                .first::<User>(&*db);
-
-            match result {
-                // The identifier is a nickname
-                Ok(user) => {
-                    if !user.verify_password(user_in.password.as_str()) {
-                        return unauthorized().message("Password incorrect.");
-                    }
-                    return ok().data(json!(user.generate_auth_token("loginsalt")));
-                }
-                // Check if the identifier is an email address
-                Err(_) => {
-                    result = users
-                        .filter(email.eq(&user_in.identifier))
-                        .first::<User>(&*db);
-
-                    match result {
-                        // There is no such email or nickname.
-                        Err(_) => return unauthorized().message("Nickname or email doesn't exist."),
-                        // The identifier is an email
-                        Ok(user) => {
-                            if !user.verify_password(user_in.password.as_str()) {
-                                return unauthorized().message("Password incorrect.");
-                            }
-                            return ok().data(json!(user.generate_auth_token("loginsalt")));
-                        }
-                    }
-                }
-            }
-        }
+    // Return specific error if invalid JSON has been sent.
+    if let Err(error) = user_data {
+        return Err(bad_request().message(format!("{}", error).as_str()));
     }
+    let user_login = user_data.unwrap();
+    // Check if the identifier is a nickname.
+    let mut user_result = users
+        .filter(nickname.eq(&user_login.identifier))
+        .first::<User>(&*db);
+
+    if user_result.is_err() {
+        user_result = users
+            .filter(email.eq(&user_login.identifier))
+            .first::<User>(&*db);
+    }
+    let mut user = user_result.or(Err(unauthorized().message("Nickname or email doesn't exist.")))?;
+
+    if !user.verify_password(user_login.password.as_str()) {
+        return Err(unauthorized().message("Password incorrect."));
+    }
+    let auth_token = user.generate_auth_token(&db)?;
+    Ok(ok().data(json!(auth_token)))
 }

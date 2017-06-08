@@ -5,7 +5,9 @@ CREATE TABLE users (
     nickname VARCHAR(120) UNIQUE not null,
     email VARCHAR(120) UNIQUE not null,
     password_hash BYTEA not null,
+    current_auth_token VARCHAR(120),
 
+    last_action TIMESTAMP WITH TIME ZONE,
     created_at TIMESTAMP WITH TIME ZONE default current_timestamp not null,
     updated_at TIMESTAMP WITH TIME ZONE default current_timestamp not null
 );

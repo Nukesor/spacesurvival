@@ -161,9 +161,9 @@ pub fn add_module(request_data: Result<JSON<NewModuleSerializer>, SerdeError>,
 
 /// Remove module from pod
 #[delete("/pod/<module_uuid>")]
-pub fn remove_module(module_uuid: &str, current_user: User, db: DB) -> APIResponse {
+pub fn remove_module(module_uuid: String, current_user: User, db: DB) -> APIResponse {
     // Parse and check if we got a valid id
-    let result = Uuid::parse_str(module_uuid);
+    let result = Uuid::parse_str(&module_uuid.as_str());
     if result.is_err() {
         return bad_request().message("Got an invalid uuid");
     }
@@ -190,9 +190,9 @@ pub fn remove_module(module_uuid: &str, current_user: User, db: DB) -> APIRespon
 
 /// upgrade module from pod
 #[post("/pod/upgrade/<module_uuid>")]
-pub fn upgrade_module(module_uuid: &str, current_user: User, db: DB) -> APIResponse {
+pub fn upgrade_module(module_uuid: String, current_user: User, db: DB) -> APIResponse {
     // Parse and check if we got a valid id
-    let result = Uuid::parse_str(module_uuid);
+    let result = Uuid::parse_str(&module_uuid.as_str());
     if result.is_err() {
         return bad_request().message("Got an invalid uuid");
     }
@@ -253,9 +253,9 @@ pub fn upgrade_module(module_uuid: &str, current_user: User, db: DB) -> APIRespo
 
 /// Remove module upgrade from pod queue
 #[delete("/pod/upgrade/<module_uuid>")]
-pub fn stop_module_upgrade(module_uuid: &str, current_user: User, db: DB) -> APIResponse {
+pub fn stop_module_upgrade(module_uuid: String, current_user: User, db: DB) -> APIResponse {
     // Parse and check if we got a valid id
-    let result = Uuid::parse_str(module_uuid);
+    let result = Uuid::parse_str(&module_uuid.as_str());
     if result.is_err() {
         return bad_request().message("Got an invalid uuid");
     }

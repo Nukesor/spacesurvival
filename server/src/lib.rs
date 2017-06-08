@@ -8,12 +8,11 @@ extern crate rocket;
 extern crate r2d2;
 extern crate r2d2_diesel;
 extern crate argon2rs;
-extern crate rustc_serialize;
 extern crate serde_json;
 extern crate serde_yaml;
 extern crate validator;
-extern crate jsonwebtoken;
 extern crate petgraph;
+extern crate ring;
 
 #[macro_use]
 extern crate rocket_contrib;
@@ -40,8 +39,13 @@ pub mod statics;
 #[cfg(test)]
 mod tests;
 
+use rocket::fairing::AdHoc;
+use chrono::Duration;
+
 use data::modules::get_module_list;
 use data::researches::build_research_graph;
+
+pub struct RuntimeConfig(Duration);
 
 
 pub fn rocket_factory() -> rocket::Rocket {
@@ -51,6 +55,11 @@ pub fn rocket_factory() -> rocket::Rocket {
 
     rocket::ignite()
         .manage(helpers::db::init_db_pool())
+        .attach(AdHoc::on_attach(|rocket| {
+            let auth_timeout = rocket.config().get_int("auth_token_timeout_days").unwrap_or(7);
+            let auth_token_duration = Duration::days(auth_timeout);
+            Ok(rocket.manage(RuntimeConfig(auth_token_duration)))
+        }))
         .mount("/", routes![statics::index])
         .mount("/static", routes![statics::static_files])
         .mount("/api/auth",

@@ -57,14 +57,14 @@ pub fn get_researches(current_user: User, db: DB) -> APIResponse {
 /// - Checks if there are enough resources
 /// - Removes resources from db
 #[post("/pod/<research_name>")]
-pub fn start_research(research_name: &str,
+pub fn start_research(research_name: String,
                           current_user: User,
                           db: DB)
                           -> APIResponse {
 
     // Check if the given research name maps to a research type.
     // Early return if we don't know this research name
-    let research_result = ResearchTypes::from_str(research_name);
+    let research_result = ResearchTypes::from_string(&research_name);
     if research_result.is_err() {
         return bad_request().message(format!("No such research type `{}`", research_name).as_str());
     }
@@ -158,10 +158,10 @@ pub fn start_research(research_name: &str,
 
 /// Remove research from queue
 #[delete("/pod/<research_name>")]
-pub fn stop_research(research_name: &str, current_user: User, db: DB) -> APIResponse {
+pub fn stop_research(research_name: String, current_user: User, db: DB) -> APIResponse {
 
     // Check if there is a research for this research_name
-    let research_type_result = ResearchTypes::from_str(research_name);
+    let research_type_result = ResearchTypes::from_string(&research_name);
     // Early return if we don't know this research name
     if research_type_result.is_err() {
         return bad_request().message(format!("No such research type `{}`", research_name).as_str());
