@@ -5,7 +5,7 @@ use data::types::*;
 use data::researches::get_research_list;
 use data::helper::{get_research_dependency_strings, dependencies_fulfilled};
 use helpers::db::DB;
-use responses::{APIResponse, accepted, bad_request, created, ok};
+use responses::{APIResponse, accepted, bad_request, created, ok, internal_server_error};
 
 use models::user::User;
 use models::research::{Research, NewResearch};
@@ -22,33 +22,27 @@ use schema::queue_entries::dsl as queue_entry_dsl;
 /// This route returns the list of all researches and their levels/costs,
 /// as well as the current level of the research for the pod of the current user.
 #[get("/pod")]
-pub fn get_researches(current_user: User, db: DB) -> APIResponse {
-
-    let mut research_list = get_research_list();
-
+pub fn get_researches(current_user: User, db: DB) -> Result<APIResponse, APIResponse> {
     // Ger current pod and pod researches
     let pod = current_user.get_pod(&db);
-    
+    let mut research_list = get_research_list();
     let researches = pod.get_researches(&db);
-    for research in researches {
-        let type_result = ResearchTypes::from_string(&research.name);
-        if type_result.is_err() {
-            return bad_request()
-                       .message(format!("Found research {}, but no matching ResearchType!",
-                                        research.name)
-                                        .as_str());
-        }
-        let research_type = type_result.unwrap();
-        let list_result = research_list.get_mut(&research_type);
-        if list_result.is_none() {
-            return bad_request().message(format!("Found type {}, but no matching entry in our research list!", research_type).as_str());
-        }
 
-        let mut list_entry = list_result.unwrap();
-        list_entry.current_level = research.level;
+    for research in researches {
+        let research_type = ResearchTypes::from_string(&research.name).or(
+            Err(bad_request().message(format!("Found research {}, but no matching ResearchType!",
+                                        research.name)
+                                        .as_str())))?;
+        let list_result = research_list.get_mut(&research_type);
+        if let Some(list_entry) = list_result {
+            list_entry.current_level = research.level;
+        } else {
+            return Err(bad_request().message(format!("Found type {}, but no matching entry in our research list!",
+                                             research_type).as_str()));
+        }
     }
 
-    ok().message("Research data.").data(json!(&research_list))
+    Ok(ok().data(json!(&research_list)))
 }
 
 /// Add a new research to the queue of the pod
@@ -74,14 +68,11 @@ pub fn start_research(research_name: String,
 
     let (pod, queue) = current_user.get_pod_and_queue(&db);
 
-    let mut research_result = pod.get_research(research_type.to_string(), &db);
-
     let research: Research;
-    if research_result.is_ok() {
-        research = research_result.unwrap();
-        research_level = research.level + 1;
-    }
-    else {
+    let research_result = pod.get_research(research_type.to_string(), &db);
+
+    // Research doesn't exist, we create a new one.
+    if research_result.is_err() {
         let dependencies = research_dsl::researches
             .filter(research_dsl::name.eq_any(dependency_strings))
             .get_results::<Research>(&*db);
@@ -99,13 +90,15 @@ pub fn start_research(research_name: String,
             base_id: None,
         };
 
-        research_result = diesel::insert(&new_research)
+        research = diesel::insert(&new_research)
             .into(researches::table)
-            .get_result::<Research>(&*db);
-        
-        research = research_result.expect("Failed to create research.");
-
+            .get_result::<Research>(&*db)
+            .or(Err(internal_server_error()))?;
         research_level = 1;
+    } else {
+        // research exists and we use the existing
+        research = research_result.or(Err(internal_server_error()))?;
+        research_level = research.level + 1;
     }
 
     // Check if there already are existing queue entries for this research.
@@ -123,7 +116,7 @@ pub fn start_research(research_name: String,
     let all_levels = &research_list
                           .get(&research_type)
                           .as_ref()
-                          .expect("No research in yml for this type.")
+                          .ok_or(internal_server_error())?
                           .levels;
 
     if research_level > all_levels.len() as i32 {
@@ -195,7 +188,7 @@ pub fn stop_research(research_name: String, current_user: User, db: DB) -> Resul
     diesel::delete(queue_entry_dsl::queue_entries
                        .filter(queue_entry_dsl::id.eq(research_entry.id)))
             .execute(&*db)
-            .expect("Failed to remove queue_entry.");
+            .or(Err(internal_server_error()))?;
 
     Ok(accepted().message("Resource removed."))
 }

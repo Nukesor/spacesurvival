@@ -13,19 +13,15 @@ use schema::queue_entries::dsl as queue_entry_dsl;
 ///
 /// This route returns the list of the currently running entries in the queue.
 #[get("/pod")]
-pub fn pod_queue_entries(current_user: User, db: DB) -> APIResponse {
+pub fn pod_queue_entries(current_user: User, db: DB) -> Result<APIResponse, APIResponse> {
 
     let (_, queue) = current_user.get_pod_and_queue(&db);
 
-    let queue_entry_result = queue_entry_dsl::queue_entries
+    let queue_entries = queue_entry_dsl::queue_entries
         .filter(queue_entry_dsl::queue_id.eq(queue.id))
         .order(queue_entry_dsl::created_at.asc())
-        .get_results::<QueueEntry>(&*db);
+        .get_results::<QueueEntry>(&*db)
+        .or(Err(ok().message("Queue is empty.")))?;
 
-    if queue_entry_result.is_ok() {
-        let queue_entries = queue_entry_result.unwrap();
-        ok().message("Queue data.").data(json!(&queue_entries))
-    } else {
-        ok().message("Queue is empty.")
-    }
+    Ok(ok().data(json!(&queue_entries)))
 }

@@ -4,8 +4,9 @@ use validator::Validate;
 use rocket_contrib::{JSON, SerdeError};
 
 use helpers::db::DB;
+use helpers::request::validate_json;
 use validation::user::{UserSerializer, UserSettingsSerializer};
-use responses::{APIResponse, ok, created, conflict, bad_request, forbidden, unauthorized};
+use responses::{APIResponse, ok, created, conflict, bad_request, forbidden, unauthorized, internal_server_error};
 
 use models::user::{User, ChangedUser};
 use schema::users::dsl::*;
@@ -23,10 +24,7 @@ pub fn info(current_user: User) -> APIResponse {
 #[post("/register", data = "<user_data>", format = "application/json")]
 pub fn register(user_data: Result<JSON<UserSerializer>, SerdeError>, db: DB) -> Result<APIResponse, APIResponse> {
 
-    if let Err(error) = user_data {
-        return Err(bad_request().message(format!("{}", error).as_str()));
-    }
-    let data = user_data.unwrap();
+    let data = validate_json(user_data)?;
     data.validate().or(Err(bad_request().message("Invalid user data")))?;
 
     // Check for existing user email
@@ -52,7 +50,7 @@ pub fn register(user_data: Result<JSON<UserSerializer>, SerdeError>, db: DB) -> 
                               new_password_hash,
                               &db);
 
-    Ok(created().message("User created.").data(json!(&user)))
+    Ok(created().data(json!(&user)))
 }
 
 
@@ -62,11 +60,7 @@ pub fn settings(current_user: User,
                 db: DB)
                 -> Result<APIResponse, APIResponse> {
 
-    if let Err(error) = user_data {
-        return Err(bad_request().message(format!("{}", error).as_str()));
-    }
-    let data = user_data.unwrap();
-
+    let data = validate_json(user_data)?;
     let mut new_password_hash: Option<Vec<u8>> = None;
     // Check if a new password is provided.
     // In case it is, we want the old password to verify the identity of the client.
@@ -91,7 +85,7 @@ pub fn settings(current_user: User,
     let user = diesel::update(users.filter(id.eq(current_user.id)))
         .set(&changed_user)
         .get_result::<User>(&*db)
-        .expect("Failed to update user.");
+        .or(Err(internal_server_error()))?;
 
-    Ok(ok().message("User data changed.").data(json!(&user)))
+    Ok(ok().data(json!(&user)))
 }

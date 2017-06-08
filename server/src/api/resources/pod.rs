@@ -1,7 +1,7 @@
 use diesel::prelude::*;
 
 use helpers::db::DB;
-use responses::{APIResponse, ok};
+use responses::{APIResponse, ok, internal_server_error};
 
 use models::pod::Pod;
 use models::user::User;
@@ -15,16 +15,16 @@ use schema::resources::dsl as resource_dsl;
 ///
 /// This route returns the list of resources of the users pod.
 #[get("/pod")]
-pub fn pod_resources(current_user: User, db: DB) -> APIResponse {
+pub fn pod_resources(current_user: User, db: DB) -> Result<APIResponse, APIResponse> {
     let pod = pod_dsl::pods
         .filter(pod_dsl::user_id.eq(current_user.id))
         .get_result::<Pod>(&*db)
-        .expect("Failed to get user pod.");
+        .or(Err(internal_server_error()))?;
 
     let resources = resource_dsl::resources
         .filter(resource_dsl::pod_id.eq(pod.id))
         .get_results::<Resource>(&*db)
-        .expect("Failed to get resources from pod.");
+        .or(Err(internal_server_error()))?;
 
-    ok().message("Pod Resources.").data(json!(&resources))
+    Ok(ok().data(json!(&resources)))
 }

@@ -2,7 +2,8 @@ use diesel::prelude::*;
 use rocket_contrib::{JSON, SerdeError};
 
 use helpers::db::DB;
-use responses::{APIResponse, ok, unauthorized, bad_request};
+use helpers::request::validate_json;
+use responses::{APIResponse, ok, unauthorized};
 use validation::user::LoginSerializer;
 
 use models::user::User;
@@ -16,11 +17,7 @@ use schema::users::dsl::*;
 #[post("/login", data = "<user_data>", format = "application/json")]
 pub fn login(user_data: Result<JSON<LoginSerializer>, SerdeError>, db: DB) -> Result<APIResponse, APIResponse> {
 
-    // Return specific error if invalid JSON has been sent.
-    if let Err(error) = user_data {
-        return Err(bad_request().message(format!("{}", error).as_str()));
-    }
-    let user_login = user_data.unwrap();
+    let user_login = validate_json(user_data)?;
 
     // Check if the identifier is a nickname.
     let mut user_result = users

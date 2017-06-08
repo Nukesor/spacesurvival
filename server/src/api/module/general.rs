@@ -6,5 +6,5 @@ use data::modules::get_module_list;
 pub fn get_info() -> APIResponse {
 
     let module_list = get_module_list();
-    ok().message("Research data.").data(json!(&module_list))
+    ok().data(json!(&module_list))
 }

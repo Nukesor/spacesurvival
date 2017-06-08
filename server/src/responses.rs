@@ -10,6 +10,12 @@ pub struct APIResponse {
     status: Status,
 }
 
+//impl From<APIResponse> for APIResponse {
+//    fn from(response: APIResponse) -> APIResponse {
+//        APIResponse { response }
+//    }
+//}
+
 impl APIResponse {
     /// Set the data of the `Response` to `data`.
     pub fn data(mut self, data: Value) -> APIResponse {
