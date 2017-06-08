@@ -159,15 +159,13 @@ pub fn stop_research(research_name: String, current_user: User, db: DB) -> Resul
 
     // Check if there exists a queue entry for this research and this pod.
     // Early return if this isn't the case.
-    let research_entry_result = queue_entry_dsl::queue_entries
+    let research_entry = queue_entry_dsl::queue_entries
         .filter(queue_entry_dsl::queue_id.eq(queue.id))
         .filter(queue_entry_dsl::research_name.eq(research_type.to_string()))
         .order(queue_entry_dsl::level.desc())
-        .get_result::<QueueEntry>(&*db);
-    if research_entry_result.is_ok() {
-        return Err(bad_request().message("Can't delete. There is no queue entry for this research."));
-    }
-    let research_entry = research_entry_result.unwrap();
+        .get_result::<QueueEntry>(&*db)
+        .or(Err(bad_request().message(
+                    "Can't delete. There is no queue entry for this research.")))?;
 
     // Get all needed info for resource manipulation
     let research_list = get_research_list();

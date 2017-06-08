@@ -191,8 +191,10 @@ pub fn upgrade_module(module_uuid: String, current_user: User, db: DB) -> Result
     let pod_resources = pod.get_resources(&db);
 
     // Add resources from module to pod resources
+    let module_type = ModuleTypes::from_string(&module.name)
+        .or(Err(internal_server_error()))?;
     let all_levels = &module_list
-                          .get(&ModuleTypes::from_string(&module.name).unwrap())
+                          .get(&module_type)
                           .unwrap()
                           .levels;
 
@@ -248,8 +250,10 @@ pub fn stop_module_upgrade(module_uuid: String, current_user: User, db: DB) -> R
 
     // Get all needed info for resource manipulation
     let module_list = get_module_list();
+    let module_type = ModuleTypes::from_string(&module.name)
+        .or(Err(internal_server_error()))?;
     let all_levels = &module_list
-                          .get(&ModuleTypes::from_string(&module.name).unwrap())
+                          .get(&module_type)
                           .unwrap()
                           .levels;
     let costs_result = &all_levels[module.level as usize].resources;
