@@ -120,6 +120,11 @@ impl User {
         }
     }
 
+    pub fn get_curret_auth_token(self) -> Result<String, APIResponse> {
+        let token = self.current_auth_token.ok_or(internal_server_error())?;
+        Ok(format!("{}:{}", self.id.hyphenated().to_string(), token))
+    }
+
     /// Get a `User` from a login token.
     ///
     /// A login token has this format:

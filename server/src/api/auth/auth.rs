@@ -4,7 +4,7 @@ use rocket_contrib::{JSON, SerdeError};
 
 use helpers::db::DB;
 use helpers::request::validate_json;
-use responses::{APIResponse, ok, unauthorized, internal_server_error};
+use responses::{APIResponse, ok, unauthorized};
 use validation::user::LoginSerializer;
 use RuntimeConfig;
 
@@ -42,7 +42,7 @@ pub fn login(user_data: Result<JSON<LoginSerializer>, SerdeError>,
     }
     
     let token = if user.has_valid_auth_token(rconfig.0) {
-        user.current_auth_token.ok_or(internal_server_error())?
+        user.get_curret_auth_token()?
     } else {
         user.generate_auth_token(&db)?
     };
