@@ -7,7 +7,7 @@ use data::types::*;
 use data::modules::get_module_list;
 use data::helper::{get_module_dependency_strings, dependencies_fulfilled};
 use helpers::db::DB;
-use responses::{APIResponse, bad_request, created, ok};
+use responses::{APIResponse, accepted, bad_request, created, ok};
 use validation::queue::NewModuleSerializer;
 
 use models::user::User;
@@ -175,7 +175,7 @@ pub fn remove_module(module_uuid: String, current_user: User, db: DB) -> Result<
             .execute(&*db)
             .expect("Failed to remove module.");
 
-    Ok(ok().message("Module removed."))
+    Ok(accepted().message("Module removed."))
 }
 
 /// upgrade module from pod
@@ -280,5 +280,5 @@ pub fn stop_module_upgrade(module_uuid: String, current_user: User, db: DB) -> R
             .expect("Failed to remove module.");
     }
 
-    Ok(ok().message("Module upgrade stopped."))
+    Ok(accepted().message("Module upgrade stopped."))
 }

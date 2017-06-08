@@ -5,7 +5,7 @@ use data::types::*;
 use data::researches::get_research_list;
 use data::helper::{get_research_dependency_strings, dependencies_fulfilled};
 use helpers::db::DB;
-use responses::{APIResponse, bad_request, created, ok};
+use responses::{APIResponse, accepted, bad_request, created, ok};
 
 use models::user::User;
 use models::research::{Research, NewResearch};
@@ -197,5 +197,5 @@ pub fn stop_research(research_name: String, current_user: User, db: DB) -> Resul
             .execute(&*db)
             .expect("Failed to remove queue_entry.");
 
-    Ok(ok().message("Resource removed."))
+    Ok(accepted().message("Resource removed."))
 }
