@@ -1,6 +1,5 @@
 module Api.Research exposing (..)
 
-import Api.Queue
 import Api.Util exposing (..)
 import Dict
 import Json.Decode as Decode exposing (value)
@@ -13,18 +12,17 @@ import Model.Research exposing (..)
 
 researchesDecoder : Decode.Decoder (Dict.Dict String Research)
 researchesDecoder =
-    dataDecoder <|
-        Decode.dict <|
-            Decode.succeed Research
-                |: (Decode.field "name" Decode.string)
-                |: (Decode.field "current_level" Decode.int)
-                |: (Decode.field "dependencies" <|
-                        Decode.list <|
-                            Decode.map2 (,)
-                                (Decode.index 0 Decode.string)
-                                (Decode.index 1 Decode.int)
-                   )
-                |: (Decode.field "levels" (Decode.list researchLevelDecoder))
+    Decode.dict <|
+        Decode.succeed Research
+            |: (Decode.field "name" Decode.string)
+            |: (Decode.field "current_level" Decode.int)
+            |: (Decode.field "dependencies" <|
+                    Decode.list <|
+                        Decode.map2 (,)
+                            (Decode.index 0 Decode.string)
+                            (Decode.index 1 Decode.int)
+               )
+            |: (Decode.field "levels" (Decode.list researchLevelDecoder))
 
 
 researchLevelDecoder : Decode.Decoder ResearchLevel

@@ -1,6 +1,6 @@
 module Api.Modules exposing (..)
 
-import Api.Util exposing (authenticatedGet, authenticatedPost, dataDecoder, pairDecoder)
+import Api.Util exposing (authenticatedGet, authenticatedPost, pairDecoder)
 import Array
 import Dict
 import Json.Decode as Decode
@@ -15,14 +15,12 @@ import Model.Util exposing (Point)
 
 modulesDecoder : Decode.Decoder (Dict.Dict String ModuleType)
 modulesDecoder =
-    dataDecoder <|
-        Decode.dict moduleDecoder
+    Decode.dict moduleDecoder
 
 
 gridDecoder : Decode.Decoder Grid
 gridDecoder =
-    dataDecoder <|
-        Decode.map slotsToGrid (Decode.list gridSlotDecoder)
+    Decode.map slotsToGrid (Decode.list gridSlotDecoder)
 
 
 slotsToGrid : List GridSlot -> Grid

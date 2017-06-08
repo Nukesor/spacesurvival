@@ -7,11 +7,6 @@ import Model.User exposing (User(LoggedIn))
 import Time.DateTime exposing (DateTime, fromISO8601)
 
 
-dataDecoder : Decode.Decoder a -> Decode.Decoder a
-dataDecoder =
-    Decode.field "data"
-
-
 dateDecoder : Decode.Decoder DateTime
 dateDecoder =
     Decode.map (fromISO8601 >> unwrap) Decode.string

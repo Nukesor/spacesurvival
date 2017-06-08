@@ -1,6 +1,6 @@
 module Api.Queue exposing (..)
 
-import Api.Util exposing (authenticatedGet, dataDecoder, dateDecoder)
+import Api.Util exposing (authenticatedGet, dateDecoder)
 import Json.Decode as Decode
 import Json.Decode.Extra exposing ((|:))
 import Messages
@@ -10,14 +10,13 @@ import Model.Queue exposing (Entry(ResearchEntry), Queue, ResearchData)
 
 queueDecoder : Decode.Decoder Queue
 queueDecoder =
-    dataDecoder <|
-        Decode.list <|
-            Decode.oneOf [ researchDecoder ]
-
-
-queueEntryDecoder =
-    dataDecoder <|
+    Decode.list <|
         Decode.oneOf [ researchDecoder ]
+
+
+queueEntryDecoder : Decode.Decoder Entry
+queueEntryDecoder =
+    Decode.oneOf [ researchDecoder ]
 
 
 researchDecoder : Decode.Decoder Model.Queue.Entry

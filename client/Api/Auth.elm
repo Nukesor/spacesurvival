@@ -6,7 +6,6 @@ import Model exposing (..)
 import Model.User exposing (..)
 import Http
 import Messages
-import Api.Util exposing (dataDecoder)
 
 
 port readToken : () -> Cmd msg
@@ -29,7 +28,7 @@ registerEncoder user =
 
 registerDecoder : Decode.Decoder LoginData
 registerDecoder =
-    dataDecoder <| Decode.map2 registeredUser (Decode.field "nickname" Decode.string) (Decode.field "email" Decode.string)
+    Decode.map2 registeredUser (Decode.field "nickname" Decode.string) (Decode.field "email" Decode.string)
 
 
 loginEncoder : LoginData -> Encode.Value
@@ -39,7 +38,7 @@ loginEncoder user =
 
 loginDecoder : Decode.Decoder LoggedInData
 loginDecoder =
-    Decode.map loggedInUser (dataDecoder Decode.string)
+    Decode.map loggedInUser Decode.string
 
 
 registeredUser : String -> String -> LoginData

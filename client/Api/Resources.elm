@@ -1,6 +1,6 @@
 module Api.Resources exposing (..)
 
-import Api.Util exposing (authenticatedGet, dataDecoder)
+import Api.Util exposing (authenticatedGet)
 import Json.Decode as Decode
 import Json.Decode.Extra exposing ((|:))
 import Messages exposing (Msg(ReceiveResources))
@@ -10,8 +10,7 @@ import Model.Resources exposing (Resource)
 
 decodeResources : Decode.Decoder (List Resource)
 decodeResources =
-    dataDecoder <|
-        Decode.list decodeResource
+    Decode.list decodeResource
 
 
 decodeResource : Decode.Decoder Resource
