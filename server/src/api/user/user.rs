@@ -21,46 +21,38 @@ pub fn info(current_user: User) -> APIResponse {
 ///
 /// Needs a unique nickname, unique email and password.
 #[post("/register", data = "<user_data>", format = "application/json")]
-pub fn register(user_data: Result<JSON<UserSerializer>, SerdeError>, db: DB) -> APIResponse {
+pub fn register(user_data: Result<JSON<UserSerializer>, SerdeError>, db: DB) -> Result<APIResponse, APIResponse> {
 
-    match user_data {
-        // Return specific error if invalid JSON has been sent.
-        Err(error) => return bad_request().message(format!("{}", error).as_str()),
-        Ok(data) => {
-            let validation = data.validate();
-            match validation {
-                Err(error) => {
-                    let hashmap = error.inner();
-                    if hashmap.contains_key("email") {
-                        return bad_request().message("Invalid email provided");
-                    }
-                    if hashmap.contains_key("nickname") {
-                        return bad_request().message("Nickname length has to be
-                                                     between 1 and 120 characters.");
-                    }
-                }
-                Ok(_) => (),
-            }
-
-            // Check for existing user email
-            let results = users
-                .filter(email.eq(data.email.clone()))
-                .first::<User>(&*db);
-            if results.is_ok() {
-                return conflict().message("Nickname already taken.");
-            }
-            // Create new password hash
-            let new_password_hash = User::make_password_hash(data.password.as_str());
-
-            // Create new user to get uuid for pod
-            let user = User::new_user(data.nickname.clone(),
-                                      data.email.clone(),
-                                      new_password_hash,
-                                      &db);
-
-            return created().message("User created.").data(json!(&user));
-        }
+    if let Err(error) = user_data {
+        return Err(bad_request().message(format!("{}", error).as_str()));
     }
+    let data = user_data.unwrap();
+    data.validate().or(Err(bad_request().message("Invalid user data")))?;
+
+    // Check for existing user email
+    users
+        .filter(email.eq(data.email.clone()))
+        .first::<User>(&*db)
+        .optional()
+        .or(Err(conflict().message("Email already taken.")))?;
+
+    // Check for existing user nickname
+    users
+        .filter(email.eq(data.email.clone()))
+        .first::<User>(&*db)
+        .optional()
+        .or(Err(conflict().message("Nickname already taken.")))?;
+
+    // Create new password hash
+    let new_password_hash = User::make_password_hash(data.password.as_str());
+
+    // Create new user to get uuid for pod
+    let user = User::new_user(data.nickname.clone(),
+                              data.email.clone(),
+                              new_password_hash,
+                              &db);
+
+    Ok(created().message("User created.").data(json!(&user)))
 }
 
 
@@ -68,46 +60,38 @@ pub fn register(user_data: Result<JSON<UserSerializer>, SerdeError>, db: DB) -> 
 pub fn settings(current_user: User,
                 user_data: Result<JSON<UserSettingsSerializer>, SerdeError>,
                 db: DB)
-                -> APIResponse {
+                -> Result<APIResponse, APIResponse> {
 
-    // Return specific error if invalid JSON has been sent.
-    match user_data {
-        Err(error) => return bad_request().message(format!("{}", error).as_str()),
-        Ok(data) => {
-            let mut new_password_hash: Option<Vec<u8>> = None;
-            // Check if a new password is provided.
-            // In case it is, we want the old password to verify the identity of the client.
-            match data.new_password.as_ref() {
-                Some(new_password) => {
-                    match data.password.as_ref() {
-                        Some(old_password) => {
-                            if !current_user.verify_password(old_password.as_str()) {
-                                return unauthorized().message("Incorrect password.");
-                            }
-                            new_password_hash = Some(User::make_password_hash(new_password
-                                                                                  .as_str()))
-                        }
-                        None => {
-                            return forbidden().message("The current passwords needs to be \
-                                    specified, if you want to change your password.")
-                        }
-                    }
-                }
-                None => (),
-            };
+    if let Err(error) = user_data {
+        return Err(bad_request().message(format!("{}", error).as_str()));
+    }
+    let data = user_data.unwrap();
 
-            let changed_user = ChangedUser {
-                nickname: data.nickname.clone(),
-                email: data.email.clone(),
-                password_hash: new_password_hash,
-            };
-
-            let user = diesel::update(users.filter(id.eq(current_user.id)))
-                .set(&changed_user)
-                .get_result::<User>(&*db)
-                .expect("Failed to update user.");
-
-            ok().message("User data changed.").data(json!(&user))
+    let mut new_password_hash: Option<Vec<u8>> = None;
+    // Check if a new password is provided.
+    // In case it is, we want the old password to verify the identity of the client.
+    if let Some(ref new_password) = data.new_password {
+        if let Some(ref old_password) = data.password {
+            if !current_user.verify_password(old_password.as_str()) {
+                return Err(unauthorized().message("Incorrect password."));
+            }
+            new_password_hash = Some(User::make_password_hash(new_password.as_str()));
+        } else {
+            return Err(forbidden().message("The current passwords needs to be \
+                                            specified, if you want to change your password."));
         }
     }
+
+    let changed_user = ChangedUser {
+        nickname: data.nickname.clone(),
+        email: data.email.clone(),
+        password_hash: new_password_hash,
+    };
+
+    let user = diesel::update(users.filter(id.eq(current_user.id)))
+        .set(&changed_user)
+        .get_result::<User>(&*db)
+        .expect("Failed to update user.");
+
+    Ok(ok().message("User data changed.").data(json!(&user)))
 }
