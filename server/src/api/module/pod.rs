@@ -52,9 +52,9 @@ pub fn add_module(request_data: Result<JSON<NewModuleSerializer>, SerdeError>,
     let module_data = validate_json(request_data)?;
 
     // Check if the given module name maps to a module type.
-    let result = ModuleTypes::from_string(&module_data.module_name);
+    let result = ModuleTypes::from_string(&module_data.module_type);
     let module_type = result.or(Err(bad_request().message(format!("No such module type `{}`",
-                                             module_data.module_name)
+                                             module_data.module_type)
                                              .as_str())))?;
     let dependency_strings = get_module_dependency_strings(&module_type);
 
@@ -70,7 +70,7 @@ pub fn add_module(request_data: Result<JSON<NewModuleSerializer>, SerdeError>,
         existing_module = module_dsl::modules
             .count()
             .filter(module_dsl::pod_id.eq(pod.id))
-            .filter(module_dsl::name.eq(&module_data.module_name))
+            .filter(module_dsl::name.eq(&module_data.module_type))
             .execute(&*db)
             .unwrap_or(0);
     }
@@ -120,7 +120,7 @@ pub fn add_module(request_data: Result<JSON<NewModuleSerializer>, SerdeError>,
 
     // Create the new module
     let new_module = NewModule {
-        name: module_data.module_name.clone(),
+        name: module_data.module_type.clone(),
         stationary: module_data.stationary,
         level: 0,
         x_pos: module_data.position_x,

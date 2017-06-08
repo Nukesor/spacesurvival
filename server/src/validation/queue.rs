@@ -4,7 +4,7 @@ use validator::Validate;
 
 #[derive(Debug, Validate, Deserialize)]
 pub struct NewModuleSerializer {
-    pub module_name: String,
+    pub module_type: String,
     pub stationary: bool,
     pub position_x: Option<i32>,
     pub position_y: Option<i32>,
