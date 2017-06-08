@@ -21,11 +21,13 @@ pub fn login(user_data: Result<JSON<LoginSerializer>, SerdeError>, db: DB) -> Re
         return Err(bad_request().message(format!("{}", error).as_str()));
     }
     let user_login = user_data.unwrap();
+
     // Check if the identifier is a nickname.
     let mut user_result = users
         .filter(nickname.eq(&user_login.identifier))
         .first::<User>(&*db);
 
+    // Check if the identifier is an email adress.
     if user_result.is_err() {
         user_result = users
             .filter(email.eq(&user_login.identifier))
@@ -33,6 +35,7 @@ pub fn login(user_data: Result<JSON<LoginSerializer>, SerdeError>, db: DB) -> Re
     }
     let mut user = user_result.or(Err(unauthorized().message("Nickname or email doesn't exist.")))?;
 
+    // Verify password
     if !user.verify_password(user_login.password.as_str()) {
         return Err(unauthorized().message("Password incorrect."));
     }
