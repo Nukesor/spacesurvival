@@ -11,7 +11,7 @@ static MODULE_LIST: &'static [u8] = include_bytes!("../../module_data.yml");
 /// It shouldn't be used in any other context!
 #[derive(Debug, PartialEq, Serialize, Deserialize)]
 pub struct Module {
-    pub name: String,
+    pub display_name: String,
     #[serde(default = "dependencies_default")]
     pub dependencies: Vec<(ResearchTypes, i32)>,
     pub levels: Vec<Level>,

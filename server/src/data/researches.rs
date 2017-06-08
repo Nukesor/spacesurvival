@@ -20,7 +20,7 @@ fn current_level_default() -> i32 { 0 }
 /// It shouldn't be used in any other context!
 #[derive(Debug, PartialEq, Deserialize, Serialize)]
 pub struct Research {
-    pub name: String,
+    pub display_name: String,
     #[serde(default = "dependencies_default")]
     pub dependencies: Vec<(ResearchTypes, i32)>,
     #[serde(default = "current_level_default")]
