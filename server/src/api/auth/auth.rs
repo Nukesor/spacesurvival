@@ -1,10 +1,12 @@
 use diesel::prelude::*;
+use rocket::State;
 use rocket_contrib::{JSON, SerdeError};
 
 use helpers::db::DB;
 use helpers::request::validate_json;
-use responses::{APIResponse, ok, unauthorized};
+use responses::{APIResponse, ok, unauthorized, internal_server_error};
 use validation::user::LoginSerializer;
+use RuntimeConfig;
 
 use models::user::User;
 use schema::users::dsl::*;
@@ -15,7 +17,9 @@ use schema::users::dsl::*;
 /// Check if we can login with the credentials.
 /// We try to get the user by searching email and nickname for the given identifier.
 #[post("/login", data = "<user_data>", format = "application/json")]
-pub fn login(user_data: Result<JSON<LoginSerializer>, SerdeError>, db: DB) -> Result<APIResponse, APIResponse> {
+pub fn login(user_data: Result<JSON<LoginSerializer>, SerdeError>,
+             rconfig: State<RuntimeConfig>,
+             db: DB) -> Result<APIResponse, APIResponse> {
 
     let user_login = validate_json(user_data)?;
 
@@ -36,6 +40,11 @@ pub fn login(user_data: Result<JSON<LoginSerializer>, SerdeError>, db: DB) -> Re
     if !user.verify_password(user_login.password.as_str()) {
         return Err(unauthorized().message("Password incorrect."));
     }
-    let auth_token = user.generate_auth_token(&db)?;
-    Ok(ok().data(json!(auth_token)))
+    
+    let token = if user.has_valid_auth_token(rconfig.0) {
+        user.current_auth_token.ok_or(internal_server_error())?
+    } else {
+        user.generate_auth_token(&db)?
+    };
+    Ok(ok().data(json!(token)))
 }

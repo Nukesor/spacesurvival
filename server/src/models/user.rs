@@ -103,7 +103,7 @@ impl User {
         self.current_auth_token = Some(new_auth_token.clone());
         self.last_action = Some(UTC::now());
         self.save_changes::<User>(conn).or(Err(internal_server_error()))?;
-        Ok(new_auth_token)
+        Ok(format!("{}:{}", self.id.hyphenated().to_string(), new_auth_token))
     }
 
     /// Return whether or not the user has a valid auth token.
@@ -128,6 +128,8 @@ impl User {
         use schema::users::dsl::*;
 
         let v: Vec<&str> = token.split(':').collect();
+        // Invalid token has been sent
+        if v.len() < 2 { return None; }
         let (user_id, auth_token) = (Uuid::parse_str(v[0]).unwrap_or(Uuid::nil()), v[1]);
 
         let user = users
