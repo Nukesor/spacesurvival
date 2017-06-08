@@ -15,7 +15,7 @@ import Model.Util exposing (Point)
 
 modulesDecoder : Decode.Decoder (Dict.Dict String ModuleType)
 modulesDecoder =
-    Decode.dict moduleDecoder
+    Decode.dict moduleTypeDecoder
 
 
 gridDecoder : Decode.Decoder Grid
@@ -48,10 +48,10 @@ gridSlotDecoder =
         |: (Decode.field "y_pos" Decode.int)
 
 
-moduleDecoder : Decode.Decoder ModuleType
-moduleDecoder =
+moduleTypeDecoder : Decode.Decoder ModuleType
+moduleTypeDecoder =
     Decode.succeed ModuleType
-        |: (Decode.field "name" Decode.string)
+        |: (Decode.field "display_name" Decode.string)
         |: (Decode.field "dependencies" (Decode.list (pairDecoder Decode.string Decode.int)))
         |: (Decode.field "levels" (Decode.list moduleLevelDecoder))
 
@@ -76,9 +76,9 @@ shootsDecoder =
 
 
 newModuleEncoder : String -> Point -> Encode.Value
-newModuleEncoder id point =
+newModuleEncoder mod_type point =
     Encode.object
-        [ ( "module_name", Encode.string id )
+        [ ( "module_type", Encode.string mod_type )
         , ( "stationary", Encode.bool False )
         , ( "position_x", Encode.int point.x )
         , ( "position_y", Encode.int point.y )

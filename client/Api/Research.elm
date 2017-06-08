@@ -14,7 +14,7 @@ researchesDecoder : Decode.Decoder (Dict.Dict String Research)
 researchesDecoder =
     Decode.dict <|
         Decode.succeed Research
-            |: (Decode.field "name" Decode.string)
+            |: (Decode.field "display_name" Decode.string)
             |: (Decode.field "current_level" Decode.int)
             |: (Decode.field "dependencies" <|
                     Decode.list <|
