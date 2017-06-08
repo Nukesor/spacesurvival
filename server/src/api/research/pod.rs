@@ -60,15 +60,12 @@ pub fn get_researches(current_user: User, db: DB) -> APIResponse {
 pub fn start_research(research_name: String,
                           current_user: User,
                           db: DB)
-                          -> APIResponse {
+                          -> Result<APIResponse, APIResponse> {
 
     // Check if the given research name maps to a research type.
     // Early return if we don't know this research name
-    let research_result = ResearchTypes::from_string(&research_name);
-    if research_result.is_err() {
-        return bad_request().message(format!("No such research type `{}`", research_name).as_str());
-    }
-    let research_type =  research_result.unwrap();
+    let research_type = ResearchTypes::from_string(&research_name).or(
+        Err(bad_request().message(format!("No such research type `{}`", research_name).as_str())))?;
 
     // Get and set some variables we need for querying and dependency checking.
     let dependency_strings = get_research_dependency_strings(&research_type);
@@ -93,7 +90,7 @@ pub fn start_research(research_name: String,
                                                dependencies,
                                                &research_list);
         if !fulfilled {
-            return bad_request().message("Dependencies not fulfilled.");
+            return Err(bad_request().message("Dependencies not fulfilled."));
         }
         // Create a new module in the
         let new_research = NewResearch {
@@ -130,14 +127,14 @@ pub fn start_research(research_name: String,
                           .levels;
 
     if research_level > all_levels.len() as i32 {
-        return bad_request().message("Already at max level.");
+        return Err(bad_request().message("Already at max level."));
     }
 
     let level_index: usize = (research_level-1) as usize;
     let costs = &all_levels[level_index].resources;
 
     if costs.is_some() && !Resource::check_resources(costs, pod_resources, &db) {
-        return bad_request().message("Insufficient resources.");
+        return Err(bad_request().message("Insufficient resources."));
     }
 
     // Create a new queue entry with the given research type.
@@ -152,22 +149,18 @@ pub fn start_research(research_name: String,
     };
     queue.add_entry(new_queue_entry, &db);
 
-    created().message("Queue entry added.")
+    Ok(created().message("Queue entry added."))
 }
 
 
 /// Remove research from queue
 #[delete("/pod/<research_name>")]
-pub fn stop_research(research_name: String, current_user: User, db: DB) -> APIResponse {
+pub fn stop_research(research_name: String, current_user: User, db: DB) -> Result<APIResponse, APIResponse> {
 
     // Check if there is a research for this research_name
-    let research_type_result = ResearchTypes::from_string(&research_name);
     // Early return if we don't know this research name
-    if research_type_result.is_err() {
-        return bad_request().message(format!("No such research type `{}`", research_name).as_str());
-    }
-    let research_type = research_type_result.unwrap();
-
+    let research_type = ResearchTypes::from_string(&research_name).or(
+        Err(bad_request().message(format!("No such research type `{}`", research_name).as_str())))?;
     // Get user pod and pod queue
     let (pod, queue) = current_user.get_pod_and_queue(&db);
 
@@ -179,13 +172,12 @@ pub fn stop_research(research_name: String, current_user: User, db: DB) -> APIRe
         .order(queue_entry_dsl::level.desc())
         .get_result::<QueueEntry>(&*db);
     if research_entry_result.is_ok() {
-        return bad_request().message("Can't delete. There is no queue entry for this research.");
+        return Err(bad_request().message("Can't delete. There is no queue entry for this research."));
     }
     let research_entry = research_entry_result.unwrap();
 
     // Get all needed info for resource manipulation
     let research_list = get_research_list();
-
     let pod_resources = pod.get_resources(&db);
 
     // Add resources from research to pod resources
@@ -205,5 +197,5 @@ pub fn stop_research(research_name: String, current_user: User, db: DB) -> APIRe
             .execute(&*db)
             .expect("Failed to remove queue_entry.");
 
-    ok().message("Resource removed.")
+    Ok(ok().message("Resource removed."))
 }
