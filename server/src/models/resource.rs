@@ -7,11 +7,10 @@ use data::types::*;
 use helpers::db::DB;
 
 use schema::resources;
-use schema::resources::dsl as resource_dsl;
 
 
 /// A model for querying and serializing data from the `resources` table.
-#[derive(Debug, Serialize, Deserialize, Identifiable, Queryable, Associations)]
+#[derive(Debug, Serialize, Deserialize, Identifiable, Queryable, Associations, AsChangeset)]
 #[belongs_to(pods)]
 #[belongs_to(bases)]
 pub struct Resource {
@@ -100,21 +99,21 @@ impl Resource {
     /// - The second parameter is a vector of all `Resource` database models from a pod or a base.
     /// - The third parameter decides if the amount is to be added or subtracted.
     pub fn update_resources(costs: &Vec<(ResourceTypes, i64)>,
-                            resources: Vec<Resource>,
+                            mut resources: Vec<Resource>,
                             subtract: bool,
                             db: &DB) {
 
         for &(ref resource_type, amount) in costs.iter() {
             // Try to get the correct entry from existing resources.
             let resource = resources
-                .iter()
+                .iter_mut()
                 .filter(|x| x.name == resource_type.to_string())
                 .next();
             match resource {
                 // There is no resource for this resource_type,
                 // thereby it's not enough.
                 // There is a resource for this resource type
-                Some(resource) => {
+                Some(mut resource) => {
                     resource.update_resource(amount, subtract, db);
                 }
                 None => (),
@@ -127,7 +126,7 @@ impl Resource {
     ///
     /// - The first parameter is the amount to be added or subtracted.
     /// - The second parameter decides if the amount is to be added or subtracted.
-    pub fn update_resource(&self, amount: i64, subtract: bool, db: &DB) {
+    pub fn update_resource(&mut self, amount: i64, subtract: bool, db: &DB) {
         let mut new_amount: i64;
         if subtract {
             new_amount = self.amount - amount;
@@ -137,17 +136,8 @@ impl Resource {
                 new_amount = self.max_amount;
             }
         }
-
-        let updated_resource = UpdatedResource {
-            amount: Some(new_amount),
-            production: None,
-            max_amount: None,
-        };
-
-        diesel::update(resource_dsl::resources.filter(resource_dsl::id.eq(self.id)))
-            .set(&updated_resource)
-            .get_result::<Resource>(&**db)
-            .expect("Failed to update resource.");
+        self.amount = new_amount;
+        self.save_changes::<Resource>(&**db).expect("Failed to update Resource");
     }
 }
 
@@ -161,14 +151,4 @@ pub struct NewResource {
     pub max_amount: i64,
     pub pod_id: Option<Uuid>,
     pub base_id: Option<Uuid>,
-}
-
-
-/// Changeset for Resources.
-#[derive(AsChangeset)]
-#[table_name="resources"]
-pub struct UpdatedResource {
-    pub amount: Option<i64>,
-    pub production: Option<i64>,
-    pub max_amount: Option<i64>,
 }

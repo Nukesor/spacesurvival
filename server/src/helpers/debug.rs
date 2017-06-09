@@ -25,7 +25,7 @@ pub fn create_debug_user() {
     let pod = user.get_pod(&db);
 
     let resources = pod.get_resources(&db);
-    for resource in resources {
+    for mut resource in resources {
         resource.update_resource(5000, false, &db)
     }
 

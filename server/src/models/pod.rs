@@ -19,7 +19,7 @@ use schema::resources::dsl as resource_dsl;
 use schema::researches::dsl as research_dsl;
 
 
-#[derive(Debug, Serialize, Deserialize, Identifiable, Queryable, Associations)]
+#[derive(Debug, Serialize, Deserialize, Identifiable, Queryable, Associations, AsChangeset)]
 #[belongs_to(users)]
 #[belongs_to(bases)]
 #[has_many(modules)]
@@ -110,7 +110,7 @@ impl Pod {
                     *resources_production.entry(resource_type).or_insert(0) -= amount;
                 }
             }
-            for resource in resources {
+            for mut resource in resources {
                 let resource_type = ResourceTypes::from_string(&resource.name).unwrap();
                 match resources_production.get(&resource_type) {
                     Some(amount) => {
@@ -135,11 +135,4 @@ impl Pod {
 pub struct NewPod {
     pub name: String,
     pub user_id: Uuid,
-}
-
-
-#[derive(AsChangeset)]
-#[table_name="pods"]
-pub struct ChangedPod {
-    pub name: Option<String>,
 }
