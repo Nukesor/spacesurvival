@@ -60,7 +60,7 @@ pub fn add_module(request_data: Result<JSON<NewModuleSerializer>, SerdeError>,
 
     let (pod, queue) = current_user.get_pod_and_queue(&db);
 
-    let existing_module;
+    let existing_module: i64;
     // Check if there already exists a module for this position
     // We distinguish between stationary and normal modules.
 
@@ -71,7 +71,7 @@ pub fn add_module(request_data: Result<JSON<NewModuleSerializer>, SerdeError>,
             .count()
             .filter(module_dsl::pod_id.eq(pod.id))
             .filter(module_dsl::name.eq(&module_data.module_type))
-            .execute(&*db)
+            .get_result(&*db)
             .unwrap_or(0);
     }
     // Normal modules can exist multiple times. Thereby we just 
@@ -82,7 +82,7 @@ pub fn add_module(request_data: Result<JSON<NewModuleSerializer>, SerdeError>,
             .filter(module_dsl::pod_id.eq(pod.id))
             .filter(module_dsl::x_pos.eq(module_data.position_x))
             .filter(module_dsl::y_pos.eq(module_data.position_y))
-            .execute(&*db)
+            .get_result(&*db)
             .unwrap_or(0);
     };
 
