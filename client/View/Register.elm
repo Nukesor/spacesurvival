@@ -12,15 +12,35 @@ view : Model.Model -> List (Html Messages.Msg)
 view model =
     case model.user of
         Registering user ->
-            [ input
-                [ type_ "text", placeholder "Username", onInput (updateNickname user), value user.nickname ]
-                []
-            , input [ type_ "email", placeholder "E-Mail", onInput (updateEmail user), value user.email ] []
-            , input
-                [ type_ "password", placeholder "Password", onInput (updatePassword user), value user.password ]
-                []
-            , a [ onClick <| Messages.UpdateUser (LoggingIn { identifier = "", password = "" }), href "#" ] [ text "back to login" ]
-            , button [ onClick Messages.Register ] [ text "Sign Up!" ]
+            [ Html.form [ onSubmit Messages.Register ]
+                [ input
+                    [ type_ "text"
+                    , placeholder "Username"
+                    , onInput (updateNickname user)
+                    , value user.nickname
+                    ]
+                    []
+                , input
+                    [ type_ "email"
+                    , placeholder "E-Mail"
+                    , onInput (updateEmail user)
+                    , value user.email
+                    ]
+                    []
+                , input
+                    [ type_ "password"
+                    , placeholder "Password"
+                    , onInput (updatePassword user)
+                    , value user.password
+                    ]
+                    []
+                , a
+                    [ onClick (Messages.UpdateUser (LoggingIn { identifier = "", password = "" }))
+                    , href "#"
+                    ]
+                    [ text "back to login" ]
+                , button [] [ text "Sign Up!" ]
+                ]
             ]
 
         _ ->

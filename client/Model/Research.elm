@@ -44,7 +44,8 @@ updateable : Researches -> String -> Bool
 updateable researches key =
     case Dict.get key researches of
         Just research ->
-            List.all (dependencyFulfilled researches) research.dependencies && not (atMaxLevel research)
+            List.all (dependencyFulfilled researches) research.dependencies
+                && not (atMaxLevel research)
 
         _ ->
             False

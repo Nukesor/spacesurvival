@@ -12,13 +12,25 @@ view : Model.Model -> List (Html Messages.Msg)
 view model =
     case model.user of
         LoggingIn user ->
-            [ p [] [ text "Please log in or register to play!" ]
-            , input [ type_ "text", placeholder "Username", onInput (updateIdentifier user), value user.identifier ] []
-            , input
-                [ type_ "password", placeholder "Password", onInput (updatePassword user), value user.password ]
-                []
-            , a [ onClick (toRegister user), href "#" ] [ text "Create Account" ]
-            , button [ onClick Messages.Login ] [ text "Log in" ]
+            [ Html.form [ onSubmit Messages.Login ]
+                [ p [] [ text "Please log in or register to play!" ]
+                , input
+                    [ type_ "text"
+                    , placeholder "Username"
+                    , onInput (updateIdentifier user)
+                    , value user.identifier
+                    ]
+                    []
+                , input
+                    [ type_ "password"
+                    , placeholder "Password"
+                    , onInput (updatePassword user)
+                    , value user.password
+                    ]
+                    []
+                , a [ onClick (toRegister user), href "#" ] [ text "Create Account" ]
+                , button [] [ text "Log in" ]
+                ]
             ]
 
         _ ->

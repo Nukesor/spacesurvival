@@ -71,7 +71,7 @@ update msg model =
                     { model | researches = researches } ! []
 
                 Err err ->
-                    { model | user = Model.User.LoggingIn { identifier = "", password = "" } } ! []
+                    logout model ! []
 
         ReceiveQueue result ->
             case Debug.log "queue" result of
@@ -86,7 +86,7 @@ update msg model =
                         { model | queue = queue } ! commands
 
                 Err err ->
-                    model ! []
+                    logout model ! []
 
         SetMainView view ->
             { model | mainView = view } ! []
@@ -138,3 +138,8 @@ update msg model =
 
         StartBuilding id point ->
             model ! [ startBuilding model id point ]
+
+
+logout : Model -> Model
+logout model =
+    { model | user = Model.User.LoggingIn { identifier = "", password = "" } }

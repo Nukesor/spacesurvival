@@ -3,7 +3,6 @@ module View exposing (..)
 import Model exposing (..)
 import Html exposing (..)
 import Html.Attributes exposing (..)
-import Html.Events exposing (..)
 import Messages
 import View.Background
 import Html.CssHelpers
@@ -40,9 +39,7 @@ auth : Model -> Html Messages.Msg
 auth model =
     div [ class "dialog-container" ]
         [ div (List.concat [ Animation.render model.authDialogAnimation, [ class "dialog" ] ])
-            [ Html.form [ onSubmit Messages.Login ] <|
-                authForm model
-            ]
+            (authForm model)
         ]
 
 
