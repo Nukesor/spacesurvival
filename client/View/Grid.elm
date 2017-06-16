@@ -20,31 +20,47 @@ view model =
     div [ Html.Attributes.class "grid-container", helpers.class [ CenterContainer ] ]
         [ div [ helpers.class [ Container ] ]
             [ svg [ Svg.Attributes.width "100%", Svg.Attributes.height "100%" ]
-                (Grid.map
-                    slot
-                    model.grid
+                (List.concat
+                    (Grid.map
+                        slot
+                        model.grid
+                    )
                 )
             , View.BuildDialog.view model
             ]
         ]
 
 
-slot : Slot -> Svg Msg
+slot : Slot -> List (Svg Msg)
 slot slot =
     let
         ( xp, yp ) =
             toPercentage slot.position
     in
-        image
-            [ Svg.Attributes.xlinkHref "/static/img/grid_slot.svg"
-            , Svg.Attributes.x xp
-            , Svg.Attributes.y yp
-            , Svg.Attributes.width "10%"
-            , Svg.Attributes.height "10%"
-            , Svg.Attributes.class "slot"
-            , onClick (ShowBuildDialog (Just slot.position))
-            ]
-            []
+        case slot.entry of
+            Just mod ->
+                [ image
+                    [ Svg.Attributes.xlinkHref "/static/img/module.svg"
+                    , Svg.Attributes.x xp
+                    , Svg.Attributes.y yp
+                    , Svg.Attributes.width "10%"
+                    , Svg.Attributes.height "10%"
+                    ]
+                    []
+                ]
+
+            Nothing ->
+                [ image
+                    [ Svg.Attributes.xlinkHref "/static/img/grid_slot.svg"
+                    , Svg.Attributes.x xp
+                    , Svg.Attributes.y yp
+                    , Svg.Attributes.width "10%"
+                    , Svg.Attributes.height "10%"
+                    , Svg.Attributes.class "slot"
+                    , onClick (ShowBuildDialog (Just slot.position))
+                    ]
+                    []
+                ]
 
 
 toPercentage : Point -> ( String, String )
