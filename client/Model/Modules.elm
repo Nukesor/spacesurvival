@@ -13,7 +13,7 @@ type alias ModuleId =
 
 
 type alias AvailableModules =
-    Dict.Dict String ModuleType
+    Dict.Dict ModuleId ModuleType
 
 
 type alias Module =

@@ -1,6 +1,6 @@
 LaserTurret:
   display_name: "Laser turret"
-  dependencies: 
+  dependencies:
     - ["EnergyWeapons", 1]
   levels:
     - level: 1
@@ -35,8 +35,8 @@ LaserTurret:
 
 PlasmaGenerator:
   display_name: "Plasma Generator"
-  dependencies: 
-      - ["EnergyWeapons", 1]
+  dependencies:
+      - ["Plasma", 1]
   levels:
     - level: 1
       time: 30

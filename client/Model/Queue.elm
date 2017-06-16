@@ -85,6 +85,7 @@ timeToCompletion entry currentDate =
                 time data
 
 
+secondsBetween : DateTime -> DateTime -> Int
 secondsBetween a b =
     (Time.DateTime.delta a b).seconds
 
