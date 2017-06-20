@@ -33,7 +33,7 @@ pub fn create_debug_user() {
     let new_module = NewModule {
         name: "PlasmaGenerator".to_string(),
         stationary: false,
-        level: 0,
+        level: 1,
         x_pos: Some(2),
         y_pos: Some(2),
 

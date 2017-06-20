@@ -32,29 +32,40 @@ pub fn tick(db: &DB) {
             match entry {
                 QueueEntry{module_id: Some(module_id), ..} => {
                     let module = Module::get(module_id, db).expect("QueueEntry with invalid Module.id");
+                    // Increment module level
                     diesel::update(module_dsl::modules.find(module.id))
-                        .set(module_dsl::level.eq(module.level + 1));
-                    let pod = pods_dsl::pods
-                        .filter(pods_dsl::user_id.eq(module.id))
-                        .first::<Pod>(&**db)
-                        .unwrap();
-                    pod.update_resources(&db);
+                        .set(module_dsl::level.eq(module.level + 1))
+                        .execute(&**db)
+                        .expect("Failed to update module level.");
+
+                    // Update resources in pod or base
+                    match module {
+                        Module{pod_id: Some(pod_id), ..} => {
+                            let pod = pods_dsl::pods
+                                .filter(pods_dsl::id.eq(pod_id))
+                                .get_result::<Pod>(&**db)
+                                .expect("Failed to get module pod.");
+                            pod.update_resources(&db);
+                        }
+                        _ => (),
+                    }
                 }
                 QueueEntry{research_id: Some(research_id), ..} => {
                     let research = Research::get(research_id, db).expect("QueueEntry with invalid Research.id");
+                    // Increment research level
                     diesel::update(research_dsl::researches.find(research.id))
                         .set(research_dsl::level.eq(research.level + 1))
                         .execute(&**db)
-                        .expect("Failed to update module level.");
+                        .expect("Failed to update research level.");
                 }
                 _ => (),
             }
 
+            // Remove entry from queue
             let queue = queue_dsl::queues
                 .filter(queue_dsl::id.eq(entry.queue_id))
                 .first::<Queue>(&**db)
                 .unwrap();
-
             queue.remove_entry(entry.id, db)
         }
     }
