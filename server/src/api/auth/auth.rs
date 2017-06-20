@@ -17,9 +17,11 @@ use schema::users::dsl::*;
 /// Check if we can login with the credentials.
 /// We try to get the user by searching email and nickname for the given identifier.
 #[post("/login", data = "<user_data>", format = "application/json")]
-pub fn login(user_data: Result<JSON<LoginSerializer>, SerdeError>,
-             rconfig: State<RuntimeConfig>,
-             db: DB) -> Result<APIResponse, APIResponse> {
+pub fn login(
+    user_data: Result<JSON<LoginSerializer>, SerdeError>,
+    rconfig: State<RuntimeConfig>,
+    db: DB,
+) -> Result<APIResponse, APIResponse> {
 
     let user_login = validate_json(user_data)?;
 
@@ -34,13 +36,15 @@ pub fn login(user_data: Result<JSON<LoginSerializer>, SerdeError>,
             .filter(email.eq(&user_login.identifier))
             .first::<User>(&*db);
     }
-    let mut user = user_result.or(Err(unauthorized().message("Nickname or email doesn't exist.")))?;
+    let mut user = user_result.or(Err(unauthorized().message(
+        "Nickname or email doesn't exist.",
+    )))?;
 
     // Verify password
     if !user.verify_password(user_login.password.as_str()) {
         return Err(unauthorized().message("Password incorrect."));
     }
-    
+
     let token = if user.has_valid_auth_token(rconfig.0) {
         user.get_curret_auth_token()?
     } else {

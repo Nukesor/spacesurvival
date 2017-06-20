@@ -102,8 +102,14 @@ impl User {
         let new_auth_token = Uuid::new_v4().hyphenated().to_string();
         self.current_auth_token = Some(new_auth_token.clone());
         self.last_action = Some(UTC::now());
-        self.save_changes::<User>(conn).or(Err(internal_server_error()))?;
-        Ok(format!("{}:{}", self.id.hyphenated().to_string(), new_auth_token))
+        self.save_changes::<User>(conn).or(
+            Err(internal_server_error()),
+        )?;
+        Ok(format!(
+            "{}:{}",
+            self.id.hyphenated().to_string(),
+            new_auth_token
+        ))
     }
 
     /// Return whether or not the user has a valid auth token.
@@ -134,13 +140,12 @@ impl User {
 
         let v: Vec<&str> = token.split(':').collect();
         // Invalid token has been sent
-        if v.len() < 2 { return None; }
+        if v.len() < 2 {
+            return None;
+        }
         let (user_id, auth_token) = (Uuid::parse_str(v[0]).unwrap_or(Uuid::nil()), v[1]);
 
-        let user = users
-            .filter(id.eq(user_id))
-            .first::<User>(&*db)
-            .optional();
+        let user = users.filter(id.eq(user_id)).first::<User>(&*db).optional();
         if let Ok(Some(u)) = user {
             if let Some(token) = u.current_auth_token.clone() {
                 if verify_slices_are_equal(token.as_bytes(), auth_token.as_bytes()).is_ok() {
@@ -150,11 +155,10 @@ impl User {
         }
         return None;
     }
-
 }
 
 #[derive(Insertable)]
-#[table_name="users"]
+#[table_name = "users"]
 pub struct NewUser {
     pub nickname: String,
     pub email: String,
@@ -162,7 +166,7 @@ pub struct NewUser {
 }
 
 #[derive(AsChangeset)]
-#[table_name="users"]
+#[table_name = "users"]
 pub struct ChangedUser {
     pub nickname: Option<String>,
     pub email: Option<String>,

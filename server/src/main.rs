@@ -10,12 +10,9 @@ use spacelib::helpers::debug::create_debug_user;
 
 
 fn main() {
-    #[cfg(debug_assertions)]
-    create_debug_user();
+    #[cfg(debug_assertions)] create_debug_user();
 
-    thread::spawn(|| {
-        spawn_tick_thread();
-    });
+    thread::spawn(|| { spawn_tick_thread(); });
 
     rocket_factory().launch();
 }

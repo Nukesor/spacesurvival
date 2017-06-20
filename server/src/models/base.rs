@@ -18,7 +18,7 @@ pub struct Base {
 
 
 #[derive(Insertable)]
-#[table_name="bases"]
+#[table_name = "bases"]
 pub struct NewBase {
     pub name: String,
 }

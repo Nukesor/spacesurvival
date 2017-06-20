@@ -31,8 +31,9 @@ pub fn tick(db: &DB) {
     if let Ok(finished_entries) = finished_entries_result {
         for entry in finished_entries {
             match entry {
-                QueueEntry{module_id: Some(module_id), ..} => {
-                    let module = Module::get(module_id, db).expect("QueueEntry with invalid Module.id");
+                QueueEntry { module_id: Some(module_id), .. } => {
+                    let module =
+                        Module::get(module_id, db).expect("QueueEntry with invalid Module.id");
                     // Increment module level
                     diesel::update(module_dsl::modules.find(module.id))
                         .set(module_dsl::level.eq(module.level + 1))
@@ -41,7 +42,7 @@ pub fn tick(db: &DB) {
 
                     // Update resources in pod or base
                     match module {
-                        Module{pod_id: Some(pod_id), ..} => {
+                        Module { pod_id: Some(pod_id), .. } => {
                             let pod = pods_dsl::pods
                                 .filter(pods_dsl::id.eq(pod_id))
                                 .get_result::<Pod>(&**db)
@@ -51,8 +52,10 @@ pub fn tick(db: &DB) {
                         _ => (),
                     }
                 }
-                QueueEntry{research_id: Some(research_id), ..} => {
-                    let research = Research::get(research_id, db).expect("QueueEntry with invalid Research.id");
+                QueueEntry { research_id: Some(research_id), .. } => {
+                    let research = Research::get(research_id, db).expect(
+                        "QueueEntry with invalid Research.id",
+                    );
                     // Increment research level
                     diesel::update(research_dsl::researches.find(research.id))
                         .set(research_dsl::level.eq(research.level + 1))

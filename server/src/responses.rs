@@ -25,7 +25,9 @@ impl APIResponse {
 
     /// Convenience method to set `self.data` to `{"message": message}`.
     pub fn message(mut self, message: &str) -> APIResponse {
-        self.data = json!({"message": message});
+        self.data = json!({
+            "message": message
+        });
         self
     }
 }

@@ -2,7 +2,7 @@ use std::fmt;
 use std::slice::Iter;
 
 /// A helper macro to get the length of expressions in a macro
-/// TODO: Remove this, if it's implemented in Rust. Right now they plan to 
+/// TODO: Remove this, if it's implemented in Rust. Right now they plan to
 /// to make this a post v1.0 feature.
 macro_rules! count_expr {
     () => { 0 };

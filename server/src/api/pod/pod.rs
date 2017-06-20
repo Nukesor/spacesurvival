@@ -12,10 +12,11 @@ use models::user::User;
 
 /// Endpoint for setting different values for your pod
 #[post("/settings", data = "<pod_data>", format = "application/json")]
-pub fn settings(pod_data: Result<JSON<PodSettingsSerializer>, SerdeError>,
-                current_user: User,
-                db: DB)
-                -> Result<APIResponse, APIResponse> {
+pub fn settings(
+    pod_data: Result<JSON<PodSettingsSerializer>, SerdeError>,
+    current_user: User,
+    db: DB,
+) -> Result<APIResponse, APIResponse> {
 
     let mut pod = current_user.get_pod(&db);
     let pod_settings = validate_json(pod_data)?;
@@ -23,8 +24,9 @@ pub fn settings(pod_data: Result<JSON<PodSettingsSerializer>, SerdeError>,
     if let Some(ref name) = pod_settings.name {
         pod.name = name.clone();
     }
-    pod.save_changes::<Pod>(&*db) 
-        .or(Err(internal_server_error()))?;
+    pod.save_changes::<Pod>(&*db).or(
+        Err(internal_server_error()),
+    )?;
 
     Ok(ok().data(json!(&pod)))
 }

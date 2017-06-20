@@ -40,11 +40,11 @@ impl Queue {
     /// Remove an entry to the queue and update the queue.
     pub fn remove_entry(&self, id: Uuid, db: &DB) {
         // Remove queue_entry from database
-        diesel::delete(queue_entry_dsl::queue_entries
-                       .filter(queue_entry_dsl::id.eq(id))
-                       .filter(queue_entry_dsl::queue_id.eq(self.id))
-                       )
-            .execute(&**db)
+        diesel::delete(
+            queue_entry_dsl::queue_entries
+                .filter(queue_entry_dsl::id.eq(id))
+                .filter(queue_entry_dsl::queue_id.eq(self.id)),
+        ).execute(&**db)
             .expect("Failed to remove queue_entry.");
         self.update_entries(db);
     }
@@ -70,9 +70,11 @@ impl Queue {
         if let Ok(entry) = queue_entry_result {
             if entry.finishes_at.is_none() {
                 let finishes_at = UTC::now() + Duration::seconds(entry.duration);
-                diesel::update(queue_entry_dsl::queue_entries
-                         .filter(queue_entry_dsl::id.eq(entry.id)))
-                    .set(queue_entry_dsl::finishes_at.eq(finishes_at))
+                diesel::update(queue_entry_dsl::queue_entries.filter(
+                    queue_entry_dsl::id.eq(
+                        entry.id,
+                    ),
+                )).set(queue_entry_dsl::finishes_at.eq(finishes_at))
                     .execute(&**db)
                     .expect("Failed to update queue entries.");
             }
@@ -82,7 +84,7 @@ impl Queue {
 
 
 #[derive(Insertable)]
-#[table_name="queues"]
+#[table_name = "queues"]
 pub struct NewQueue {
     pub slots: i32,
     pub pod_id: Option<Uuid>,
@@ -108,7 +110,7 @@ pub struct QueueEntry {
 
 
 #[derive(Insertable)]
-#[table_name="queue_entries"]
+#[table_name = "queue_entries"]
 pub struct NewQueueEntry {
     pub queue_id: Uuid,
     pub research_id: Option<Uuid>,

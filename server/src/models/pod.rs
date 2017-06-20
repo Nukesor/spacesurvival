@@ -50,11 +50,11 @@ impl Pod {
     }
 
     pub fn get_module(&self, id: Uuid, db: &DB) -> Result<Module, diesel::result::Error> {
-      // Get the research from an id
-      module_dsl::modules
-          .filter(module_dsl::id.eq(id))
-          .filter(module_dsl::pod_id.eq(self.id))
-          .get_result::<Module>(&**db)
+        // Get the research from an id
+        module_dsl::modules
+            .filter(module_dsl::id.eq(id))
+            .filter(module_dsl::pod_id.eq(self.id))
+            .get_result::<Module>(&**db)
     }
 
     pub fn get_modules(&self, db: &DB) -> Result<Vec<Module>, diesel::result::Error> {
@@ -97,21 +97,26 @@ impl Pod {
         if let Ok(modules) = modules_result {
             let module_list = get_module_list();
             for module in modules {
-                let module_type = ModuleTypes::from_string(&module.name).expect("Missing module type");
-                let level = &module_list.get(&module_type)
+                let module_type =
+                    ModuleTypes::from_string(&module.name).expect("Missing module type");
+                let level = &module_list
+                    .get(&module_type)
                     .as_ref()
                     .expect("No module in yml for this type.")
-                    .levels[module.level as usize];
+                    .levels
+                    [module.level as usize];
 
                 // Calculate production
                 for &(ref resource_ref, amount) in &level.generates {
-                    let resource_type = ResourceTypes::from_string(&resource_ref.to_string()).unwrap();
+                    let resource_type = ResourceTypes::from_string(&resource_ref.to_string())
+                        .unwrap();
                     *resources_production.entry(resource_type).or_insert(0) += amount;
                 }
 
                 // Calculate consumption
                 for &(ref resource_ref, amount) in &level.consumes {
-                    let resource_type = ResourceTypes::from_string(&resource_ref.to_string()).unwrap();
+                    let resource_type = ResourceTypes::from_string(&resource_ref.to_string())
+                        .unwrap();
                     *resources_production.entry(resource_type).or_insert(0) -= amount;
                 }
             }
@@ -119,16 +124,19 @@ impl Pod {
                 let resource_type = ResourceTypes::from_string(&resource.name).unwrap();
                 match resources_production.get(&resource_type) {
                     Some(amount) => {
-                        let elapsed_time: Duration = UTC::now().signed_duration_since(resource.updated_at);
-                        let produced_since_last_update: i64 = (resource.production*elapsed_time.num_milliseconds())/60/60/1000;
+                        let elapsed_time: Duration =
+                            UTC::now().signed_duration_since(resource.updated_at);
+                        let produced_since_last_update: i64 =
+                            (resource.production * elapsed_time.num_milliseconds()) / 60 / 60 /
+                                1000;
                         resource.update_resource(produced_since_last_update, false, db);
-                        diesel::update(resource_dsl::resources
-                                .filter(resource_dsl::id.eq(resource.id)))
-                            .set(resource_dsl::production.eq(amount))
+                        diesel::update(resource_dsl::resources.filter(
+                            resource_dsl::id.eq(resource.id),
+                        )).set(resource_dsl::production.eq(amount))
                             .execute(&**db)
                             .expect("Failed to update resource production.");
-                    },
-                    None => ()
+                    }
+                    None => (),
                 }
             }
         }
@@ -136,7 +144,7 @@ impl Pod {
 }
 
 #[derive(Insertable)]
-#[table_name="pods"]
+#[table_name = "pods"]
 pub struct NewPod {
     pub name: String,
     pub user_id: Uuid,

@@ -57,10 +57,11 @@ impl Resource {
     ///
     /// - The first parameter is a vector of resources which represent the costs.
     /// - The second parameter is a vector of all `Resource` database models from a pod or a base.
-    pub fn enough_resources(costs: &Option<Vec<(ResourceTypes, i64)>>,
-                           resources: Vec<Resource>,
-                           db: &DB)
-                           -> bool {
+    pub fn enough_resources(
+        costs: &Option<Vec<(ResourceTypes, i64)>>,
+        resources: Vec<Resource>,
+        db: &DB,
+    ) -> bool {
         match costs.as_ref() {
             // There are no costs for this module/research
             None => return true,
@@ -98,10 +99,12 @@ impl Resource {
     /// - The first parameter is a vector of resources which represent the costs.
     /// - The second parameter is a vector of all `Resource` database models from a pod or a base.
     /// - The third parameter decides if the amount is to be added or subtracted.
-    pub fn update_resources(costs: &Vec<(ResourceTypes, i64)>,
-                            mut resources: Vec<Resource>,
-                            subtract: bool,
-                            db: &DB) {
+    pub fn update_resources(
+        costs: &Vec<(ResourceTypes, i64)>,
+        mut resources: Vec<Resource>,
+        subtract: bool,
+        db: &DB,
+    ) {
 
         for &(ref resource_type, amount) in costs.iter() {
             // Try to get the correct entry from existing resources.
@@ -137,14 +140,16 @@ impl Resource {
             }
         }
         self.amount = new_amount;
-        self.save_changes::<Resource>(&**db).expect("Failed to update Resource");
+        self.save_changes::<Resource>(&**db).expect(
+            "Failed to update Resource",
+        );
     }
 }
 
 
 /// A model to create a new database instance of in the resource table.
 #[derive(Insertable)]
-#[table_name="resources"]
+#[table_name = "resources"]
 pub struct NewResource {
     pub name: String,
     pub amount: i64,

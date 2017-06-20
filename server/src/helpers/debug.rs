@@ -17,10 +17,12 @@ pub fn create_debug_user() {
         Err(_) => panic!("Failed to get database transaction"),
     };
     let new_password_hash = User::make_password_hash("hunter2");
-    let user = User::new_user("admin".to_string(),
-                              "admin@hunter2.de".to_string(),
-                              new_password_hash,
-                              &db);
+    let user = User::new_user(
+        "admin".to_string(),
+        "admin@hunter2.de".to_string(),
+        new_password_hash,
+        &db,
+    );
 
     let pod = user.get_pod(&db);
 

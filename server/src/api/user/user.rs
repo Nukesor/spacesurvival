@@ -6,7 +6,8 @@ use rocket_contrib::{JSON, SerdeError};
 use helpers::db::DB;
 use helpers::request::validate_json;
 use validation::user::{UserSerializer, UserSettingsSerializer};
-use responses::{APIResponse, ok, created, conflict, bad_request, forbidden, unauthorized, internal_server_error};
+use responses::{APIResponse, ok, created, conflict, bad_request, forbidden, unauthorized,
+                internal_server_error};
 
 use models::user::{User, ChangedUser};
 use schema::users::dsl::*;
@@ -22,10 +23,15 @@ pub fn info(current_user: User) -> APIResponse {
 ///
 /// Needs a unique nickname, unique email and password.
 #[post("/register", data = "<user_data>", format = "application/json")]
-pub fn register(user_data: Result<JSON<UserSerializer>, SerdeError>, db: DB) -> Result<APIResponse, APIResponse> {
+pub fn register(
+    user_data: Result<JSON<UserSerializer>, SerdeError>,
+    db: DB,
+) -> Result<APIResponse, APIResponse> {
 
     let data = validate_json(user_data)?;
-    data.validate().or(Err(bad_request().message("Invalid user data")))?;
+    data.validate().or(Err(
+        bad_request().message("Invalid user data"),
+    ))?;
 
     // Check for existing user email
     users
@@ -45,20 +51,23 @@ pub fn register(user_data: Result<JSON<UserSerializer>, SerdeError>, db: DB) -> 
     let new_password_hash = User::make_password_hash(data.password.as_str());
 
     // Create new user to get uuid for pod
-    let user = User::new_user(data.nickname.clone(),
-                              data.email.clone(),
-                              new_password_hash,
-                              &db);
+    let user = User::new_user(
+        data.nickname.clone(),
+        data.email.clone(),
+        new_password_hash,
+        &db,
+    );
 
     Ok(created().data(json!(&user)))
 }
 
 
 #[post("/settings", data = "<user_data>", format = "application/json")]
-pub fn settings(current_user: User,
-                user_data: Result<JSON<UserSettingsSerializer>, SerdeError>,
-                db: DB)
-                -> Result<APIResponse, APIResponse> {
+pub fn settings(
+    current_user: User,
+    user_data: Result<JSON<UserSettingsSerializer>, SerdeError>,
+    db: DB,
+) -> Result<APIResponse, APIResponse> {
 
     let data = validate_json(user_data)?;
     let mut new_password_hash: Option<Vec<u8>> = None;
@@ -71,8 +80,10 @@ pub fn settings(current_user: User,
             }
             new_password_hash = Some(User::make_password_hash(new_password.as_str()));
         } else {
-            return Err(forbidden().message("The current passwords needs to be \
-                                            specified, if you want to change your password."));
+            return Err(forbidden().message(
+                "The current passwords needs to be \
+                                            specified, if you want to change your password.",
+            ));
         }
     }
 

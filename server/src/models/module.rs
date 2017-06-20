@@ -32,16 +32,16 @@ impl Module {
     /// This function adds a new pod into the database and returns the model with the
     /// initialized data.
     pub fn get(id: Uuid, db: &DB) -> Result<Module, diesel::result::Error> {
-      // Get the research from an id
-      module_dsl::modules
-          .filter(module_dsl::id.eq(id))
-          .get_result::<Module>(&**db)
+        // Get the research from an id
+        module_dsl::modules
+            .filter(module_dsl::id.eq(id))
+            .get_result::<Module>(&**db)
     }
 }
 
 
 #[derive(Insertable)]
-#[table_name="modules"]
+#[table_name = "modules"]
 pub struct NewModule {
     pub name: String,
     pub level: i32,

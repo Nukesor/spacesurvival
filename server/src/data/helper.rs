@@ -36,11 +36,7 @@ pub fn get_research_dependency_strings(research_type: &ResearchTypes) -> Vec<Str
 pub fn get_module_dependency_strings(module_type: &ModuleTypes) -> Vec<String> {
     let ref module_list = get_module_list();
     let mut dependency_strings = Vec::new();
-    let ref dependency_list = module_list
-        .get(module_type)
-        .as_ref()
-        .unwrap()
-        .dependencies;
+    let ref dependency_list = module_list.get(module_type).as_ref().unwrap().dependencies;
     if dependency_list.len() != 0 {
         for &(ref dependency, _) in dependency_list {
             dependency_strings.push(dependency.to_string());
@@ -57,13 +53,13 @@ pub fn get_module_dependency_strings(module_type: &ModuleTypes) -> Vec<String> {
 pub fn dependencies_fulfilled<T: Eq + Hash, M: HasDependencies>(
     reliant_type: &T,
     fulfilled_result: Result<Vec<Research>, Error>,
-list: &HashMap<T, M>) -> bool{
+    list: &HashMap<T, M>,
+) -> bool {
     // Get all researches required for the specified type.
     let dependency_list = list.get(reliant_type).as_ref().unwrap().get_dependencies();
     if dependency_list.len() == 0 {
         return true;
-    }
-    else {
+    } else {
         let fulfilled_list = match fulfilled_result {
             Ok(result) => result,
             Err(_) => return false,

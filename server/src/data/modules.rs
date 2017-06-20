@@ -24,7 +24,9 @@ impl HasDependencies for Module {
     }
 }
 
-fn resource_default() -> Vec<(ResourceTypes, i64)> {Vec::new()}
+fn resource_default() -> Vec<(ResourceTypes, i64)> {
+    Vec::new()
+}
 
 #[derive(Debug, PartialEq, Serialize, Deserialize)]
 pub struct Level {

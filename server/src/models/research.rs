@@ -27,16 +27,16 @@ impl Research {
     /// This function adds a new pod into the database and returns the model with the
     /// initialized data.
     pub fn get(id: Uuid, db: &DB) -> Result<Research, diesel::result::Error> {
-      // Get the research from an id
-      research_dsl::researches
-          .filter(research_dsl::id.eq(id))
-          .get_result::<Research>(&**db)
+        // Get the research from an id
+        research_dsl::researches
+            .filter(research_dsl::id.eq(id))
+            .get_result::<Research>(&**db)
     }
 }
 
 
 #[derive(Insertable)]
-#[table_name="researches"]
+#[table_name = "researches"]
 pub struct NewResearch {
     pub name: String,
     pub pod_id: Option<Uuid>,

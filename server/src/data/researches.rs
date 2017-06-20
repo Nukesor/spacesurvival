@@ -12,7 +12,9 @@ use data::{HasDependencies, dependencies_default};
 static RESEARCH_LIST: &'static [u8] = include_bytes!("../../research_data.yml");
 
 /// Helper function to set default value of current_level
-fn current_level_default() -> i32 { 0 } 
+fn current_level_default() -> i32 {
+    0
+}
 
 
 /// This struct is only for deserializing the included `research_data.yml`.

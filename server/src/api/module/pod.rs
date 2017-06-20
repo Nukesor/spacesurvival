@@ -12,7 +12,7 @@ use responses::{APIResponse, accepted, bad_request, created, ok, internal_server
 use validation::queue::NewModuleSerializer;
 
 use models::user::User;
-use models::module::{NewModule,Module};
+use models::module::{NewModule, Module};
 use models::research::Research;
 use models::resource::Resource;
 use models::queue::{QueueEntry, NewQueueEntry};
@@ -25,13 +25,15 @@ use schema::queue_entries::dsl as queue_entry_dsl;
 
 /// The user needs to be logged in to access this route!
 ///
-/// This route returns the list of all modules and their current levels for the pod of the current user.
+/// This route returns the list of all modules and
+/// their current levels for the pod of the current user.
 #[get("/pod")]
 pub fn get_modules(current_user: User, db: DB) -> Result<APIResponse, APIResponse> {
 
     let pod = current_user.get_pod(&db);
-    let modules = pod.get_modules(&db).or(
-        Err(ok().message("No modules installed.")))?;
+    let modules = pod.get_modules(&db).or(Err(
+        ok().message("No modules installed."),
+    ))?;
 
     Ok(ok().data(json!(&modules)))
 }
@@ -44,18 +46,19 @@ pub fn get_modules(current_user: User, db: DB) -> Result<APIResponse, APIRespons
 /// - Removes resources from db
 /// - Creates a new queue entry for this research
 #[post("/pod/new", data = "<request_data>", format = "application/json")]
-pub fn add_module(request_data: Result<JSON<NewModuleSerializer>, SerdeError>,
-                          current_user: User,
-                          db: DB)
-                          -> Result<APIResponse, APIResponse> {
+pub fn add_module(
+    request_data: Result<JSON<NewModuleSerializer>, SerdeError>,
+    current_user: User,
+    db: DB,
+) -> Result<APIResponse, APIResponse> {
     // Unwrap or return specific error if invalid JSON has been sent.
     let module_data = validate_json(request_data)?;
 
     // Check if the given module name maps to a module type.
     let result = ModuleTypes::from_string(&module_data.module_type);
-    let module_type = result.or(Err(bad_request().message(format!("No such module type `{}`",
-                                             module_data.module_type)
-                                             .as_str())))?;
+    let module_type = result.or(Err(bad_request().message(
+        format!("No such module type `{}`", module_data.module_type).as_str(),
+    )))?;
     let dependency_strings = get_module_dependency_strings(&module_type);
 
     let (pod, queue) = current_user.get_pod_and_queue(&db);
@@ -74,7 +77,7 @@ pub fn add_module(request_data: Result<JSON<NewModuleSerializer>, SerdeError>,
             .get_result(&*db)
             .unwrap_or(0);
     }
-    // Normal modules can exist multiple times. Thereby we just 
+    // Normal modules can exist multiple times. Thereby we just
     // have to check if the requested position is free.
     else {
         existing_module = module_dsl::modules
@@ -88,7 +91,9 @@ pub fn add_module(request_data: Result<JSON<NewModuleSerializer>, SerdeError>,
 
     // Early return if there already is a module.
     if existing_module != 0 {
-        return Err(bad_request().message("There already is a module at this position."));
+        return Err(bad_request().message(
+            "There already is a module at this position.",
+        ));
     }
 
     // Get the researches the module is depending on
@@ -99,18 +104,18 @@ pub fn add_module(request_data: Result<JSON<NewModuleSerializer>, SerdeError>,
     // Check if the dependencies are fulfilled.
     // If they're not fulfilled, return a bad request.
     let module_list = get_module_list();
-    let fulfilled = dependencies_fulfilled(&module_type,
-                                           dependencies,
-                                           &module_list);
+    let fulfilled = dependencies_fulfilled(&module_type, dependencies, &module_list);
     if !fulfilled {
         return Err(bad_request().message("Dependencies not fulfilled."));
     }
 
     // Get cost for level 1
-    let level = &module_list.get(&module_type)
-          .as_ref()
-          .ok_or(internal_server_error())?
-          .levels[0];
+    let level = &module_list
+        .get(&module_type)
+        .as_ref()
+        .ok_or(internal_server_error())?
+        .levels
+        [0];
 
     // Check if we have enough resources and subtract them.
     if level.resources.is_some() && !pod.has_enough_resources(&level.resources, &db) {
@@ -151,56 +156,69 @@ pub fn add_module(request_data: Result<JSON<NewModuleSerializer>, SerdeError>,
 
 /// Remove module from pod
 #[delete("/pod/<module_uuid>")]
-pub fn remove_module(module_uuid: String, current_user: User, db: DB) -> Result<APIResponse, APIResponse> {
+pub fn remove_module(
+    module_uuid: String,
+    current_user: User,
+    db: DB,
+) -> Result<APIResponse, APIResponse> {
     // Parse and check if we got a valid id
-    let module_id = Uuid::parse_str(&module_uuid.as_str()).or(
-        Err(bad_request().message("Got an invalid uuid")))?;
+    let module_id = Uuid::parse_str(&module_uuid.as_str()).or(Err(
+        bad_request().message("Got an invalid uuid"),
+    ))?;
 
-    // Get the module and get it from the pod to ensure this is a request from 
+    // Get the module and get it from the pod to ensure this is a request from
     // the owner of the module
     let pod = current_user.get_pod(&db);
     let module = pod.get_module(module_id, &db).or(
-        Err(bad_request().message("No module with this id.")))?;
+        Err(bad_request().message(
+            "No module with this id.",
+        )),
+    )?;
 
     // Remove queue_entry from database
-    diesel::delete(module_dsl::modules
-                       .filter(module_dsl::id.eq(module.id)))
-            .execute(&*db)
-            .or(Err(internal_server_error()))?;
+    diesel::delete(module_dsl::modules.filter(module_dsl::id.eq(module.id)))
+        .execute(&*db)
+        .or(Err(internal_server_error()))?;
 
     Ok(accepted().message("Module removed."))
 }
 
 /// upgrade module from pod
 #[post("/pod/upgrade/<module_uuid>")]
-pub fn upgrade_module(module_uuid: String, current_user: User, db: DB) -> Result<APIResponse, APIResponse> {
+pub fn upgrade_module(
+    module_uuid: String,
+    current_user: User,
+    db: DB,
+) -> Result<APIResponse, APIResponse> {
     // Parse and check if we got a valid id
-    let module_id = Uuid::parse_str(&module_uuid.as_str()).or(
-        Err(bad_request().message("Got an invalid uuid")))?;
+    let module_id = Uuid::parse_str(&module_uuid.as_str()).or(Err(
+        bad_request().message("Got an invalid uuid"),
+    ))?;
     let (pod, queue) = current_user.get_pod_and_queue(&db);
 
-    // Get the module and get it from the pod to ensure this is a request from 
+    // Get the module and get it from the pod to ensure this is a request from
     // the owner of the module
     let module = pod.get_module(module_id, &db).or(
-        Err(bad_request().message("No module with this id.")))?;
+        Err(bad_request().message(
+            "No module with this id.",
+        )),
+    )?;
     let level = module.level + 1;
 
     // Get all needed info for resource manipulation
     let module_list = get_module_list();
     // Add resources from module to pod resources
-    let module_type = ModuleTypes::from_string(&module.name)
-        .or(Err(internal_server_error()))?;
-    let all_levels = &module_list
-                          .get(&module_type)
-                          .unwrap()
-                          .levels;
+    let module_type = ModuleTypes::from_string(&module.name).or(Err(
+        internal_server_error(),
+    ))?;
+    let all_levels = &module_list.get(&module_type).unwrap().levels;
 
     // Check if there is a next level.
     if level > all_levels.len() as i32 {
         return Err(bad_request().message("Already at max level"));
     }
 
-    let level_index: usize = (level-1) as usize;
+    let level_index: usize = (level - 1) as usize;
     let costs = &all_levels[level_index].resources;
 
     if costs.is_some() && !pod.has_enough_resources(costs, &db) {
@@ -226,10 +244,15 @@ pub fn upgrade_module(module_uuid: String, current_user: User, db: DB) -> Result
 
 /// Remove module upgrade from pod queue
 #[delete("/pod/upgrade/<module_uuid>")]
-pub fn stop_module_upgrade(module_uuid: String, current_user: User, db: DB) -> Result<APIResponse, APIResponse> {
+pub fn stop_module_upgrade(
+    module_uuid: String,
+    current_user: User,
+    db: DB,
+) -> Result<APIResponse, APIResponse> {
     // Parse and check if we got a valid id
-    let module_id = Uuid::parse_str(&module_uuid.as_str()).or(
-        Err(bad_request().message("Got an invalid uuid")))?;
+    let module_id = Uuid::parse_str(&module_uuid.as_str()).or(Err(
+        bad_request().message("Got an invalid uuid"),
+    ))?;
     let (pod, queue) = current_user.get_pod_and_queue(&db);
 
     // Get the queue entry
@@ -240,19 +263,18 @@ pub fn stop_module_upgrade(module_uuid: String, current_user: User, db: DB) -> R
         .first::<QueueEntry>(&*db)
         .or(Err(bad_request().message("No queue entry with this id.")))?;
 
-    // Get the module and get it from the pod to ensure this is a request from 
+    // Get the module and get it from the pod to ensure this is a request from
     // the owner of the module
-    let module = pod.get_module(module_id, &db)
-        .or(Err(internal_server_error()))?;
+    let module = pod.get_module(module_id, &db).or(
+        Err(internal_server_error()),
+    )?;
 
     // Get all needed info for resource manipulation
     let module_list = get_module_list();
-    let module_type = ModuleTypes::from_string(&module.name)
-        .or(Err(internal_server_error()))?;
-    let all_levels = &module_list
-                          .get(&module_type)
-                          .unwrap()
-                          .levels;
+    let module_type = ModuleTypes::from_string(&module.name).or(Err(
+        internal_server_error(),
+    ))?;
+    let all_levels = &module_list.get(&module_type).unwrap().levels;
     let costs_result = &all_levels[module.level as usize].resources;
 
     // Refund resources
@@ -265,8 +287,7 @@ pub fn stop_module_upgrade(module_uuid: String, current_user: User, db: DB) -> R
 
     // Remove module if it's just a upgrade dummy.
     if module.level == 0 {
-        diesel::delete(module_dsl::modules
-                       .filter(module_dsl::id.eq(module.id)))
+        diesel::delete(module_dsl::modules.filter(module_dsl::id.eq(module.id)))
             .execute(&*db)
             .or(Err(internal_server_error()))?;
     }

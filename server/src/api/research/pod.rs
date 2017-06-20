@@ -29,16 +29,27 @@ pub fn get_researches(current_user: User, db: DB) -> Result<APIResponse, APIResp
     let researches = pod.get_researches(&db);
 
     for research in researches {
-        let research_type = ResearchTypes::from_string(&research.name).or(
-            Err(bad_request().message(format!("Found research {}, but no matching ResearchType!",
-                                        research.name)
-                                        .as_str())))?;
+        let research_type = ResearchTypes::from_string(&research.name).or(Err(
+            bad_request()
+                .message(
+                    format!(
+                        "Found research {}, but no matching ResearchType!",
+                        research.name
+                    ).as_str(),
+                ),
+        ))?;
         let list_result = research_list.get_mut(&research_type);
         if let Some(list_entry) = list_result {
             list_entry.current_level = research.level;
         } else {
-            return Err(bad_request().message(format!("Found type {}, but no matching entry in our research list!",
-                                             research_type).as_str()));
+            return Err(
+                bad_request().message(
+                    format!(
+                        "Found type {}, but no matching entry in our research list!",
+                        research_type
+                    ).as_str(),
+                ),
+            );
         }
     }
 
@@ -51,15 +62,20 @@ pub fn get_researches(current_user: User, db: DB) -> Result<APIResponse, APIResp
 /// - Checks if there are enough resources
 /// - Removes resources from db
 #[post("/pod/<research_name>")]
-pub fn start_research(research_name: String,
-                          current_user: User,
-                          db: DB)
-                          -> Result<APIResponse, APIResponse> {
+pub fn start_research(
+    research_name: String,
+    current_user: User,
+    db: DB,
+) -> Result<APIResponse, APIResponse> {
 
     // Check if the given research name maps to a research type.
     // Early return if we don't know this research name
-    let research_type = ResearchTypes::from_string(&research_name).or(
-        Err(bad_request().message(format!("No such research type `{}`", research_name).as_str())))?;
+    let research_type = ResearchTypes::from_string(&research_name).or(Err(
+        bad_request()
+            .message(
+                format!("No such research type `{}`", research_name).as_str(),
+            ),
+    ))?;
 
     // Get and set some variables we need for querying and dependency checking.
     let dependency_strings = get_research_dependency_strings(&research_type);
@@ -77,9 +93,7 @@ pub fn start_research(research_name: String,
             .filter(research_dsl::name.eq_any(dependency_strings))
             .get_results::<Research>(&*db);
 
-        let fulfilled = dependencies_fulfilled(&research_type,
-                                               dependencies,
-                                               &research_list);
+        let fulfilled = dependencies_fulfilled(&research_type, dependencies, &research_list);
         if !fulfilled {
             return Err(bad_request().message("Dependencies not fulfilled."));
         }
@@ -113,16 +127,16 @@ pub fn start_research(research_name: String,
     research_level += existing_entries as i32;
 
     let all_levels = &research_list
-                          .get(&research_type)
-                          .as_ref()
-                          .ok_or(internal_server_error())?
-                          .levels;
+        .get(&research_type)
+        .as_ref()
+        .ok_or(internal_server_error())?
+        .levels;
 
     if research_level > all_levels.len() as i32 {
         return Err(bad_request().message("Already at max level."));
     }
 
-    let level_index: usize = (research_level-1) as usize;
+    let level_index: usize = (research_level - 1) as usize;
     let costs = &all_levels[level_index].resources;
 
     if costs.is_some() && !pod.has_enough_resources(costs, &db) {
@@ -147,12 +161,20 @@ pub fn start_research(research_name: String,
 
 /// Remove research from queue
 #[delete("/pod/<research_name>")]
-pub fn stop_research(research_name: String, current_user: User, db: DB) -> Result<APIResponse, APIResponse> {
+pub fn stop_research(
+    research_name: String,
+    current_user: User,
+    db: DB,
+) -> Result<APIResponse, APIResponse> {
 
     // Check if there is a research for this research_name
     // Early return if we don't know this research name
-    let research_type = ResearchTypes::from_string(&research_name).or(
-        Err(bad_request().message(format!("No such research type `{}`", research_name).as_str())))?;
+    let research_type = ResearchTypes::from_string(&research_name).or(Err(
+        bad_request()
+            .message(
+                format!("No such research type `{}`", research_name).as_str(),
+            ),
+    ))?;
     // Get user pod and pod queue
     let (pod, queue) = current_user.get_pod_and_queue(&db);
 
@@ -164,17 +186,15 @@ pub fn stop_research(research_name: String, current_user: User, db: DB) -> Resul
         .order(queue_entry_dsl::level.desc())
         .get_result::<QueueEntry>(&*db)
         .or(Err(bad_request().message(
-                    "Can't delete. There is no queue entry for this research.")))?;
+            "Can't delete. There is no queue entry for this research.",
+        )))?;
 
     // Get all needed info for resource manipulation
     let research_list = get_research_list();
     let pod_resources = pod.get_resources(&db);
 
     // Add resources from research to pod resources
-    let all_levels = &research_list
-                          .get(&research_type)
-                          .unwrap()
-                          .levels;
+    let all_levels = &research_list.get(&research_type).unwrap().levels;
     let costs_result = &all_levels[research_entry.level as usize].resources;
 
     if let Some(ref costs) = *costs_result {
@@ -182,10 +202,12 @@ pub fn stop_research(research_name: String, current_user: User, db: DB) -> Resul
     }
 
     // Remove queue_entry from database
-    diesel::delete(queue_entry_dsl::queue_entries
-                       .filter(queue_entry_dsl::id.eq(research_entry.id)))
-            .execute(&*db)
-            .or(Err(internal_server_error()))?;
+    diesel::delete(queue_entry_dsl::queue_entries.filter(
+        queue_entry_dsl::id.eq(
+            research_entry.id,
+        ),
+    )).execute(&*db)
+        .or(Err(internal_server_error()))?;
 
     Ok(accepted().message("Resource removed."))
 }

@@ -18,4 +18,4 @@ pub trait HasDependencies {
 fn dependencies_default() -> Vec<(ResearchTypes, i32)> {
     let dependencies: Vec<(ResearchTypes, i32)> = Vec::new();
     dependencies
-} 
+}
