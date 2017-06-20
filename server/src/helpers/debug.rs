@@ -45,5 +45,5 @@ pub fn create_debug_user() {
         .into(modules::table)
         .execute(&*db)
         .expect("Failed to create module.");
-    pod.update_resources(&db);
+    pod.update_resource_production(&db);
 }

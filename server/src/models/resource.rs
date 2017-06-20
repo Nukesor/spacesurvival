@@ -29,7 +29,7 @@ pub struct Resource {
 
 
 impl Resource {
-    /// This function adds a new pod into the database and returns the model with the
+    /// This function adds resources for every type into the database and returns the model with the
     /// initialized data.
     pub fn create_pod_resources(pod_id: Uuid, db: &DB) {
         let mut resources: Vec<NewResource> = Vec::new();
@@ -57,7 +57,7 @@ impl Resource {
     ///
     /// - The first parameter is a vector of resources which represent the costs.
     /// - The second parameter is a vector of all `Resource` database models from a pod or a base.
-    pub fn check_resources(costs: &Option<Vec<(ResourceTypes, i64)>>,
+    pub fn enough_resources(costs: &Option<Vec<(ResourceTypes, i64)>>,
                            resources: Vec<Resource>,
                            db: &DB)
                            -> bool {

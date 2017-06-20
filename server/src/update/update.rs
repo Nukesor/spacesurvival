@@ -27,6 +27,7 @@ pub fn tick(db: &DB) {
         .filter(queue_entry_dsl::finishes_at.lt(UTC::now()))
         .get_results::<QueueEntry>(&**db);
 
+    // Check for finished research or module tasks in queue.
     if let Ok(finished_entries) = finished_entries_result {
         for entry in finished_entries {
             match entry {
@@ -45,7 +46,7 @@ pub fn tick(db: &DB) {
                                 .filter(pods_dsl::id.eq(pod_id))
                                 .get_result::<Pod>(&**db)
                                 .expect("Failed to get module pod.");
-                            pod.update_resources(&db);
+                            pod.update_resource_production(&db);
                         }
                         _ => (),
                     }

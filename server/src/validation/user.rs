@@ -6,6 +6,7 @@ pub struct UserSerializer {
     pub nickname: String,
     #[validate(email)]
     pub email: String,
+    #[serde(skip_serializing)]
     pub password: String,
 }
 

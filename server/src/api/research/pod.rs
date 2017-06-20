@@ -110,7 +110,6 @@ pub fn start_research(research_name: String,
         .get_result(&*db)
         .unwrap_or(0);
 
-    let pod_resources = pod.get_resources(&db);
     research_level += existing_entries as i32;
 
     let all_levels = &research_list
@@ -126,7 +125,7 @@ pub fn start_research(research_name: String,
     let level_index: usize = (research_level-1) as usize;
     let costs = &all_levels[level_index].resources;
 
-    if costs.is_some() && !Resource::check_resources(costs, pod_resources, &db) {
+    if costs.is_some() && !pod.has_enough_resources(costs, &db) {
         return Err(bad_request().message("Insufficient resources."));
     }
 

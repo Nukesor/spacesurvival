@@ -113,8 +113,7 @@ pub fn add_module(request_data: Result<JSON<NewModuleSerializer>, SerdeError>,
           .levels[0];
 
     // Check if we have enough resources and subtract them.
-    let pod_resources = pod.get_resources(&db);
-    if level.resources.is_some() && !Resource::check_resources(&level.resources, pod_resources, &db) {
+    if level.resources.is_some() && !pod.has_enough_resources(&level.resources, &db) {
         return Err(bad_request().message("Insufficient resources."));
     }
 
@@ -188,8 +187,6 @@ pub fn upgrade_module(module_uuid: String, current_user: User, db: DB) -> Result
 
     // Get all needed info for resource manipulation
     let module_list = get_module_list();
-    let pod_resources = pod.get_resources(&db);
-
     // Add resources from module to pod resources
     let module_type = ModuleTypes::from_string(&module.name)
         .or(Err(internal_server_error()))?;
@@ -206,7 +203,7 @@ pub fn upgrade_module(module_uuid: String, current_user: User, db: DB) -> Result
     let level_index: usize = (level-1) as usize;
     let costs = &all_levels[level_index].resources;
 
-    if costs.is_some() && !Resource::check_resources(costs, pod_resources, &db) {
+    if costs.is_some() && !pod.has_enough_resources(costs, &db) {
         return Err(bad_request().message("Insufficient resources."));
     }
 

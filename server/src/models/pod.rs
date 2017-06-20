@@ -85,7 +85,12 @@ impl Pod {
             .expect("Failed to get user resources.")
     }
 
-    pub fn update_resources(&self, db: &DB) {
+    pub fn has_enough_resources(&self, costs: &Option<Vec<(ResourceTypes, i64)>>, db: &DB) -> bool {
+        let pod_resources = self.get_resources(db);
+        Resource::enough_resources(costs, pod_resources, db)
+    }
+
+    pub fn update_resource_production(&self, db: &DB) {
         let mut resources_production: HashMap<ResourceTypes, i64> = HashMap::new();
         let resources = self.get_resources(db);
         let modules_result = self.get_modules(db);
