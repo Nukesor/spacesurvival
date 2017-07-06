@@ -1,7 +1,7 @@
 use diesel;
 use uuid::Uuid;
 use diesel::prelude::*;
-use chrono::{DateTime, UTC};
+use chrono::{DateTime, Utc};
 
 use data::types::*;
 use helpers::db::DB;
@@ -23,8 +23,8 @@ pub struct Resource {
     pub pod_id: Option<Uuid>,
     pub base_id: Option<Uuid>,
 
-    pub created_at: DateTime<UTC>,
-    pub updated_at: DateTime<UTC>,
+    pub created_at: DateTime<Utc>,
+    pub updated_at: DateTime<Utc>,
 }
 
 

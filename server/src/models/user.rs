@@ -1,5 +1,5 @@
 use uuid::Uuid;
-use chrono::{DateTime, UTC, Duration};
+use chrono::{DateTime, Utc, Duration};
 use argon2rs::argon2i_simple;
 use ring::constant_time::verify_slices_are_equal;
 
@@ -28,9 +28,9 @@ pub struct User {
     pub password_hash: Vec<u8>,
     pub current_auth_token: Option<String>,
 
-    pub last_action: Option<DateTime<UTC>>,
-    pub created_at: DateTime<UTC>,
-    pub updated_at: DateTime<UTC>,
+    pub last_action: Option<DateTime<Utc>>,
+    pub created_at: DateTime<Utc>,
+    pub updated_at: DateTime<Utc>,
 }
 
 
@@ -101,7 +101,7 @@ impl User {
     pub fn generate_auth_token(&mut self, conn: &PgConnection) -> Result<String, APIResponse> {
         let new_auth_token = Uuid::new_v4().hyphenated().to_string();
         self.current_auth_token = Some(new_auth_token.clone());
-        self.last_action = Some(UTC::now());
+        self.last_action = Some(Utc::now());
         self.save_changes::<User>(conn).or(
             Err(internal_server_error()),
         )?;
@@ -114,7 +114,7 @@ impl User {
 
     /// Return whether or not the user has a valid auth token.
     pub fn has_valid_auth_token(&self, auth_token_timeout: Duration) -> bool {
-        let latest_valid_date = UTC::now() - auth_token_timeout;
+        let latest_valid_date = Utc::now() - auth_token_timeout;
         if let Some(last_action) = self.last_action {
             if self.current_auth_token.is_some() {
                 last_action > latest_valid_date

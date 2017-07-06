@@ -1,6 +1,6 @@
 use diesel;
 use diesel::prelude::*;
-use chrono::UTC;
+use chrono::Utc;
 
 use helpers::db::DB;
 
@@ -24,7 +24,7 @@ use schema::queue_entries::dsl as queue_entry_dsl;
 pub fn tick(db: &DB) {
 
     let finished_entries_result = queue_entry_dsl::queue_entries
-        .filter(queue_entry_dsl::finishes_at.lt(UTC::now()))
+        .filter(queue_entry_dsl::finishes_at.lt(Utc::now()))
         .get_results::<QueueEntry>(&**db);
 
     // Check for finished research or module tasks in queue.

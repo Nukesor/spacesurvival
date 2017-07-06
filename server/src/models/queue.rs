@@ -1,7 +1,7 @@
 use diesel;
 use diesel::prelude::*;
 use uuid::Uuid;
-use chrono::{DateTime, UTC, Duration};
+use chrono::{DateTime, Utc, Duration};
 
 use helpers::db::DB;
 
@@ -12,14 +12,13 @@ use schema::queue_entries::dsl as queue_entry_dsl;
 #[derive(Debug, Serialize, Deserialize, Identifiable, Queryable, Associations)]
 #[belongs_to(pods)]
 #[belongs_to(bases)]
-#[has_many(queue_entries)]
 pub struct Queue {
     pub id: Uuid,
     pub pod_id: Option<Uuid>,
     pub base_id: Option<Uuid>,
     pub slots: i32,
-    pub created_at: DateTime<UTC>,
-    pub updated_at: DateTime<UTC>,
+    pub created_at: DateTime<Utc>,
+    pub updated_at: DateTime<Utc>,
 }
 
 
@@ -69,7 +68,7 @@ impl Queue {
 
         if let Ok(entry) = queue_entry_result {
             if entry.finishes_at.is_none() {
-                let finishes_at = UTC::now() + Duration::seconds(entry.duration);
+                let finishes_at = Utc::now() + Duration::seconds(entry.duration);
                 diesel::update(queue_entry_dsl::queue_entries.filter(
                     queue_entry_dsl::id.eq(
                         entry.id,
@@ -103,9 +102,9 @@ pub struct QueueEntry {
     pub research_name: Option<String>,
     pub level: i32,
     pub duration: i64,
-    pub finishes_at: Option<DateTime<UTC>>,
-    pub updated_at: DateTime<UTC>,
-    pub created_at: DateTime<UTC>,
+    pub finishes_at: Option<DateTime<Utc>>,
+    pub updated_at: DateTime<Utc>,
+    pub created_at: DateTime<Utc>,
 }
 
 

@@ -3,7 +3,7 @@ use std::collections::HashMap;
 use diesel;
 use diesel::prelude::*;
 use uuid::Uuid;
-use chrono::{DateTime, UTC, Duration};
+use chrono::{DateTime, Utc, Duration};
 
 use data::types::*;
 use data::modules::get_module_list;
@@ -13,7 +13,7 @@ use models::module::Module;
 use models::resource::Resource;
 use models::research::Research;
 
-use schema::{pods, modules, researches, resources};
+use schema::pods;
 use schema::modules::dsl as module_dsl;
 use schema::resources::dsl as resource_dsl;
 use schema::researches::dsl as research_dsl;
@@ -22,16 +22,13 @@ use schema::researches::dsl as research_dsl;
 #[derive(Debug, Serialize, Deserialize, Identifiable, Queryable, Associations, AsChangeset)]
 #[belongs_to(users)]
 #[belongs_to(bases)]
-#[has_many(modules)]
-#[has_many(researches)]
-#[has_many(resources)]
 pub struct Pod {
     pub name: String,
     pub id: Uuid,
     pub user_id: Uuid,
     pub base_id: Option<Uuid>,
-    pub created_at: DateTime<UTC>,
-    pub updated_at: DateTime<UTC>,
+    pub created_at: DateTime<Utc>,
+    pub updated_at: DateTime<Utc>,
 }
 
 
@@ -125,7 +122,7 @@ impl Pod {
                 match resources_production.get(&resource_type) {
                     Some(amount) => {
                         let elapsed_time: Duration =
-                            UTC::now().signed_duration_since(resource.updated_at);
+                            Utc::now().signed_duration_since(resource.updated_at);
                         let produced_since_last_update: i64 =
                             (resource.production * elapsed_time.num_milliseconds()) / 60 / 60 /
                                 1000;

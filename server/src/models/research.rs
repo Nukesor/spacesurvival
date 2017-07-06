@@ -1,7 +1,7 @@
 use diesel;
 use diesel::prelude::*;
 use uuid::Uuid;
-use chrono::{DateTime, UTC};
+use chrono::{DateTime, Utc};
 
 use helpers::db::DB;
 
@@ -19,8 +19,8 @@ pub struct Research {
     pub id: Uuid,
     pub pod_id: Option<Uuid>,
     pub base_id: Option<Uuid>,
-    pub created_at: DateTime<UTC>,
-    pub updated_at: DateTime<UTC>,
+    pub created_at: DateTime<Utc>,
+    pub updated_at: DateTime<Utc>,
 }
 
 impl Research {
