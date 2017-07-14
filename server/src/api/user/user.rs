@@ -1,7 +1,7 @@
 use diesel;
 use diesel::prelude::*;
 use validator::Validate;
-use rocket_contrib::{JSON, SerdeError};
+use rocket_contrib::{Json, SerdeError};
 
 use helpers::db::DB;
 use helpers::request::validate_json;
@@ -24,7 +24,7 @@ pub fn info(current_user: User) -> APIResponse {
 /// Needs a unique nickname, unique email and password.
 #[post("/register", data = "<user_data>", format = "application/json")]
 pub fn register(
-    user_data: Result<JSON<UserSerializer>, SerdeError>,
+    user_data: Result<Json<UserSerializer>, SerdeError>,
     db: DB,
 ) -> Result<APIResponse, APIResponse> {
 
@@ -65,7 +65,7 @@ pub fn register(
 #[post("/settings", data = "<user_data>", format = "application/json")]
 pub fn settings(
     current_user: User,
-    user_data: Result<JSON<UserSettingsSerializer>, SerdeError>,
+    user_data: Result<Json<UserSettingsSerializer>, SerdeError>,
     db: DB,
 ) -> Result<APIResponse, APIResponse> {
 

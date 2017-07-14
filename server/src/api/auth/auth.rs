@@ -1,6 +1,6 @@
 use diesel::prelude::*;
 use rocket::State;
-use rocket_contrib::{JSON, SerdeError};
+use rocket_contrib::{Json, SerdeError};
 
 use helpers::db::DB;
 use helpers::request::validate_json;
@@ -18,7 +18,7 @@ use schema::users::dsl::*;
 /// We try to get the user by searching email and nickname for the given identifier.
 #[post("/login", data = "<user_data>", format = "application/json")]
 pub fn login(
-    user_data: Result<JSON<LoginSerializer>, SerdeError>,
+    user_data: Result<Json<LoginSerializer>, SerdeError>,
     rconfig: State<RuntimeConfig>,
     db: DB,
 ) -> Result<APIResponse, APIResponse> {

@@ -1,5 +1,5 @@
 use diesel::prelude::*;
-use rocket_contrib::{JSON, SerdeError};
+use rocket_contrib::{Json, SerdeError};
 
 use helpers::db::DB;
 use helpers::request::validate_json;
@@ -13,7 +13,7 @@ use models::user::User;
 /// Endpoint for setting different values for your pod
 #[post("/settings", data = "<pod_data>", format = "application/json")]
 pub fn settings(
-    pod_data: Result<JSON<PodSettingsSerializer>, SerdeError>,
+    pod_data: Result<Json<PodSettingsSerializer>, SerdeError>,
     current_user: User,
     db: DB,
 ) -> Result<APIResponse, APIResponse> {

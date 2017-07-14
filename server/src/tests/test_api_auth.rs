@@ -12,7 +12,7 @@ describe! auth_tests {
     describe! status {
         before_each {
             let mut req = MockRequest::new(Method::Post, "/api/user/register")
-                .header(ContentType::JSON)
+                .header(ContentType::Json)
                 .body(r#"{
                       "email": "admin",
                       "nickname": "hunter",

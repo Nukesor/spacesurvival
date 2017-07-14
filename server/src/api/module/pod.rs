@@ -1,6 +1,6 @@
 use diesel;
 use diesel::prelude::*;
-use rocket_contrib::{JSON, SerdeError};
+use rocket_contrib::{Json, SerdeError};
 use uuid::Uuid;
 
 use data::types::*;
@@ -47,11 +47,11 @@ pub fn get_modules(current_user: User, db: DB) -> Result<APIResponse, APIRespons
 /// - Creates a new queue entry for this research
 #[post("/pod/new", data = "<request_data>", format = "application/json")]
 pub fn add_module(
-    request_data: Result<JSON<NewModuleSerializer>, SerdeError>,
+    request_data: Result<Json<NewModuleSerializer>, SerdeError>,
     current_user: User,
     db: DB,
 ) -> Result<APIResponse, APIResponse> {
-    // Unwrap or return specific error if invalid JSON has been sent.
+    // Unwrap or return specific error if invalid Json has been sent.
     let module_data = validate_json(request_data)?;
 
     // Check if the given module name maps to a module type.
