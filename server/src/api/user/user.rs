@@ -1,12 +1,10 @@
 use diesel;
 use diesel::prelude::*;
-use validator::Validate;
-use rocket_contrib::{Json, SerdeError};
+use rocket_contrib::Json;
 
 use helpers::db::DB;
-use helpers::request::validate_json;
 use validation::user::{UserSerializer, UserSettingsSerializer};
-use responses::{APIResponse, ok, created, conflict, bad_request, forbidden, unauthorized,
+use responses::{APIResponse, ok, created, conflict, forbidden, unauthorized,
                 internal_server_error};
 
 use models::user::{User, ChangedUser};
@@ -22,16 +20,11 @@ pub fn info(current_user: User) -> APIResponse {
 /// Endpoint for registering a new User.
 ///
 /// Needs a unique nickname, unique email and password.
-#[post("/register", data = "<user_data>", format = "application/json")]
+#[post("/register", data = "<data>", format = "application/json")]
 pub fn register(
-    user_data: Result<Json<UserSerializer>, SerdeError>,
+    data: Json<UserSerializer>,
     db: DB,
 ) -> Result<APIResponse, APIResponse> {
-
-    let data = validate_json(user_data)?;
-    data.validate().or(Err(
-        bad_request().message("Invalid user data"),
-    ))?;
 
     // Check for existing user email
     users
@@ -62,14 +55,12 @@ pub fn register(
 }
 
 
-#[post("/settings", data = "<user_data>", format = "application/json")]
+#[post("/settings", data = "<data>", format = "application/json")]
 pub fn settings(
     current_user: User,
-    user_data: Result<Json<UserSettingsSerializer>, SerdeError>,
+    data: Json<UserSettingsSerializer>,
     db: DB,
 ) -> Result<APIResponse, APIResponse> {
-
-    let data = validate_json(user_data)?;
     let mut new_password_hash: Option<Vec<u8>> = None;
     // Check if a new password is provided.
     // In case it is, we want the old password to verify the identity of the client.
