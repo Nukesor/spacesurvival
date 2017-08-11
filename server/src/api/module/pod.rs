@@ -1,13 +1,12 @@
 use diesel;
 use diesel::prelude::*;
-use rocket_contrib::{Json, SerdeError};
+use rocket_contrib::Json;
 use uuid::Uuid;
 
 use data::types::*;
 use data::modules::get_module_list;
 use data::helper::{get_module_dependency_strings, dependencies_fulfilled};
 use helpers::db::DB;
-use helpers::request::validate_json;
 use responses::{APIResponse, accepted, bad_request, created, ok, internal_server_error};
 use validation::queue::NewModuleSerializer;
 
@@ -45,15 +44,12 @@ pub fn get_modules(current_user: User, db: DB) -> Result<APIResponse, APIRespons
 /// - Checks if there are enough resources
 /// - Removes resources from db
 /// - Creates a new queue entry for this research
-#[post("/pod/new", data = "<request_data>", format = "application/json")]
+#[post("/pod/new", data = "<module_data>", format = "application/json")]
 pub fn add_module(
-    request_data: Result<Json<NewModuleSerializer>, SerdeError>,
+    module_data: Json<NewModuleSerializer>,
     current_user: User,
     db: DB,
 ) -> Result<APIResponse, APIResponse> {
-    // Unwrap or return specific error if invalid Json has been sent.
-    let module_data = validate_json(request_data)?;
-
     // Check if the given module name maps to a module type.
     let result = ModuleTypes::from_string(&module_data.module_type);
     let module_type = result.or(Err(bad_request().message(
