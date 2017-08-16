@@ -1,13 +1,11 @@
 use diesel;
 use diesel::prelude::*;
-use validator::Validate;
 use rocket_contrib::{Json, SerdeError};
 
 use helpers::db::DB;
 use helpers::request::validate_json;
 use validation::user::{UserSerializer, UserSettingsSerializer};
-use responses::{APIResponse, ok, created, conflict, bad_request, forbidden, unauthorized,
-                internal_server_error};
+use responses::{APIResponse, ok, created, conflict, forbidden, unauthorized, internal_server_error};
 
 use models::user::{User, ChangedUser};
 use schema::users::dsl::*;
@@ -29,9 +27,6 @@ pub fn register(
 ) -> Result<APIResponse, APIResponse> {
 
     let data = validate_json(user_data)?;
-    data.validate().or(Err(
-        bad_request().message("Invalid user data"),
-    ))?;
 
     // Check for existing user email
     users

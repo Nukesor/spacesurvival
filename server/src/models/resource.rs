@@ -116,7 +116,7 @@ impl Resource {
                 // There is no resource for this resource_type,
                 // thereby it's not enough.
                 // There is a resource for this resource type
-                Some(mut resource) => {
+                Some(resource) => {
                     resource.update_resource(amount, subtract, db);
                 }
                 None => (),

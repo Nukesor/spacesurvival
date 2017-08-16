@@ -1,4 +1,5 @@
 use std::io::Cursor;
+use std::collections::HashMap;
 use rocket_contrib::Value;
 use rocket::request::Request;
 use rocket::response::{Response, Responder};
@@ -27,6 +28,14 @@ impl APIResponse {
     pub fn message(mut self, message: &str) -> APIResponse {
         self.data = json!({
             "message": message
+        });
+        self
+    }
+
+    /// Convenience method to set return an Array of errors.
+    pub fn errors(mut self, errors: HashMap<&str, String>) -> APIResponse {
+        self.data = json!({
+            "errors": errors 
         });
         self
     }
