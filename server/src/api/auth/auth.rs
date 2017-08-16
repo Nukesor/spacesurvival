@@ -1,8 +1,9 @@
 use diesel::prelude::*;
 use rocket::State;
-use rocket_contrib::Json;
+use rocket_contrib::{Json, SerdeError};
 
 use helpers::db::DB;
+use helpers::request::validate_json;
 use responses::{APIResponse, ok, unauthorized};
 use validation::user::LoginSerializer;
 use RuntimeConfig;
@@ -15,12 +16,14 @@ use schema::users::dsl::*;
 ///
 /// Check if we can login with the credentials.
 /// We try to get the user by searching email and nickname for the given identifier.
-#[post("/login", data = "<user_login>", format = "application/json")]
+#[post("/login", data = "<user_data>", format = "application/json")]
 pub fn login(
-    user_login: Json<LoginSerializer>,
+    user_data: Result<Json<LoginSerializer>, SerdeError>,
     rconfig: State<RuntimeConfig>,
     db: DB,
 ) -> Result<APIResponse, APIResponse> {
+
+    let user_login = validate_json(user_data)?;
 
     // Check if the identifier is a nickname.
     let mut user_result = users
