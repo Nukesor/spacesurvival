@@ -26,19 +26,24 @@ impl APIResponse {
 
     /// Convenience method to set `self.data` to `{"message": message}`.
     pub fn message(mut self, message: &str) -> APIResponse {
-        self.data = json!({
-            "message": message
-        });
+        self.data = json!({"message": message});
         self
     }
 
     /// Convenience method to set return an Array of errors.
     pub fn errors(mut self, errors: HashMap<&str, String>) -> APIResponse {
-        self.data = json!({
-            "errors": errors 
-        });
+        self.data = json!({"errors": errors});
         self
     }
+
+    /// Convenience method to return a single error.
+    pub fn error(mut self, key: &str, error: &str) -> APIResponse {
+        let mut formatted_error = HashMap::new();
+        formatted_error.insert(key, error);
+        self.data = json!({"errors": formatted_error});
+        self
+    }
+
 }
 
 impl<'r> Responder<'r> for APIResponse {

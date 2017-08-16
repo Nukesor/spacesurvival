@@ -36,6 +36,7 @@ pub fn validate_json<T: Validate>(request_data: Result<Json<T>, SerdeError>) -> 
             }
         }
         // Json decoding error, return error message
-        Err(json_error) => return Err(bad_request().message(format!("{}", json_error).as_str())),
+        Err(json_error) => return Err(
+            bad_request().error("json", json_error.to_string().as_str())),
     }
 }

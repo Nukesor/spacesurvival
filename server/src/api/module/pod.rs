@@ -56,7 +56,8 @@ pub fn add_module(
 
     // Check if the given module name maps to a module type.
     let result = ModuleTypes::from_string(&module_data.module_type);
-    let module_type = result.or(Err(bad_request().message(
+    let module_type = result.or(Err(bad_request().error(
+        "module",
         format!("No such module type `{}`", module_data.module_type).as_str(),
     )))?;
     let dependency_strings = get_module_dependency_strings(&module_type);
@@ -91,7 +92,8 @@ pub fn add_module(
 
     // Early return if there already is a module.
     if existing_module != 0 {
-        return Err(bad_request().message(
+        return Err(bad_request().error(
+            "module", 
             "There already is a module at this position.",
         ));
     }
@@ -106,7 +108,7 @@ pub fn add_module(
     let module_list = get_module_list();
     let fulfilled = dependencies_fulfilled(&module_type, dependencies, &module_list);
     if !fulfilled {
-        return Err(bad_request().message("Dependencies not fulfilled."));
+        return Err(bad_request().error("module", "Dependencies not fulfilled."));
     }
 
     // Get cost for level 1
@@ -119,7 +121,7 @@ pub fn add_module(
 
     // Check if we have enough resources and subtract them.
     if level.resources.is_some() && !pod.has_enough_resources(&level.resources, &db) {
-        return Err(bad_request().message("Insufficient resources."));
+        return Err(bad_request().error("module", "Insufficient resources."));
     }
 
     // Create the new module
@@ -163,16 +165,14 @@ pub fn remove_module(
 ) -> Result<APIResponse, APIResponse> {
     // Parse and check if we got a valid id
     let module_id = Uuid::parse_str(&module_uuid.as_str()).or(Err(
-        bad_request().message("Got an invalid uuid"),
+        bad_request().error("module", "Got an invalid uuid"),
     ))?;
 
     // Get the module and get it from the pod to ensure this is a request from
     // the owner of the module
     let pod = current_user.get_pod(&db);
     let module = pod.get_module(module_id, &db).or(
-        Err(bad_request().message(
-            "No module with this id.",
-        )),
+        Err(bad_request().error("module", "No module with this id.")),
     )?;
 
     // Remove queue_entry from database
@@ -192,16 +192,14 @@ pub fn upgrade_module(
 ) -> Result<APIResponse, APIResponse> {
     // Parse and check if we got a valid id
     let module_id = Uuid::parse_str(&module_uuid.as_str()).or(Err(
-        bad_request().message("Got an invalid uuid"),
+        bad_request().error("module", "Got an invalid uuid"),
     ))?;
     let (pod, queue) = current_user.get_pod_and_queue(&db);
 
     // Get the module and get it from the pod to ensure this is a request from
     // the owner of the module
     let module = pod.get_module(module_id, &db).or(
-        Err(bad_request().message(
-            "No module with this id.",
-        )),
+        Err(bad_request().error("module", "No module with this id.")),
     )?;
     let level = module.level + 1;
 
@@ -215,14 +213,14 @@ pub fn upgrade_module(
 
     // Check if there is a next level.
     if level > all_levels.len() as i32 {
-        return Err(bad_request().message("Already at max level"));
+        return Err(bad_request().error("module", "Already at max level"));
     }
 
     let level_index: usize = (level - 1) as usize;
     let costs = &all_levels[level_index].resources;
 
     if costs.is_some() && !pod.has_enough_resources(costs, &db) {
-        return Err(bad_request().message("Insufficient resources."));
+        return Err(bad_request().error("module", "Insufficient resources."));
     }
 
     // Create a new queue entry with the given research type.
@@ -251,7 +249,7 @@ pub fn stop_module_upgrade(
 ) -> Result<APIResponse, APIResponse> {
     // Parse and check if we got a valid id
     let module_id = Uuid::parse_str(&module_uuid.as_str()).or(Err(
-        bad_request().message("Got an invalid uuid"),
+        bad_request().error("module", "Got an invalid uuid"),
     ))?;
     let (pod, queue) = current_user.get_pod_and_queue(&db);
 
@@ -261,7 +259,7 @@ pub fn stop_module_upgrade(
         .filter(queue_entry_dsl::queue_id.eq(queue.id))
         .order(queue_entry_dsl::level.desc())
         .first::<QueueEntry>(&*db)
-        .or(Err(bad_request().message("No queue entry with this id.")))?;
+        .or(Err(bad_request().error("module", "No queue entry with this id.")))?;
 
     // Get the module and get it from the pod to ensure this is a request from
     // the owner of the module

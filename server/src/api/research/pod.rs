@@ -31,7 +31,7 @@ pub fn get_researches(current_user: User, db: DB) -> Result<APIResponse, APIResp
     for research in researches {
         let research_type = ResearchTypes::from_string(&research.name).or(Err(
             bad_request()
-                .message(
+                .error("research",
                     format!(
                         "Found research {}, but no matching ResearchType!",
                         research.name
@@ -43,7 +43,8 @@ pub fn get_researches(current_user: User, db: DB) -> Result<APIResponse, APIResp
             list_entry.current_level = research.level;
         } else {
             return Err(
-                bad_request().message(
+                bad_request()
+                .error("research",
                     format!(
                         "Found type {}, but no matching entry in our research list!",
                         research_type
@@ -72,7 +73,7 @@ pub fn start_research(
     // Early return if we don't know this research name
     let research_type = ResearchTypes::from_string(&research_name).or(Err(
         bad_request()
-            .message(
+            .error("research",
                 format!("No such research type `{}`", research_name).as_str(),
             ),
     ))?;
@@ -95,7 +96,7 @@ pub fn start_research(
 
         let fulfilled = dependencies_fulfilled(&research_type, dependencies, &research_list);
         if !fulfilled {
-            return Err(bad_request().message("Dependencies not fulfilled."));
+            return Err(bad_request().error("research", "Dependencies not fulfilled."));
         }
         // Create a new module in the
         let new_research = NewResearch {
@@ -133,14 +134,14 @@ pub fn start_research(
         .levels;
 
     if research_level > all_levels.len() as i32 {
-        return Err(bad_request().message("Already at max level."));
+        return Err(bad_request().error("research", "Already at max level."));
     }
 
     let level_index: usize = (research_level - 1) as usize;
     let costs = &all_levels[level_index].resources;
 
     if costs.is_some() && !pod.has_enough_resources(costs, &db) {
-        return Err(bad_request().message("Insufficient resources."));
+        return Err(bad_request().error("research", "Insufficient resources."));
     }
 
     // Create a new queue entry with the given research type.
@@ -171,7 +172,7 @@ pub fn stop_research(
     // Early return if we don't know this research name
     let research_type = ResearchTypes::from_string(&research_name).or(Err(
         bad_request()
-            .message(
+            .error("research",
                 format!("No such research type `{}`", research_name).as_str(),
             ),
     ))?;
@@ -185,7 +186,7 @@ pub fn stop_research(
         .filter(queue_entry_dsl::research_name.eq(research_type.to_string()))
         .order(queue_entry_dsl::level.desc())
         .get_result::<QueueEntry>(&*db)
-        .or(Err(bad_request().message(
+        .or(Err(bad_request().error("research",
             "Can't delete. There is no queue entry for this research.",
         )))?;
 
