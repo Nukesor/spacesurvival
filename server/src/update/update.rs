@@ -74,9 +74,9 @@ pub fn tick(db: &DB) {
         }
     }
 
-    let pods = pod_dsl::pods
-        .get_results::<Pod>(&**db)
-        .expect("No Pods in database.");
+    let pods = pod_dsl::pods.get_results::<Pod>(&**db).expect(
+        "No Pods in database.",
+    );
 
     for pod in pods {
         pod.update_resources(&*db);

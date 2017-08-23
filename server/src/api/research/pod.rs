@@ -31,7 +31,8 @@ pub fn get_researches(current_user: User, db: DB) -> Result<APIResponse, APIResp
     for research in researches {
         let research_type = ResearchTypes::from_string(&research.name).or(Err(
             bad_request()
-                .error("research",
+                .error(
+                    "research",
                     format!(
                         "Found research {}, but no matching ResearchType!",
                         research.name
@@ -43,8 +44,8 @@ pub fn get_researches(current_user: User, db: DB) -> Result<APIResponse, APIResp
             list_entry.current_level = research.level;
         } else {
             return Err(
-                bad_request()
-                .error("research",
+                bad_request().error(
+                    "research",
                     format!(
                         "Found type {}, but no matching entry in our research list!",
                         research_type
@@ -73,7 +74,8 @@ pub fn start_research(
     // Early return if we don't know this research name
     let research_type = ResearchTypes::from_string(&research_name).or(Err(
         bad_request()
-            .error("research",
+            .error(
+                "research",
                 format!("No such research type `{}`", research_name).as_str(),
             ),
     ))?;
@@ -96,7 +98,10 @@ pub fn start_research(
 
         let fulfilled = dependencies_fulfilled(&research_type, dependencies, &research_list);
         if !fulfilled {
-            return Err(bad_request().error("research", "Dependencies not fulfilled."));
+            return Err(bad_request().error(
+                "research",
+                "Dependencies not fulfilled.",
+            ));
         }
         // Create a new module in the
         let new_research = NewResearch {
@@ -172,7 +177,8 @@ pub fn stop_research(
     // Early return if we don't know this research name
     let research_type = ResearchTypes::from_string(&research_name).or(Err(
         bad_request()
-            .error("research",
+            .error(
+                "research",
                 format!("No such research type `{}`", research_name).as_str(),
             ),
     ))?;
@@ -186,7 +192,8 @@ pub fn stop_research(
         .filter(queue_entry_dsl::research_name.eq(research_type.to_string()))
         .order(queue_entry_dsl::level.desc())
         .get_result::<QueueEntry>(&*db)
-        .or(Err(bad_request().error("research",
+        .or(Err(bad_request().error(
+            "research",
             "Can't delete. There is no queue entry for this research.",
         )))?;
 

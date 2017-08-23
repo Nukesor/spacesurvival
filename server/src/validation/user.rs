@@ -6,10 +6,8 @@ pub struct UserSerializer {
     pub nickname: String,
     #[validate(email(message = "Invalid email"))]
     pub email: String,
-    #[validate(length(
-            min = "5", max = "120",
-            message = "Passwords has to have between 5 and 120 characters"
-    ))]
+    #[validate(length(min = "5", max = "120",
+                        message = "Passwords has to have between 5 and 120 characters"))]
     #[serde(skip_serializing)]
     pub password: String,
 }
@@ -28,9 +26,7 @@ pub struct UserSettingsSerializer {
     #[validate(email(message = "Invalid email"))]
     pub email: Option<String>,
     pub password: Option<String>,
-    #[validate(length(
-            min = "5", max = "120",
-            message = "Passwords has to have between 5 and 120 characters"
-    ))]
+    #[validate(length(min = "5", max = "120",
+                        message = "Passwords has to have between 5 and 120 characters"))]
     pub new_password: Option<String>,
 }

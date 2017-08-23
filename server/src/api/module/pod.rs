@@ -93,7 +93,7 @@ pub fn add_module(
     // Early return if there already is a module.
     if existing_module != 0 {
         return Err(bad_request().error(
-            "module", 
+            "module",
             "There already is a module at this position.",
         ));
     }
@@ -165,15 +165,19 @@ pub fn remove_module(
 ) -> Result<APIResponse, APIResponse> {
     // Parse and check if we got a valid id
     let module_id = Uuid::parse_str(&module_uuid.as_str()).or(Err(
-        bad_request().error("module", "Got an invalid uuid"),
+        bad_request().error(
+            "module",
+            "Got an invalid uuid",
+        ),
     ))?;
 
     // Get the module and get it from the pod to ensure this is a request from
     // the owner of the module
     let pod = current_user.get_pod(&db);
-    let module = pod.get_module(module_id, &db).or(
-        Err(bad_request().error("module", "No module with this id.")),
-    )?;
+    let module = pod.get_module(module_id, &db).or(Err(bad_request().error(
+        "module",
+        "No module with this id.",
+    )))?;
 
     // Remove queue_entry from database
     diesel::delete(module_dsl::modules.filter(module_dsl::id.eq(module.id)))
@@ -192,15 +196,19 @@ pub fn upgrade_module(
 ) -> Result<APIResponse, APIResponse> {
     // Parse and check if we got a valid id
     let module_id = Uuid::parse_str(&module_uuid.as_str()).or(Err(
-        bad_request().error("module", "Got an invalid uuid"),
+        bad_request().error(
+            "module",
+            "Got an invalid uuid",
+        ),
     ))?;
     let (pod, queue) = current_user.get_pod_and_queue(&db);
 
     // Get the module and get it from the pod to ensure this is a request from
     // the owner of the module
-    let module = pod.get_module(module_id, &db).or(
-        Err(bad_request().error("module", "No module with this id.")),
-    )?;
+    let module = pod.get_module(module_id, &db).or(Err(bad_request().error(
+        "module",
+        "No module with this id.",
+    )))?;
     let level = module.level + 1;
 
     // Get all needed info for resource manipulation
@@ -249,7 +257,10 @@ pub fn stop_module_upgrade(
 ) -> Result<APIResponse, APIResponse> {
     // Parse and check if we got a valid id
     let module_id = Uuid::parse_str(&module_uuid.as_str()).or(Err(
-        bad_request().error("module", "Got an invalid uuid"),
+        bad_request().error(
+            "module",
+            "Got an invalid uuid",
+        ),
     ))?;
     let (pod, queue) = current_user.get_pod_and_queue(&db);
 
@@ -259,7 +270,10 @@ pub fn stop_module_upgrade(
         .filter(queue_entry_dsl::queue_id.eq(queue.id))
         .order(queue_entry_dsl::level.desc())
         .first::<QueueEntry>(&*db)
-        .or(Err(bad_request().error("module", "No queue entry with this id.")))?;
+        .or(Err(bad_request().error(
+            "module",
+            "No queue entry with this id.",
+        )))?;
 
     // Get the module and get it from the pod to ensure this is a request from
     // the owner of the module

@@ -37,7 +37,7 @@ impl Resource {
             resources.push(NewResource {
                 name: resource.to_string(),
                 amount: 100,
-                max_amount: 5000*1000*1000,
+                max_amount: 5000 * 1000 * 1000,
 
                 pod_id: Some(pod_id),
                 base_id: None,
