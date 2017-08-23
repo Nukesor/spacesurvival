@@ -9,7 +9,7 @@ use models::module::Module;
 use models::research::Research;
 use models::queue::{Queue, QueueEntry};
 
-use schema::pods::dsl as pods_dsl;
+use schema::pods::dsl as pod_dsl;
 use schema::modules::dsl as module_dsl;
 use schema::researches::dsl as research_dsl;
 use schema::queues::dsl as queue_dsl;
@@ -43,8 +43,8 @@ pub fn tick(db: &DB) {
                     // Update resources in pod or base
                     match module {
                         Module { pod_id: Some(pod_id), .. } => {
-                            let pod = pods_dsl::pods
-                                .filter(pods_dsl::id.eq(pod_id))
+                            let pod = pod_dsl::pods
+                                .filter(pod_dsl::id.eq(pod_id))
                                 .get_result::<Pod>(&**db)
                                 .expect("Failed to get module pod.");
                             pod.update_resource_production(&db);
@@ -72,5 +72,13 @@ pub fn tick(db: &DB) {
                 .unwrap();
             queue.remove_entry(entry.id, db)
         }
+    }
+
+    let pods = pod_dsl::pods
+        .get_results::<Pod>(&**db)
+        .expect("No Pods in database.");
+
+    for pod in pods {
+        pod.update_resources(&*db);
     }
 }

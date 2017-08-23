@@ -278,7 +278,7 @@ pub fn stop_module_upgrade(
     // Refund resources
     let pod_resources = pod.get_resources(&db);
     if let Some(ref costs) = *costs_result {
-        Resource::update_resources(costs, pod_resources, false, &db);
+        Resource::change_resources(costs, pod_resources, false, &db);
     }
 
     queue.remove_entry(queue_entry.id, &db);

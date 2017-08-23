@@ -37,7 +37,7 @@ impl Resource {
             resources.push(NewResource {
                 name: resource.to_string(),
                 amount: 100,
-                max_amount: 5000,
+                max_amount: 5000*1000*1000,
 
                 pod_id: Some(pod_id),
                 base_id: None,
@@ -86,7 +86,7 @@ impl Resource {
                         }
                     }
                 }
-                Resource::update_resources(costs, resources, true, db);
+                Resource::change_resources(costs, resources, true, db);
                 return true;
             }
         }
@@ -99,7 +99,7 @@ impl Resource {
     /// - The first parameter is a vector of resources which represent the costs.
     /// - The second parameter is a vector of all `Resource` database models from a pod or a base.
     /// - The third parameter decides if the amount is to be added or subtracted.
-    pub fn update_resources(
+    pub fn change_resources(
         costs: &Vec<(ResourceTypes, i64)>,
         mut resources: Vec<Resource>,
         subtract: bool,
@@ -117,7 +117,7 @@ impl Resource {
                 // thereby it's not enough.
                 // There is a resource for this resource type
                 Some(resource) => {
-                    resource.update_resource(amount, subtract, db);
+                    resource.change_resource(amount, subtract, db);
                 }
                 None => (),
             }
@@ -129,7 +129,7 @@ impl Resource {
     ///
     /// - The first parameter is the amount to be added or subtracted.
     /// - The second parameter decides if the amount is to be added or subtracted.
-    pub fn update_resource(&mut self, amount: i64, subtract: bool, db: &DB) {
+    pub fn change_resource(&mut self, amount: i64, subtract: bool, db: &DB) {
         let mut new_amount: i64;
         if subtract {
             new_amount = self.amount - amount;

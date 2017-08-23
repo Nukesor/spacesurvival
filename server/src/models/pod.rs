@@ -88,14 +88,16 @@ impl Pod {
     }
 
     pub fn update_resource_production(&self, db: &DB) {
+        // Create a map to save the resource production.
         let mut resources_production: HashMap<ResourceTypes, i64> = HashMap::new();
+        // Get all resources and all modules
         let resources = self.get_resources(db);
         let modules_result = self.get_modules(db);
         if let Ok(modules) = modules_result {
             let module_list = get_module_list();
             for module in modules {
-                let module_type =
-                    ModuleTypes::from_string(&module.name).expect("Missing module type");
+                // Get all modules information to compute the current resource production
+                let module_type = ModuleTypes::from_string(&module.name).expect("Missing module type");
                 let level = &module_list
                     .get(&module_type)
                     .as_ref()
@@ -117,16 +119,17 @@ impl Pod {
                     *resources_production.entry(resource_type).or_insert(0) -= amount;
                 }
             }
+
             for mut resource in resources {
                 let resource_type = ResourceTypes::from_string(&resource.name).unwrap();
                 match resources_production.get(&resource_type) {
+                    // Calculate produced amount.
                     Some(amount) => {
                         let elapsed_time: Duration =
                             Utc::now().signed_duration_since(resource.updated_at);
                         let produced_since_last_update: i64 =
-                            (resource.production * elapsed_time.num_milliseconds()) / 60 / 60 /
-                                1000;
-                        resource.update_resource(produced_since_last_update, false, db);
+                            (resource.production * elapsed_time.num_milliseconds()) / 60 / 60 / 1000;
+                        resource.change_resource(produced_since_last_update, false, db);
                         diesel::update(resource_dsl::resources.filter(
                             resource_dsl::id.eq(resource.id),
                         )).set(resource_dsl::production.eq(amount))
@@ -136,6 +139,17 @@ impl Pod {
                     None => (),
                 }
             }
+        }
+    }
+
+    pub fn update_resources(&self, db: &DB) {
+        let resources = self.get_resources(db);
+        for mut resource in resources {
+            let elapsed_time: Duration =
+                Utc::now().signed_duration_since(resource.updated_at);
+            let produced_since_last_update: i64 =
+                (resource.production * elapsed_time.num_milliseconds()) / 60 / 60 / 1000;
+            resource.change_resource(produced_since_last_update, false, db);
         }
     }
 }

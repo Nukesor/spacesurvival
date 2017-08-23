@@ -199,7 +199,7 @@ pub fn stop_research(
     let costs_result = &all_levels[research_entry.level as usize].resources;
 
     if let Some(ref costs) = *costs_result {
-        Resource::update_resources(costs, pod_resources, false, &db);
+        Resource::change_resources(costs, pod_resources, false, &db);
     }
 
     // Remove queue_entry from database

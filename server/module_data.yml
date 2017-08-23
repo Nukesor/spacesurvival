@@ -44,9 +44,9 @@ PlasmaGenerator:
         - ["Iron", 200]
         - ["Water", 100]
       generates:
-        - ["Water", 200]
+        - ["Water", 200000000]
       consumes:
-        - ["Iron", 10]
+        - ["Iron", 10000000]
 
     - level: 2
       time: 30
