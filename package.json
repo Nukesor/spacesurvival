@@ -1,6 +1,7 @@
 {
   "name": "spacesurvival",
   "dependencies": {
+    "elm": "^0.18.0",
     "elm-css": "^0.6.0"
   },
   "devDependencies": {},
