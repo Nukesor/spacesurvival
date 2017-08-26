@@ -2,7 +2,7 @@ module Update exposing (..)
 
 import Animation
 import Api.Auth
-import Api.Modules exposing (startBuilding)
+import Api.Modules exposing (fetchGridModules, startBuilding)
 import Api.Queue exposing (fetchQueue)
 import Api.Research exposing (fetchResearches, startResearching)
 import Api.Resources
@@ -122,7 +122,7 @@ update msg model =
 
                 commands =
                     if model.queue /= updatedQueue then
-                        [ fetchQueue model ]
+                        [ fetchQueue model, fetchGridModules model ]
                     else
                         []
             in
