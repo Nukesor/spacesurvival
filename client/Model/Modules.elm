@@ -1,7 +1,7 @@
 module Model.Modules exposing (..)
 
 import Dict
-import Model.Research exposing (ResearchId, ResourceId)
+import Model.Research exposing (ResearchId, ResourceId, dependencyFulfilled)
 
 
 type alias SlotEntry =
@@ -47,3 +47,13 @@ type alias Shoots =
 
 type alias UserModules =
     {}
+
+
+buildableModules : Model.Research.Researches -> AvailableModules -> AvailableModules
+buildableModules researches modules =
+    Dict.filter (\key mod -> isBuildable researches mod) modules
+
+
+isBuildable : Model.Research.Researches -> ModuleType -> Bool
+isBuildable researches mod =
+    List.all (dependencyFulfilled researches) mod.dependencies

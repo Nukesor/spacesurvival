@@ -8,7 +8,7 @@ import Html.CssHelpers
 import Html.Events exposing (..)
 import Messages
 import Model
-import Model.Modules exposing (ModuleType)
+import Model.Modules exposing (ModuleType, buildableModules)
 import Model.Util
 
 
@@ -20,6 +20,7 @@ view model =
                 [ ul
                     [ helpers.class [ BuildItemList ] ]
                     (model.availableModules
+                        |> buildableModules model.researches
                         |> Dict.map (buildItem point)
                         |> Dict.values
                     )
