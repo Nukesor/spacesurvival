@@ -137,7 +137,7 @@ update msg model =
                 |> withDefault (model ! [])
 
         StartBuilding id point ->
-            model ! [ startBuilding model id point ]
+            { model | buildingAt = Nothing } ! [ startBuilding model id point ]
 
 
 logout : Model -> Model
