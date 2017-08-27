@@ -1,6 +1,7 @@
 module Model.Grid exposing (..)
 
 import Array
+import Extra.Maybe exposing (isJust)
 import List
 import Model.Modules exposing (..)
 import Model.Util exposing (..)
@@ -16,12 +17,28 @@ type alias Slot =
     }
 
 
-map : (Slot -> a) -> Grid -> List a
-map fn grid =
+modules : Grid -> List Module
+modules grid =
     grid
-        |> Array.map (\ys -> Array.toList (Array.map fn ys))
+        |> applyFunctor List.filterMap .entry
+
+
+applyFunctor : (fn -> List Slot -> List b) -> fn -> Grid -> List b
+applyFunctor functor fn grid =
+    grid
+        |> Array.map (\ys -> functor fn (Array.toList ys))
         |> Array.toList
         |> List.concat
+
+
+map : (Slot -> a) -> Grid -> List a
+map fn grid =
+    applyFunctor List.map fn grid
+
+
+filter : (Slot -> Bool) -> Grid -> List Slot
+filter fn grid =
+    applyFunctor List.filter fn grid
 
 
 atPosition : Int -> Int -> Grid -> Maybe Slot

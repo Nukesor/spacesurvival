@@ -1,4 +1,4 @@
-module ArrayExtra exposing (..)
+module Extra.Array exposing (..)
 
 import Array
 
