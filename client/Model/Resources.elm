@@ -21,6 +21,11 @@ type alias Resource =
     }
 
 
+formatAmount : Int -> String
+formatAmount amount =
+    toString ((toFloat amount) / 1000000)
+
+
 resourcesExist : Resources -> List ( ResourceId, Int ) -> Bool
 resourcesExist existing mods =
     List.foldl
