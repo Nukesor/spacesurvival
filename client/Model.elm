@@ -10,6 +10,7 @@ import Model.Resources exposing (Resources)
 import Model.User exposing (User)
 import Model.Util
 import Time.DateTime exposing (DateTime)
+import Time
 
 
 type alias Model =
@@ -23,6 +24,7 @@ type alias Model =
     , queue : Queue
     , resources : Resources
     , currentDate : DateTime
+    , lastTick : Maybe Time.Time
     }
 
 
