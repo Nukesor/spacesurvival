@@ -1,6 +1,7 @@
 #![feature(plugin)]
 #![plugin(rocket_codegen)]
 #![cfg_attr(test, plugin(stainless))]
+#![recursion_limit="256"]
 
 extern crate uuid;
 extern crate chrono;
