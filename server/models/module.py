@@ -1,0 +1,41 @@
+from sqlalchemy import (
+    Column,
+    ForeignKeyConstraint,
+)
+
+from sqlalchemy.types import (
+    Boolean,
+    String,
+    Integer,
+    DateTime,
+)
+from sqlalchemy.dialects.postgresql import UUID
+
+
+class Module(Base):
+    __tablename__ = 'module'
+
+    __table_args__ = (
+        ForeignKeyConstraint(['pod_id'], ['pod.id']),
+        ForeignKeyConstraint(['base_id'], ['base.id']),
+        CheckConstraint(
+            "(pod_id is not NULL or base_id is not NULL) and"
+            "not(pod_id is not NULL and pod_id is not NULL)"
+        ),
+    )
+
+    id = Column(UUID, primary_key=True)
+    pod_id = Column(UUID, nullable=True)
+    base_id = Column(UUID, nullable=True)
+
+    name = Column(String(255))
+    level = Column(Integer)
+    stationary = Column(Boolean)
+    x_pos = Column(Integer)
+    y_pos = Column(Integer)
+
+    created_at = Column(DateTime, server_default=func.now())
+    updated_at = Column(
+        DateTime, server_default=func.now(),
+        onupdate=func.current_timestamp()
+    )

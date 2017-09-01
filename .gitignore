@@ -1,8 +1,8 @@
 target
-Cargo.lock
 package-lock.json
 .env
 elm-stuff
 static
 node_modules
-*.bk
+spacesurvival.egg*
+venv

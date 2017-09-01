@@ -1,0 +1,5 @@
+#!/bin/bash
+
+virtualenv -p python3 venv
+venv/bin/pip install --upgrade pip
+venv/bin/python setup.py develop
