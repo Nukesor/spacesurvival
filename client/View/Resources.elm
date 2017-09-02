@@ -4,9 +4,9 @@ import Css exposing (..)
 import Css.Namespace exposing (namespace)
 import Html exposing (..)
 import Html.CssHelpers
-import Model.Resources exposing (Resource)
 import Svg exposing (image, svg)
 import Svg.Attributes
+import Model.Resources exposing (Resource, formatAmount)
 
 
 view model =
@@ -17,7 +17,7 @@ item : Resource -> Html msg
 item resource =
     li []
         [ resourceImage resource
-        , Html.text ((toString resource.amount) ++ "/" ++ (toString resource.maxAmount) ++ " " ++ resource.name)
+        , Html.text ((formatAmount resource.amount) ++ "/" ++ (formatAmount resource.maxAmount) ++ " " ++ resource.name)
         ]
 
 

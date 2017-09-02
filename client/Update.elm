@@ -8,6 +8,8 @@ import Api.Research exposing (fetchResearches, startResearching)
 import Api.Resources
 import Messages exposing (..)
 import Model exposing (..)
+import Model.Grid exposing (modules)
+import Model.Modules
 import Model.Queue exposing (unfinishedEntries)
 import Model.User exposing (LoginData)
 import Result exposing (withDefault)
@@ -117,19 +119,33 @@ update msg model =
 
         Tick time ->
             let
-                updatedQueue =
-                    unfinishedEntries model.currentDate model.queue
-
-                commands =
-                    if model.queue /= updatedQueue then
-                        [ fetchQueue model, fetchGridModules model ]
-                    else
-                        []
+                dt =
+                    Maybe.map (\lastTick -> time - lastTick) model.lastTick
             in
-                { model
-                    | currentDate = Time.DateTime.fromTimestamp time
-                }
-                    ! commands
+                case dt of
+                    Just dt ->
+                        let
+                            updatedQueue =
+                                unfinishedEntries model.currentDate model.queue
+
+                            updatedResources =
+                                Model.Modules.tick dt (modules model.grid) model.availableModules model.resources
+
+                            commands =
+                                if model.queue /= updatedQueue then
+                                    [ fetchQueue model, fetchGridModules model ]
+                                else
+                                    []
+                        in
+                            { model
+                                | currentDate = Time.DateTime.fromTimestamp time
+                                , resources = updatedResources
+                                , lastTick = Just time
+                            }
+                                ! commands
+
+                    Nothing ->
+                        { model | lastTick = Just time } ! []
 
         ReceiveGrid result ->
             result

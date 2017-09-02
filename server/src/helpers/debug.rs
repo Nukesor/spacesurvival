@@ -28,7 +28,7 @@ pub fn create_debug_user() {
 
     let resources = pod.get_resources(&db);
     for mut resource in resources {
-        resource.change_resource(5000, false, &db)
+        resource.change_resource(100000000, false, &db)
     }
 
     // Create the new module

@@ -2,6 +2,7 @@ module Model.Modules exposing (..)
 
 import Dict
 import Model.Research exposing (ResearchId, ResourceId, dependencyFulfilled)
+import Model.Resources exposing (Resources, applyTick, foldModifications, resourcesExist)
 import Time
 
 
@@ -60,12 +61,35 @@ isBuildable researches mod =
     List.all (dependencyFulfilled researches) mod.dependencies
 
 
+tick : Time.Time -> List Module -> AvailableModules -> Resources -> Resources
+tick dt modules moduleSpecs resources =
+    let
+        canExecute level =
+            resourcesExist resources level.consumes
 
--- tick : Time.Time -> List Module -> AvailableModules -> Resources -> Resources
--- tick dt modules moduleSpecs resources =
---     modules
---         |> List.filterMap (\mod -> findCurrentLevel moduleSpecs mod)
---         |> List.map (\level -> )
+        levels =
+            modules
+                |> List.filterMap (\mod -> findCurrentLevel moduleSpecs mod)
+                |> List.filter canExecute
+
+        toModifications modificationsPerModule =
+            modificationsPerModule
+                |> List.map (resourcesPerTick dt)
+                |> foldModifications
+
+        input =
+            levels
+                |> List.map .consumes
+                |> toModifications
+
+        output =
+            levels
+                |> List.map .generates
+                |> toModifications
+    in
+        resources
+            |> applyTick (-) input
+            |> applyTick (+) output
 
 
 findCurrentLevel : AvailableModules -> Module -> Maybe ModuleLevel
@@ -90,4 +114,4 @@ applyDeltaTime time hourlyValue =
         perSecond =
             (toFloat hourlyValue) / (60 * 60)
     in
-        round (perSecond / (Time.inSeconds time))
+        round (perSecond * (Time.inSeconds time))

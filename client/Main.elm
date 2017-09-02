@@ -34,6 +34,7 @@ init =
     , queue = []
     , resources = []
     , currentDate = dateTime Time.DateTime.zero
+    , lastTick = Nothing
     }
         ! [ Api.Auth.readToken ()
           , perform Tick Time.now
