@@ -1,4 +1,5 @@
 from sqlalchemy import (
+    Base,
     Column,
     ForeignKeyConstraint,
 )
@@ -25,7 +26,11 @@ class Pod(Base):
     user_id = Column(UUID)
     base_id = Column(UUID, nullable=True)
 
-    name = Column(String(255), primary_key=True)
+    name = Column(String(255))
+    modules = relationship("Module", backref="user")
+    queue = relationship("Queue", uselist=False, back_populates="pod")
+    researches = relationship("Research", backref="pod")
+    resources = relationship("Resource", backref="pod")
 
     created_at = Column(DateTime, server_default=func.now())
     updated_at = Column(

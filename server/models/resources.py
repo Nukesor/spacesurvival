@@ -1,4 +1,5 @@
 from sqlalchemy import (
+    Base,
     Column,
     ForeignKeyConstraint,
 )

@@ -8,10 +8,14 @@ setup(
     description='Spacesurvival',
     install_requires=[
         'flask>=0.12',
-        'pytest',
+        'flask-security>=3.0.0',
+        'flask-sqlalchemy>=2.2',
+        'flask-marshmallow>=0.8',
+        'marshmallow-sqlalchemy>=0.12.1',
+        'webargs>=1.8.1',
         'sqlalchemy>=1.1.13',
         'sqlalchemy-utils>=0.32.16',
-        'flask-sqlalchemy>=2.2',
+        'pytest',
     ],
     classifiers=[
         'Programming Language :: Python :: 3.6',

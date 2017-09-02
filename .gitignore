@@ -6,3 +6,5 @@ static
 node_modules
 spacesurvival.egg*
 venv
+build
+dist

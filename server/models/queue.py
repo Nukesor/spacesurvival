@@ -1,4 +1,5 @@
 from sqlalchemy import (
+    Base,
     Column,
     ForeignKeyConstraint,
 )
@@ -30,6 +31,8 @@ class Queue(Base):
 
     name = Column(String(255))
     slots = Column(Integer)
+    pod = relationship("Pod", back_populates="queue")
+    base = relationship("Base", back_populates="queue")
 
     created_at = Column(DateTime, server_default=func.now())
     updated_at = Column(
