@@ -1,6 +1,5 @@
 module View.Resources exposing (view, rules)
 
-import Animation exposing (marginRight)
 import Css exposing (..)
 import Css.Namespace exposing (namespace)
 import Html exposing (..)
@@ -29,7 +28,7 @@ resourceImage resource =
         , Svg.Attributes.height "40px"
         ]
         [ image
-            [ Svg.Attributes.xlinkHref "/static/img/minerals.svg"
+            [ Svg.Attributes.xlinkHref ("/static/img/" ++ resource.name ++ ".svg")
             , Svg.Attributes.width "100%"
             , Svg.Attributes.height "100%"
             ]

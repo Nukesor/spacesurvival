@@ -90,8 +90,8 @@ enum_impl!{ResearchTypes {
 /// It's used to check against the costs in `research_data.yml` and `module_data.yml`,
 /// to validate types in requests and to guarantee database string integrity.
 enum_impl!{ResourceTypes {
-    Iron,
-    Water,
+    Minerals,
+    Fuel,
 }}
 
 /// This enum contains all types of valid modules.

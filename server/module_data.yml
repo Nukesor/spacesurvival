@@ -6,8 +6,8 @@ LaserTurret:
     - level: 1
       time: 5
       resources:
-        - ["Iron", 200]
-        - ["Water", 100]
+        - ["Minerals", 200]
+        - ["Fuel", 100]
       shoots:
         rate: 1
         damage: 10
@@ -15,8 +15,8 @@ LaserTurret:
     - level: 2
       time: 60
       resources:
-        - ["Iron", 200]
-        - ["Water", 100]
+        - ["Minerals", 200]
+        - ["Fuel", 100]
       shoots:
         rate: 1
         damage: 10
@@ -24,8 +24,8 @@ LaserTurret:
     - level: 3
       time: 120
       resources:
-        - ["Iron", 200]
-        - ["Water", 100]
+        - ["Minerals", 200]
+        - ["Fuel", 100]
       shoots:
         rate: 1
         damage: 10
@@ -41,29 +41,29 @@ PlasmaGenerator:
     - level: 1
       time: 5
       resources:
-        - ["Iron", 200]
-        - ["Water", 100]
+        - ["Minerals", 200]
+        - ["Fuel", 100]
       generates:
-        - ["Water", 200000000]
+        - ["Fuel", 200000000]
       consumes:
-        - ["Iron", 10000000]
+        - ["Minerals", 10000000]
 
     - level: 2
       time: 30
       resources:
-        - ["Iron", 200]
-        - ["Water", 100]
+        - ["Minerals", 200]
+        - ["Fuel", 100]
       generates:
-        - ["Water", 200]
+        - ["Fuel", 200]
       consumes:
-        - ["Iron", 10]
+        - ["Minerals", 10]
 
     - level: 3
       time: 30
       resources:
-        - ["Iron", 200]
-        - ["Water", 100]
+        - ["Minerals", 200]
+        - ["Fuel", 100]
       generates:
-        - ["Water", 200]
+        - ["Fuel", 200]
       consumes:
-        - ["Iron", 10]
+        - ["Minerals", 10]
