@@ -1,8 +1,8 @@
-from flask import request, send_from_directory
+from flask import request, send_from_directory, url_for
 from server import app
 
 
-@app.route('/')
+@app.route('/', methods = ['GET'])
 def index():
     return app.send_static_file('index.html')
 

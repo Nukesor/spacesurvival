@@ -4,9 +4,10 @@ from flask_marshmallow import Marshmallow
 from flask_mail import Mail
 from flask_security import Security, SQLAlchemyUserDatastore
 
-app = Flask(__name__)
+app = Flask(__name__, static_folder='../static')
 app.config['DEBUG'] = True
 app.config['SECRET_KEY'] = 'lolololol'
+app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 app.config['SQLALCHEMY_DATABASE_URI'] = 'postgres://localhost/browsergame'
 db = SQLAlchemy(app)
 ma = Marshmallow(app)
@@ -22,7 +23,6 @@ mail = Mail(app)
 # Security settings
 app.config['SECURITY_CONFIRMABLE'] = True
 app.config['SECURITY_TRACKABLE'] = True
-app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 
 from server.models.user import User
 from server.models.role import Role
