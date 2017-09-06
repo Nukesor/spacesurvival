@@ -1,12 +1,13 @@
 module View.Resources exposing (view, rules)
 
+import Animation exposing (marginRight)
 import Css exposing (..)
 import Css.Namespace exposing (namespace)
 import Html exposing (..)
 import Html.CssHelpers
+import Model.Resources exposing (Resource, formatAmount)
 import Svg exposing (image, svg)
 import Svg.Attributes
-import Model.Resources exposing (Resource, formatAmount)
 
 
 view model =
@@ -16,11 +17,12 @@ view model =
 item : Resource -> Html msg
 item resource =
     li []
-        [ resourceImage resource
-        , Html.text ((formatAmount resource.amount) ++ "/" ++ (formatAmount resource.maxAmount) ++ " " ++ resource.name)
+        [ span [ helpers.class [ Icon ] ] [ resourceImage resource ]
+        , span [] [ Html.text ((formatAmount resource.amount) ++ "/" ++ (formatAmount resource.maxAmount) ++ " " ++ resource.name) ]
         ]
 
 
+resourceImage : Resource -> Html msg
 resourceImage resource =
     svg
         [ Svg.Attributes.width "40px"
@@ -37,10 +39,17 @@ resourceImage resource =
 
 type Classes
     = Container
+    | Icon
 
 
 rules =
-    (stylesheet << namespace ns) []
+    (stylesheet << namespace ns)
+        [ Css.class Icon
+            [ verticalAlign middle
+            , display inlineBlock
+            , Css.marginRight (Css.em 0.5)
+            ]
+        ]
 
 
 ns : String
