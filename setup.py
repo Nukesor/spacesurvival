@@ -12,7 +12,9 @@ setup(
         'flask-sqlalchemy>=2.2',
         'flask-marshmallow>=0.8',
         'marshmallow-sqlalchemy>=0.12.1',
+        'bcrypt>=3.1.3',
         'webargs>=1.8.1',
+        'psycopg2>=2.7.3'
         'sqlalchemy>=1.1.13',
         'sqlalchemy-utils>=0.32.16',
         'pytest',

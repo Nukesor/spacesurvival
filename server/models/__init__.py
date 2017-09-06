@@ -4,6 +4,6 @@ from .pod import *
 from .queue import *
 from .queue_entry import *
 from .research import *
-from .resources import *
+from .resource import *
 from .role import *
 from .user import *

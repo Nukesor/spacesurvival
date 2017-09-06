@@ -14,7 +14,11 @@ from sqlalchemy.types import (
     DateTime,
 )
 from server import db
-from server.models.role import roles_users
+from server.models import (
+    Pod,
+    Queue,
+    roles_users,
+)
 
 
 class User(db.Model, UserMixin):
@@ -31,6 +35,8 @@ class User(db.Model, UserMixin):
     roles = relationship('Role', secondary=roles_users,
                             backref=db.backref('user', lazy='dynamic'))
 
+    pod = relationship("Pod", uselist=False, back_populates="user")
+
     last_login_at = Column(DateTime)
     current_login_at = Column(DateTime)
     last_login_ip = Column(String(255))
@@ -42,6 +48,15 @@ class User(db.Model, UserMixin):
         DateTime, server_default=func.now(),
         onupdate=func.current_timestamp()
     )
+
+    def __init__(self, nickname, email, password, active, roles):
+        self.nickname = nickname
+        self.email = email
+        self.hash_password(password)
+        self.active = active
+        self.roles = roles
+
+        self.pod = Pod(nickname)
 
     # Flask login 
     def get_id(self):
@@ -56,8 +71,8 @@ class User(db.Model, UserMixin):
     def is_authenticated():
         return True
 
-    def hash_password():
+    def hash_password(self, password):
         self.password_hash = hash_password(password)
 
-    def verify_password(password):
+    def verify_password(self, password):
         return verify_password(password, self.password_hash)

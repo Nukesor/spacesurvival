@@ -23,7 +23,7 @@ class Queue(db.Model):
         ForeignKeyConstraint(['pod_id'], ['pod.id']),
         ForeignKeyConstraint(['base_id'], ['base.id']),
         CheckConstraint(
-            "(pod_id is not NULL or base_id is not NULL) and"
+            "(pod_id is not NULL or base_id is not NULL) and "
             "not(pod_id is not NULL and pod_id is not NULL)"
         ),
     )

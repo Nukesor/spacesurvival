@@ -1,5 +1,5 @@
-from server import db
 from sqlalchemy.orm import relationship
+from sqlalchemy.dialects.postgresql import UUID
 from sqlalchemy import (
     func,
     Column,
@@ -11,8 +11,11 @@ from sqlalchemy.types import (
     String,
     DateTime,
 )
-from sqlalchemy.dialects.postgresql import UUID
 
+from server import db
+from server.models.queue import Queue
+from server.models.resource import Resource
+from server.data.types import ResourceTypes
 
 class Pod(db.Model):
     __tablename__ = 'pod'
@@ -25,17 +28,27 @@ class Pod(db.Model):
     )
 
     id = Column(UUID, primary_key=True)
+    name = Column(String(255))
     user_id = Column(UUID)
     base_id = Column(UUID, nullable=True)
 
-    name = Column(String(255))
-    modules = relationship("Module", backref="user")
+    user = relationship("User", back_populates="pod")
+
+    resources = relationship("Resource")
     queue = relationship("Queue", uselist=False, back_populates="pod")
-    researches = relationship("Research", backref="pod")
-    resources = relationship("Resource", backref="pod")
+    modules = relationship("Module", back_populates="pod")
+    researches = relationship("Research", back_populates="pod")
 
     created_at = Column(DateTime, server_default=func.now())
     updated_at = Column(
         DateTime, server_default=func.now(),
         onupdate=func.current_timestamp()
     )
+
+    def __init__(self, nickname):
+        self.name = "{nickname}'s pod"
+        self.queue = Queue()
+        resources = []
+        for resource in ResourceTypes:
+            resources.append(Resource(resource.name))
+        self.resources = resources

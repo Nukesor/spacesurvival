@@ -21,6 +21,7 @@ app.config['MAIL_PASSWORD'] = 'password'
 mail = Mail(app)
 
 # Security settings
+app.config['SECURITY_PASSWORD_SALT'] = 'lolwat'
 app.config['SECURITY_CONFIRMABLE'] = True
 app.config['SECURITY_TRACKABLE'] = True
 
@@ -30,8 +31,8 @@ from server.models.role import Role
 user_datastore = SQLAlchemyUserDatastore(db, User, Role)
 security = Security(app, user_datastore)
 
-import server.api
 import server.models
+import server.api
 
 def run():
     app.run(host="0.0.0.0")

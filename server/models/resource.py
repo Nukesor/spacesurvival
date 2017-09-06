@@ -23,7 +23,7 @@ class Resource(db.Model):
         ForeignKeyConstraint(['pod_id'], ['pod.id']),
         ForeignKeyConstraint(['base_id'], ['base.id']),
         CheckConstraint(
-            "(pod_id is not NULL or base_id is not NULL) and"
+            "(pod_id is not NULL or base_id is not NULL) and "
             "not(pod_id is not NULL and pod_id is not NULL)"
         ),
     )
@@ -42,3 +42,9 @@ class Resource(db.Model):
         DateTime, server_default=func.now(),
         onupdate=func.current_timestamp()
     )
+
+    def __init__(self, name):
+        self.name = name
+        self.amount = 0
+        self.production = 0
+        self.max_amount = 5000

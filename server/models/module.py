@@ -1,4 +1,5 @@
 from server import db
+from sqlalchemy.orm import relationship
 from sqlalchemy import (
     func,
     Column,
@@ -22,7 +23,7 @@ class Module(db.Model):
         ForeignKeyConstraint(['pod_id'], ['pod.id']),
         ForeignKeyConstraint(['base_id'], ['base.id']),
         CheckConstraint(
-            "(pod_id is not NULL or base_id is not NULL) and"
+            "(pod_id is not NULL or base_id is not NULL) and "
             "not(pod_id is not NULL and pod_id is not NULL)"
         ),
     )
@@ -36,6 +37,9 @@ class Module(db.Model):
     stationary = Column(Boolean)
     x_pos = Column(Integer)
     y_pos = Column(Integer)
+
+    pod = relationship("Pod", back_populates="modules")
+    base = relationship("Base", back_populates="modules")
 
     created_at = Column(DateTime, server_default=func.now())
     updated_at = Column(

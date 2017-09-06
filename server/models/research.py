@@ -1,4 +1,5 @@
 from server import db
+from sqlalchemy.orm import relationship
 from sqlalchemy import (
     func,
     Column,
@@ -22,7 +23,7 @@ class Research(db.Model):
         ForeignKeyConstraint(['pod_id'], ['pod.id']),
         ForeignKeyConstraint(['base_id'], ['base.id']),
         CheckConstraint(
-            "(pod_id is not NULL or base_id is not NULL) and"
+            "(pod_id is not NULL or base_id is not NULL) and "
             "not(pod_id is not NULL and pod_id is not NULL)"
         ),
     )
@@ -33,6 +34,9 @@ class Research(db.Model):
 
     name = Column(String(255))
     level = Column(Integer)
+
+    pod = relationship("Pod", back_populates="researches")
+    base = relationship("Base", back_populates="researches")
 
     created_at = Column(DateTime, server_default=func.now())
     updated_at = Column(

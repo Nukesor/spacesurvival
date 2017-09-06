@@ -25,7 +25,7 @@ class QueueEntry(db.Model):
         ForeignKeyConstraint(['module_id'], ['module.id']),
         ForeignKeyConstraint(['research_id'], ['research.id']),
         CheckConstraint(
-            "(research_id is not NULL or module_id is not NULL) and"
+            "(research_id is not NULL or module_id is not NULL) and "
             "not(research_id is not NULL and module_id is not NULL)"
         ),
     )
