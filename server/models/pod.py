@@ -1,5 +1,6 @@
+from server import db
 from sqlalchemy import (
-    Base,
+    func,
     Column,
     ForeignKeyConstraint,
 )
@@ -12,7 +13,7 @@ from sqlalchemy.types import (
 from sqlalchemy.dialects.postgresql import UUID
 
 
-class Pod(Base):
+class Pod(db.Model):
     __tablename__ = 'pod'
 
     __table_args__ = (

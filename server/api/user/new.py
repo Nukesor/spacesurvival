@@ -1,6 +1,7 @@
-from server import app, db
+from webargs.flaskparser import use_args
+
+from server import app, db, user_datastore
 from server.validation.user import user_creation_fields
-from server.models.roles import user_datastore
 
 
 @app.route('/register', methods = ['POST'])

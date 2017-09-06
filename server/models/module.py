@@ -1,5 +1,6 @@
+from server import db
 from sqlalchemy import (
-    Base,
+    func,
     Column,
     ForeignKeyConstraint,
 )
@@ -13,7 +14,7 @@ from sqlalchemy.types import (
 from sqlalchemy.dialects.postgresql import UUID
 
 
-class Module(Base):
+class Module(db.Model):
     __tablename__ = 'module'
 
     __table_args__ = (

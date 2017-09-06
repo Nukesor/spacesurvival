@@ -5,6 +5,7 @@ from flask_security.utils import login_user
 from server import app, db
 from server.validation.user import login_fields
 
+
 @app.route('/login', methods=['GET', 'POST'])
 @use_args(login_fields)
 def login(args):

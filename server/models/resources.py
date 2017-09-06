@@ -1,5 +1,6 @@
+from server import db
 from sqlalchemy import (
-    Base,
+    func,
     Column,
     ForeignKeyConstraint,
 )
@@ -14,7 +15,7 @@ from sqlalchemy.types import (
 from sqlalchemy.dialects.postgresql import UUID
 
 
-class Resource(Base):
+class Resource(db.Model):
     __tablename__ = 'resource'
 
     __table_args__ = (

@@ -1,12 +1,11 @@
+from server import db
+
 from flask_security import UserMixin
 from flask_security.utils import hash_password, verify_password
 from sqlalchemy_utils import EmailType
-from sqlalchemy_security import UserMixin
 from sqlalchemy.dialects.postgresql import UUID
-from sqlalchemy import (
-    Base,
-    Column,
-)
+
+from sqlalchemy import Column, func
 from sqlalchemy.types import (
     Boolean,
     String,
@@ -17,7 +16,7 @@ from server import db
 from server.models.roles import roles_users
 
 
-class User(Base, UserMixin):
+class User(db.Model, UserMixin):
     __tablename__ = 'user'
 
     id = Column(UUID, primary_key=True)

@@ -8,3 +8,4 @@ spacesurvival.egg*
 venv
 build
 dist
+__pycache__
