@@ -2,6 +2,7 @@ from server import db
 from sqlalchemy.orm import relationship
 from sqlalchemy import (
     func,
+    text,
     Column,
     CheckConstraint,
     ForeignKeyConstraint,
@@ -23,12 +24,12 @@ class Queue(db.Model):
         ForeignKeyConstraint(['pod_id'], ['pod.id']),
         ForeignKeyConstraint(['base_id'], ['base.id']),
         CheckConstraint(
-            "(pod_id is not NULL or base_id is not NULL) and "
-            "not(pod_id is not NULL and pod_id is not NULL)"
+            "(pod_id is NULL and base_id is not NULL) or "
+            "(pod_id is not NULL and base_id is NULL)"
         ),
     )
 
-    id = Column(UUID, primary_key=True)
+    id = Column(UUID, primary_key=True, server_default=text("uuid_generate_v4()"))
     pod_id = Column(UUID, nullable=True)
     base_id = Column(UUID, nullable=True)
 

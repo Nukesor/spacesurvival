@@ -2,6 +2,7 @@ from sqlalchemy.orm import relationship
 from sqlalchemy.dialects.postgresql import UUID
 from sqlalchemy import (
     func,
+    text,
     Column,
     ForeignKeyConstraint,
 )
@@ -27,7 +28,7 @@ class Pod(db.Model):
         ForeignKeyConstraint(['base_id'], ['base.id']),
     )
 
-    id = Column(UUID, primary_key=True)
+    id = Column(UUID, primary_key=True, server_default=text("uuid_generate_v4()"))
     name = Column(String(255))
     user_id = Column(UUID)
     base_id = Column(UUID, nullable=True)

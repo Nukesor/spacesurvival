@@ -1,7 +1,8 @@
 from flask import Flask
+from flask_mail import Mail
+from flask_migrate import Migrate
 from flask_sqlalchemy import SQLAlchemy
 from flask_marshmallow import Marshmallow
-from flask_mail import Mail
 from flask_security import Security, SQLAlchemyUserDatastore
 
 app = Flask(__name__, static_folder='../static')
@@ -11,6 +12,7 @@ app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 app.config['SQLALCHEMY_DATABASE_URI'] = 'postgres://localhost/browsergame'
 db = SQLAlchemy(app)
 ma = Marshmallow(app)
+migrate = Migrate(app, db)
 
 # After 'Create app'
 app.config['MAIL_SERVER'] = 'smtp.example.com'

@@ -1,18 +1,16 @@
-from server import db
-
 from flask_security import UserMixin
 from flask_security.utils import hash_password, verify_password
 from sqlalchemy_utils import EmailType
 from sqlalchemy.orm import relationship
 from sqlalchemy.dialects.postgresql import UUID
-
-from sqlalchemy import Column, func
+from sqlalchemy import Column, func, text
 from sqlalchemy.types import (
     Boolean,
     String,
     Integer,
     DateTime,
 )
+
 from server import db
 from server.models import (
     Pod,
@@ -24,24 +22,22 @@ from server.models import (
 class User(db.Model, UserMixin):
     __tablename__ = 'user'
 
-    id = Column(UUID, primary_key=True)
-    name = Column(String(255))
-    nickname = Column(String(255))
+    id = Column(UUID, primary_key=True, server_default=text("uuid_generate_v4()"))
     email = Column(EmailType)
-
-    active = Column(Boolean)
+    nickname = Column(String(255))
     password_hash = Column(String(255))
+    active = Column(Boolean)
     confirmed_at = Column(DateTime, nullable=True)
     roles = relationship('Role', secondary=roles_users,
                             backref=db.backref('user', lazy='dynamic'))
 
     pod = relationship("Pod", uselist=False, back_populates="user")
 
-    last_login_at = Column(DateTime)
-    current_login_at = Column(DateTime)
-    last_login_ip = Column(String(255))
-    current_login_ip = Column(String(255))
-    login_count = Column(Integer)
+    last_login_at = Column(DateTime, nullable=True)
+    current_login_at = Column(DateTime, nullable=True)
+    last_login_ip = Column(String(255), nullable=True)
+    current_login_ip = Column(String(255), nullable=True)
+    login_count = Column(Integer, default=0)
 
     created_at = Column(DateTime, server_default=func.now())
     updated_at = Column(
@@ -50,8 +46,8 @@ class User(db.Model, UserMixin):
     )
 
     def __init__(self, nickname, email, password, active, roles):
-        self.nickname = nickname
         self.email = email
+        self.nickname = nickname
         self.hash_password(password)
         self.active = active
         self.roles = roles

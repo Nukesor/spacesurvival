@@ -10,6 +10,7 @@ setup(
         'flask>=0.12',
         'flask-security>=3.0.0',
         'flask-sqlalchemy>=2.2',
+        'flask-migrate>=2.1.1',
         'flask-marshmallow>=0.8',
         'marshmallow-sqlalchemy>=0.12.1',
         'bcrypt>=3.1.3',

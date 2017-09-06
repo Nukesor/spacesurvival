@@ -1,6 +1,7 @@
 from server import db
 from sqlalchemy import (
     func,
+    text,
     Column,
     CheckConstraint,
     ForeignKeyConstraint,
@@ -25,12 +26,12 @@ class QueueEntry(db.Model):
         ForeignKeyConstraint(['module_id'], ['module.id']),
         ForeignKeyConstraint(['research_id'], ['research.id']),
         CheckConstraint(
-            "(research_id is not NULL or module_id is not NULL) and "
-            "not(research_id is not NULL and module_id is not NULL)"
+            "(research_id is NULL and module_id is not NULL) or "
+            "(research_id is not NULL and module_id is NULL)"
         ),
     )
 
-    id = Column(UUID, primary_key=True)
+    id = Column(UUID, primary_key=True, server_default=text("uuid_generate_v4()"))
     queue_id = Column(UUID, nullable=True)
     module_id = Column(UUID, nullable=True)
     research_id = Column(UUID, nullable=True)

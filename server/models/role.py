@@ -2,6 +2,7 @@ from server import db
 from flask_security import RoleMixin
 from sqlalchemy import (
     func,
+    text,
     Column,
     ForeignKey,
 )
@@ -17,6 +18,6 @@ roles_users = db.Table('roles_users',
         db.Column('role_id', UUID, ForeignKey('role.id')))
 
 class Role(db.Model, RoleMixin):
-    id = Column(UUID, primary_key=True)
+    id = Column(UUID, primary_key=True, server_default=text("uuid_generate_v4()"))
     name = Column(String(80), unique=True)
     description = Column(String(255))

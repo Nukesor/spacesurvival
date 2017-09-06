@@ -1,7 +1,7 @@
-from server import db
 from sqlalchemy.orm import relationship
 from sqlalchemy import (
     func,
+    text,
     Column,
     ForeignKeyConstraint,
 )
@@ -13,13 +13,15 @@ from sqlalchemy.types import (
 )
 from sqlalchemy.dialects.postgresql import UUID
 
+from server import db
+
 
 class Base(db.Model):
     __tablename__ = 'base'
 
     __table_args__ = ()
 
-    id = Column(UUID, primary_key=True)
+    id = Column(UUID, primary_key=True, server_default=text("uuid_generate_v4()"))
     name = Column(String(255))
     user_id = Column(UUID)
     base_id = Column(UUID, nullable=True)
