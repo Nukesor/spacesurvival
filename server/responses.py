@@ -2,9 +2,9 @@ from flask import Response
 
 def json_response(code, message):
     return Response(
+        message,
         status=code,
         mimetype='application/json',
-        data=message
     )
 
 def ok(message=''):

@@ -3,7 +3,7 @@ from flask_security.utils import hash_password, verify_password
 from sqlalchemy_utils import EmailType
 from sqlalchemy.orm import relationship
 from sqlalchemy.dialects.postgresql import UUID
-from sqlalchemy import Column, func, text
+from sqlalchemy import func, text, Column, UniqueConstraint
 from sqlalchemy.types import (
     Boolean,
     String,
@@ -21,6 +21,11 @@ from server.models import (
 
 class User(db.Model, UserMixin):
     __tablename__ = 'user'
+
+    __table_args__ = (
+        UniqueConstraint("nickname"),
+        UniqueConstraint("email"),
+    )
 
     id = Column(UUID, primary_key=True, server_default=text("uuid_generate_v4()"))
     email = Column(EmailType)
