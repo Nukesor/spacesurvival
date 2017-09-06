@@ -3,6 +3,7 @@ from server import db
 from flask_security import UserMixin
 from flask_security.utils import hash_password, verify_password
 from sqlalchemy_utils import EmailType
+from sqlalchemy.orm import relationship
 from sqlalchemy.dialects.postgresql import UUID
 
 from sqlalchemy import Column, func
@@ -13,7 +14,7 @@ from sqlalchemy.types import (
     DateTime,
 )
 from server import db
-from server.models.roles import roles_users
+from server.models.role import roles_users
 
 
 class User(db.Model, UserMixin):
@@ -27,7 +28,7 @@ class User(db.Model, UserMixin):
     active = Column(Boolean)
     password_hash = Column(String(255))
     confirmed_at = Column(DateTime, nullable=True)
-    roles = db.relationship('Role', secondary=roles_users,
+    roles = relationship('Role', secondary=roles_users,
                             backref=db.backref('user', lazy='dynamic'))
 
     last_login_at = Column(DateTime)

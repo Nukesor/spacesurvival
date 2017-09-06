@@ -1,4 +1,5 @@
 from server import db
+from sqlalchemy.orm import relationship
 from sqlalchemy import (
     func,
     Column,

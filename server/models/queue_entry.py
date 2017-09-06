@@ -2,6 +2,7 @@ from server import db
 from sqlalchemy import (
     func,
     Column,
+    CheckConstraint,
     ForeignKeyConstraint,
 )
 
