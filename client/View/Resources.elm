@@ -4,7 +4,9 @@ import Css exposing (..)
 import Css.Namespace exposing (namespace)
 import Html exposing (..)
 import Html.CssHelpers
-import Model.Resources exposing (Resource)
+import Model.Resources exposing (Resource, formatAmount)
+import Svg exposing (image, svg)
+import Svg.Attributes
 
 
 view model =
@@ -13,15 +15,40 @@ view model =
 
 item : Resource -> Html msg
 item resource =
-    li [] [ Html.text ((toString resource.amount) ++ "/" ++ (toString resource.maxAmount) ++ " " ++ resource.name) ]
+    li []
+        [ span [ helpers.class [ Icon ] ] [ resourceImage resource ]
+        , span [] [ Html.text ((formatAmount resource.amount) ++ "/" ++ (formatAmount resource.maxAmount) ++ " " ++ resource.name) ]
+        ]
+
+
+resourceImage : Resource -> Html msg
+resourceImage resource =
+    svg
+        [ Svg.Attributes.width "40px"
+        , Svg.Attributes.height "40px"
+        ]
+        [ image
+            [ Svg.Attributes.xlinkHref ("/static/img/" ++ resource.name ++ ".svg")
+            , Svg.Attributes.width "100%"
+            , Svg.Attributes.height "100%"
+            ]
+            []
+        ]
 
 
 type Classes
     = Container
+    | Icon
 
 
 rules =
-    (stylesheet << namespace ns) []
+    (stylesheet << namespace ns)
+        [ Css.class Icon
+            [ verticalAlign middle
+            , display inlineBlock
+            , Css.marginRight (Css.em 0.5)
+            ]
+        ]
 
 
 ns : String

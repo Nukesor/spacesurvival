@@ -13,11 +13,11 @@
         "time": 5,
         "resources": [
           {
-            "type": "Water",
+            "type": "Fuel",
             "amount": 200
           },
           {
-            "type": "Iron",
+            "type": "Minerals",
             "amount": 100
           }
         ],
@@ -32,11 +32,11 @@
         "time": 60,
         "resources": [
           {
-            "type": "Water",
+            "type": "Fuel",
             "amount": 200
           },
           {
-            "type": "Iron",
+            "type": "Minerals",
             "amount": 100
           }
         ],
@@ -51,11 +51,11 @@
         "time": 120,
         "resources": [
           {
-            "type": "Water",
+            "type": "Fuel",
             "amount": 200
           },
           {
-            "type": "Iron",
+            "type": "Minerals",
             "amount": 100
           }
         ],
@@ -81,23 +81,23 @@
         "time": 5,
         "resources": [
           {
-            "type": "Water",
+            "type": "Fuel",
             "amount": 200
           },
           {
-            "type": "Iron",
+            "type": "Minerals",
             "amount": 100
           }
         ],
         "generates": [
           {
-            "type": "Water",
+            "type": "Fuel",
             "amount": 200000000
           }
         ],
         "consumes": [
           {
-            "type": "Iron",
+            "type": "Minerals",
             "amount": 10000000
           }
         ]
@@ -107,23 +107,23 @@
         "time": 5,
         "resources": [
           {
-            "type": "Water",
+            "type": "Fuel",
             "amount": 200
           },
           {
-            "type": "Iron",
+            "type": "Minerals",
             "amount": 100
           }
         ],
         "generates": [
           {
-            "type": "Water",
+            "type": "Fuel",
             "amount": 200000000
           }
         ],
         "consumes": [
           {
-            "type": "Iron",
+            "type": "Minerals",
             "amount": 10000000
           }
         ]
@@ -133,23 +133,23 @@
         "time": 5,
         "resources": [
           {
-            "type": "Water",
+            "type": "Fuel",
             "amount": 200
           },
           {
-            "type": "Iron",
+            "type": "Minerals",
             "amount": 100
           }
         ],
         "generates": [
           {
-            "type": "Water",
+            "type": "Fuel",
             "amount": 200000000
           }
         ],
         "consumes": [
           {
-            "type": "Iron",
+            "type": "Minerals",
             "amount": 10000000
           }
         ]
