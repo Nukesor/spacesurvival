@@ -1,0 +1,89 @@
+{
+  "Plasma": {
+    "display_name": "Plasma Technology",
+    "levels": [
+      {
+        "level": 1,
+        "time": 5,
+        "resources": [
+          {"type": "Water",
+            "amount": 200}
+        ]
+      },
+      {
+        "level": 2,
+        "time": 5,
+        "resources": [
+          {"type": "Water",
+            "amount": 200}
+        ]
+      },
+      {
+        "level": 3,
+        "time": 5,
+        "resources": [
+          {"type": "Water",
+            "amount": 200}
+        ]
+      }
+    ]
+  },
+  "EnergyWeapons": {
+    "display_name": "Energy Weapons",
+    "levels": [
+      {
+        "level": 1,
+        "time": 5,
+        "resources": [
+          {"type": "Iron",
+            "amount": 200}
+        ]
+      },
+      {
+        "level": 2,
+        "time": 5,
+        "resources": [
+          {"type": "Iron",
+            "amount": 200}
+        ]
+      },
+      {
+        "level": 3,
+        "time": 5,
+        "resources": [
+          {"type": "Iron",
+            "amount": 200}
+        ]
+      }
+    ]
+  },
+  "MiningEfficiency": {
+    "display_name": "Mining Efficiency",
+    "levels": [
+      {
+        "level": 1,
+        "time": 5,
+        "resources": [
+          {"type": "Iron",
+            "amount": 200}
+        ]
+      },
+      {
+        "level": 2,
+        "time": 5,
+        "resources": [
+          {"type": "Iron",
+            "amount": 200}
+        ]
+      },
+      {
+        "level": 3,
+        "time": 5,
+        "resources": [
+          {"type": "Iron",
+            "amount": 200}
+        ]
+      }
+    ]
+  }
+}

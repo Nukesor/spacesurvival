@@ -13,6 +13,7 @@ setup(
         'flask-migrate>=2.1.1',
         'flask-marshmallow>=0.8',
         'marshmallow-sqlalchemy>=0.12.1',
+        'pyyaml>=3.12',
         'bcrypt>=3.1.3',
         'webargs>=1.8.1',
         'psycopg2>=2.7.3'

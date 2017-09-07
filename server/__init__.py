@@ -4,6 +4,11 @@ from flask_migrate import Migrate
 from flask_sqlalchemy import SQLAlchemy
 from flask_marshmallow import Marshmallow
 from flask_security import Security, SQLAlchemyUserDatastore
+from server.data.module import load_modules
+from server.data.research import load_research
+
+research_data = load_research()
+module_data = load_modules()
 
 app = Flask(__name__, static_folder='../static')
 app.config['DEBUG'] = True

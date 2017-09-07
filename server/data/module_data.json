@@ -1,0 +1,159 @@
+{
+  "LaserTurret": {
+    "display_name": "Laser turret",
+    "dependencies": [
+      {
+        "type": "EnergyWeapons",
+        "leve": 1
+      }
+    ],
+    "levels": [
+      {
+        "level": 1,
+        "time": 5,
+        "resources": [
+          {
+            "type": "Water",
+            "amount": 200
+          },
+          {
+            "type": "Iron",
+            "amount": 100
+          }
+        ],
+        "shoots": {
+          "rate": 1,
+          "damage": 10,
+          "range": 100
+        }
+      },
+      {
+        "level": 2,
+        "time": 60,
+        "resources": [
+          {
+            "type": "Water",
+            "amount": 200
+          },
+          {
+            "type": "Iron",
+            "amount": 100
+          }
+        ],
+        "shoots": {
+          "rate": 1,
+          "damage": 10,
+          "range": 100
+        }
+      },
+      {
+        "level": 3,
+        "time": 120,
+        "resources": [
+          {
+            "type": "Water",
+            "amount": 200
+          },
+          {
+            "type": "Iron",
+            "amount": 100
+          }
+        ],
+        "shoots": {
+          "rate": 1,
+          "damage": 10,
+          "range": 100
+        }
+      }
+    ]
+  },
+  "PlasmaGenerator": {
+    "display_name": "Plasma Generator",
+    "dependencies": [
+      {
+        "type": "Plasma",
+        "level": 1
+      }
+    ],
+    "levels": [
+      {
+        "level": 1,
+        "time": 5,
+        "resources": [
+          {
+            "type": "Water",
+            "amount": 200
+          },
+          {
+            "type": "Iron",
+            "amount": 100
+          }
+        ],
+        "generates": [
+          {
+            "type": "Water",
+            "amount": 200000000
+          }
+        ],
+        "consumes": [
+          {
+            "type": "Iron",
+            "amount": 10000000
+          }
+        ]
+      },
+      {
+        "level": 2,
+        "time": 5,
+        "resources": [
+          {
+            "type": "Water",
+            "amount": 200
+          },
+          {
+            "type": "Iron",
+            "amount": 100
+          }
+        ],
+        "generates": [
+          {
+            "type": "Water",
+            "amount": 200000000
+          }
+        ],
+        "consumes": [
+          {
+            "type": "Iron",
+            "amount": 10000000
+          }
+        ]
+      },
+      {
+        "level": 3,
+        "time": 5,
+        "resources": [
+          {
+            "type": "Water",
+            "amount": 200
+          },
+          {
+            "type": "Iron",
+            "amount": 100
+          }
+        ],
+        "generates": [
+          {
+            "type": "Water",
+            "amount": 200000000
+          }
+        ],
+        "consumes": [
+          {
+            "type": "Iron",
+            "amount": 10000000
+          }
+        ]
+      }
+    ]
+  }
+}
