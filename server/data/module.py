@@ -14,10 +14,10 @@ class ModuleLevel(Schema):
     """The json representation of a module."""
     level = fields.Int()
     resources = fields.Nested(Resource, many=True)
-    time = fields.Int(),
-    shoots = fields.Nested(Shoots),
-    generates = fields.Nested(Resource, many=True),
-    consumes = fields.Nested(Resource, many=True),
+    time = fields.Int()
+    shoots = fields.Nested(Shoots)
+    generates = fields.Nested(Resource, many=True)
+    consumes = fields.Nested(Resource, many=True)
 
 # This class is only for deserializing the included `module_data.yml`.
 #
