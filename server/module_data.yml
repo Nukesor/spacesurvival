@@ -1,0 +1,69 @@
+LaserTurret:
+  display_name: "Laser turret"
+  dependencies:
+    - ["EnergyWeapons", 1]
+  levels:
+    - level: 1
+      time: 5
+      resources:
+        - ["Iron", 200]
+        - ["Water", 100]
+      shoots:
+        rate: 1
+        damage: 10
+        range: 100
+    - level: 2
+      time: 60
+      resources:
+        - ["Iron", 200]
+        - ["Water", 100]
+      shoots:
+        rate: 1
+        damage: 10
+        range: 100
+    - level: 3
+      time: 120
+      resources:
+        - ["Iron", 200]
+        - ["Water", 100]
+      shoots:
+        rate: 1
+        damage: 10
+        range: 100
+
+
+
+PlasmaGenerator:
+  display_name: "Plasma Generator"
+  dependencies:
+      - ["Plasma", 1]
+  levels:
+    - level: 1
+      time: 5
+      resources:
+        - ["Iron", 200]
+        - ["Water", 100]
+      generates:
+        - ["Water", 200000000]
+      consumes:
+        - ["Iron", 10000000]
+
+    - level: 2
+      time: 30
+      resources:
+        - ["Iron", 200]
+        - ["Water", 100]
+      generates:
+        - ["Water", 200]
+      consumes:
+        - ["Iron", 10]
+
+    - level: 3
+      time: 30
+      resources:
+        - ["Iron", 200]
+        - ["Water", 100]
+      generates:
+        - ["Water", 200]
+      consumes:
+        - ["Iron", 10]

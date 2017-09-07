@@ -1,11 +1,18 @@
+from flask import jsonify
+from flask_security import login_required, login_user, current_user
 from webargs.flaskparser import use_args
-from flask_security.utils import login_user
 
 from server import app, db, user_datastore
 from server.responses import created
 from server.models.user import User
+from server.schemas.user import UserSchema
 from server.validation.user import user_creation_fields
 
+@app.route('/api/user', methods = ['GET'])
+@login_required
+def info():
+    schema = UserSchema()
+    return jsonify(schema.dump(current_user).data)
 
 @app.route('/api/user/register', methods = ['POST'])
 @use_args(user_creation_fields)

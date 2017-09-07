@@ -33,7 +33,7 @@ class Module(db.Model):
     pod_id = Column(UUID, nullable=True)
     base_id = Column(UUID, nullable=True)
 
-    name = Column(String(255))
+    type = Column(String(255))
     level = Column(Integer)
     stationary = Column(Boolean)
     x_pos = Column(Integer)
