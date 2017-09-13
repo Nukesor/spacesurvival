@@ -24,8 +24,8 @@ item resource =
 resourceImage : Resource -> Html msg
 resourceImage resource =
     svg
-        [ Svg.Attributes.width "40px"
-        , Svg.Attributes.height "40px"
+        [ Svg.Attributes.width "50px"
+        , Svg.Attributes.height "50px"
         ]
         [ image
             [ Svg.Attributes.xlinkHref ("/static/img/" ++ resource.name ++ ".svg")
