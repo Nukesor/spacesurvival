@@ -92,6 +92,8 @@ enum_impl!{ResearchTypes {
 enum_impl!{ResourceTypes {
     Minerals,
     Fuel,
+    Power,
+    Nanobots,
 }}
 
 /// This enum contains all types of valid modules.
