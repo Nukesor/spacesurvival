@@ -1,7 +1,0 @@
-#!/bin/bash
-
-cargo clean
-rm */**/*.bk
-rm -r static
-rm -r node_modules
-rm -r elm-stuff

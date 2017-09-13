@@ -53,3 +53,5 @@ class Pod(db.Model):
         for resource in ResourceTypes:
             resources.append(Resource(resource.name))
         self.resources = resources
+
+

@@ -2,7 +2,7 @@ from flask import jsonify
 from flask_security import login_required, login_user, current_user
 from webargs.flaskparser import use_args
 
-from server import app, db, user_datastore
+from server import user_bp, db, user_datastore
 from server.responses import created, ok
 from server.models.module import Module
 from server.schemas.module import ModuleSchema
@@ -10,14 +10,15 @@ from server.data.types import ModuleTypes
 from server.validation.module import module_creation_fields
 
 
-@app.route('/api/module', methods = ['GET'])
+@user_bp.route('/api/module', methods = ['GET'])
 @login_required
 def get_module_meta():
     schema = ModuleSchema()
     return jsonify(schema.dump(current_user).data)
 
 
-@app.route('/api/modules/pod', methods = ['GET'])
+@user_bp.route('/api/modules/pod', methods = ['GET'])
+@login_required
 def get_pod_modules():
 
     modules = current_user.pod.modules
@@ -26,8 +27,9 @@ def get_pod_modules():
     return jsonify(schema.dump(modules).data)
 
 
-@app.route('/api/modules/pod/new', methods = ['POST'])
+@user_bp.route('/api/modules/pod/new', methods = ['POST'])
 @use_args(module_creation_fields)
+@login_required
 def new_pod_module(args):
 
     # Check for valid module type

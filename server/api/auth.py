@@ -2,7 +2,7 @@ from sqlalchemy import or_
 from webargs.flaskparser import use_args
 from flask_security.utils import login_user
 
-from server import app, db
+from server import user_bp, db
 from server.models import User
 from server.responses import bad_request, ok
 from server.validation.user import login_fields
@@ -11,7 +11,7 @@ from server.validation.user import login_fields
 #
 # Check if we can login with the credentials.
 # We try to get the user by searching email and nickname for the given identifier.
-@app.route('/api/auth/login', methods=['GET', 'POST'])
+@user_bp.route('/api/auth/login', methods=['POST'])
 @use_args(login_fields)
 def login(args):
 

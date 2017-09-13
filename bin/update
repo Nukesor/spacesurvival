@@ -1,8 +1,0 @@
-#!/bin/bash
-
-rustup update
-cargo update
-cargo install-update -a
-cargo build
-
-cargo outdated

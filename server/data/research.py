@@ -2,6 +2,7 @@ import sys
 import json
 from marshmallow import fields, Schema
 
+from server import app
 from server.data import Dependency, Resource
 from server.data.types import ResearchTypes
 
@@ -24,7 +25,7 @@ class Research(Schema):
 
 def load_research():
     try:
-        with open("server/data/research_data.json", 'r') as stream:
+        with open(app.config["RESEARCH_FILE_PATH"], 'r') as stream:
             data = json.load(stream)
 
         researches = {}

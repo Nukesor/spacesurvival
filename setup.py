@@ -18,8 +18,9 @@ setup(
         'webargs>=1.8.1',
         'psycopg2>=2.7.3'
         'sqlalchemy>=1.1.13',
-        'sqlalchemy-utils>=0.32.16',
+        'sqlalchemy-utils>=0.32.13',
         'pytest',
+        'pytest-flask',
     ],
     classifiers=[
         'Programming Language :: Python :: 3.6',
