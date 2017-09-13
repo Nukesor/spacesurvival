@@ -3,7 +3,7 @@ from flask_security import login_required, login_user, current_user
 from webargs.flaskparser import use_args
 
 from server import user_bp, db, user_datastore
-from server.responses import created
+from server.responses import created, bad_request
 from server.models.user import User
 from server.schemas.user import UserSchema
 from server.validation.user import user_creation_fields

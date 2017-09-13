@@ -14,4 +14,4 @@ def created(message=''):
     return json_response(201, message)
 
 def bad_request(message=''):
-    return json_response(404, message)
+    return json_response(400, message)
