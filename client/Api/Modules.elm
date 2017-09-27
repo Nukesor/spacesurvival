@@ -1,7 +1,6 @@
 module Api.Modules exposing (..)
 
 import Api.Util exposing (authenticatedGet, authenticatedPost, pairDecoder)
-import Array
 import Dict
 import Json.Decode as Decode
 import Json.Decode.Extra exposing ((|:))
@@ -27,7 +26,7 @@ slotsToGrid : List GridSlot -> Grid
 slotsToGrid =
     List.foldl
         (\slot grid ->
-            setAtPosition slot.x slot.y (Module slot.id slot.level) grid
+            setAtPosition slot.point (Module slot.id slot.level) grid
         )
         Model.Grid.empty
 
@@ -35,13 +34,18 @@ slotsToGrid =
 type alias GridSlot =
     { level : Int
     , id : String
-    , x : Int
-    , y : Int
+    , point : Point
     }
 
 
+toGridSlot : Int -> String -> Int -> Int -> GridSlot
+toGridSlot level id x y =
+    { level = level, id = id, point = Point x y }
+
+
+gridSlotDecoder : Decode.Decoder GridSlot
 gridSlotDecoder =
-    Decode.succeed GridSlot
+    Decode.succeed toGridSlot
         |: (Decode.field "level" Decode.int)
         |: (Decode.field "name" Decode.string)
         |: (Decode.field "x_pos" Decode.int)

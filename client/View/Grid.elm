@@ -45,6 +45,7 @@ slot slot =
                     , Svg.Attributes.y yp
                     , Svg.Attributes.width "10%"
                     , Svg.Attributes.height "10%"
+                    , onClick (ShowBuildDialog (Just slot.position))
                     ]
                     []
                 ]
