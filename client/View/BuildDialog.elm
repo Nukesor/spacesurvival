@@ -9,7 +9,7 @@ import Html.Events exposing (..)
 import Messages
 import Model
 import Model.Grid exposing (atPosition)
-import Model.Modules exposing (ModuleType, buildableModules)
+import Model.Modules exposing (Module, ModuleType, buildableModules, findLevel)
 import Model.Util exposing (Point)
 
 
@@ -37,7 +37,7 @@ availableModules model point =
     in
         case maybeMod of
             Just mod ->
-                [ Html.text "Upgrade modules here" ]
+                [ upgradeItem mod ]
 
             Nothing ->
                 model.availableModules
@@ -57,6 +57,15 @@ buildItem currentPoint id mod =
         , onClick (Messages.StartBuilding id currentPoint)
         ]
         [ Html.text mod.name ]
+
+
+upgradeItem : Module -> Html Messages.Msg
+upgradeItem mod =
+    li
+        [ helpers.class [ BuildItem ]
+        , onClick (Messages.Upgrade mod.uuid)
+        ]
+        [ Html.text ("Upgrade to level " ++ (toString (mod.level + 1))) ]
 
 
 cancelButton : Html Messages.Msg

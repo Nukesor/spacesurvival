@@ -26,7 +26,7 @@ slotsToGrid : List GridSlot -> Grid
 slotsToGrid =
     List.foldl
         (\slot grid ->
-            setAtPosition slot.point (Module slot.id slot.level) grid
+            setAtPosition slot.point (Module slot.id slot.level slot.uuid) grid
         )
         Model.Grid.empty
 
@@ -34,13 +34,14 @@ slotsToGrid =
 type alias GridSlot =
     { level : Int
     , id : String
+    , uuid : String
     , point : Point
     }
 
 
-toGridSlot : Int -> String -> Int -> Int -> GridSlot
-toGridSlot level id x y =
-    { level = level, id = id, point = Point x y }
+toGridSlot : Int -> String -> String -> Int -> Int -> GridSlot
+toGridSlot level id uuid x y =
+    { level = level, id = id, point = Point x y, uuid = uuid }
 
 
 gridSlotDecoder : Decode.Decoder GridSlot
@@ -48,6 +49,7 @@ gridSlotDecoder =
     Decode.succeed toGridSlot
         |: (Decode.field "level" Decode.int)
         |: (Decode.field "name" Decode.string)
+        |: (Decode.field "id" Decode.string)
         |: (Decode.field "x_pos" Decode.int)
         |: (Decode.field "y_pos" Decode.int)
 
@@ -111,3 +113,12 @@ startBuilding model id point =
         Decode.value
         QueueEntryAdded
         (newModuleEncoder id point)
+
+
+upgrade : Model -> String -> Cmd Messages.Msg
+upgrade model uuid =
+    authenticatedPost model
+        ("/api/modules/pod/upgrade/" ++ uuid)
+        Decode.value
+        QueueEntryAdded
+        Encode.null

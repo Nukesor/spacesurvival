@@ -1,7 +1,6 @@
 module Model.Grid exposing (..)
 
 import Array
-import Extra.Maybe exposing (isJust)
 import List
 import Model.Modules exposing (..)
 import Model.Util exposing (..)

@@ -1,6 +1,7 @@
 module Model.Modules exposing (..)
 
 import Dict
+import List.Extra
 import Model.Research exposing (ResearchId, ResourceId, dependencyFulfilled)
 import Model.Resources exposing (Resources, applyTick, foldModifications, resourcesExist)
 import Time
@@ -14,12 +15,16 @@ type alias ModuleId =
     String
 
 
+type alias Uuid =
+    String
+
+
 type alias AvailableModules =
     Dict.Dict ModuleId ModuleType
 
 
 type alias Module =
-    { id : ModuleId, level : Int }
+    { id : ModuleId, level : Int, uuid : Uuid }
 
 
 type alias ModuleType =
@@ -94,10 +99,15 @@ tick dt modules moduleSpecs resources =
 
 findCurrentLevel : AvailableModules -> Module -> Maybe ModuleLevel
 findCurrentLevel specs mod =
+    findLevel specs mod mod.level
+
+
+findLevel : AvailableModules -> Module -> Int -> Maybe ModuleLevel
+findLevel specs mod level =
     specs
         |> Dict.get mod.id
-        |> Maybe.map (\spec -> List.filter (\level -> level.level == mod.level) spec.levels)
-        |> Maybe.andThen List.head
+        |> Maybe.map .levels
+        |> Maybe.andThen (List.Extra.find (.level >> (==) level))
 
 
 resourcesPerTick : Time.Time -> List ( ResourceId, Int ) -> List ( ResourceId, Int )
