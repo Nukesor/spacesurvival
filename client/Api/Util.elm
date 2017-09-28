@@ -1,6 +1,7 @@
 module Api.Util exposing (..)
 
 import Http exposing (emptyBody, expectJson, jsonBody, stringBody)
+import String exposing (concat)
 import Json.Decode as Decode
 import Model exposing (Model)
 import Model.User exposing (User(LoggedIn))

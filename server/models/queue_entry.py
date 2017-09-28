@@ -1,4 +1,5 @@
-from server import db
+import uuid
+from server.extensions import db
 from sqlalchemy import (
     func,
     text,
@@ -31,18 +32,19 @@ class QueueEntry(db.Model):
         ),
     )
 
-    id = Column(UUID, primary_key=True, server_default=text("uuid_generate_v4()"))
-    queue_id = Column(UUID, nullable=True)
-    module_id = Column(UUID, nullable=True)
-    research_id = Column(UUID, nullable=True)
+    id = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
+    queue_id = Column(UUID(as_uuid=True), nullable=False)
+    module_id = Column(UUID(as_uuid=True))
+    research_id = Column(UUID(as_uuid=True))
 
-    name = Column(String(255))
-    level = Column(Integer)
-    duration = Column(Integer)
+    name = Column(String(255), nullable=False)
+    level = Column(Integer, nullable=False)
+    duration = Column(Integer, nullable=False)
 
-    finishes_at = Column(DateTime)
-    created_at = Column(DateTime, server_default=func.now())
+    finishes_at = Column(DateTime, nullable=False)
+    created_at = Column(DateTime, server_default=func.now(), nullable=False)
     updated_at = Column(
         DateTime, server_default=func.now(),
-        onupdate=func.current_timestamp()
+        onupdate=func.current_timestamp(),
+        nullable=False
     )

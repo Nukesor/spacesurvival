@@ -1,4 +1,5 @@
-from server import db
+import uuid
+from server.extensions import db
 from sqlalchemy.orm import relationship
 from sqlalchemy import (
     func,
@@ -29,17 +30,17 @@ class Queue(db.Model):
         ),
     )
 
-    id = Column(UUID, primary_key=True, server_default=text("uuid_generate_v4()"))
-    pod_id = Column(UUID, nullable=True)
-    base_id = Column(UUID, nullable=True)
+    id = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
+    pod_id = Column(UUID(as_uuid=True))
+    base_id = Column(UUID(as_uuid=True))
 
-    name = Column(String(255))
-    slots = Column(Integer)
+    slots = Column(Integer, default=4, nullable=False)
     pod = relationship("Pod", back_populates="queue")
     base = relationship("Base", back_populates="queue")
 
-    created_at = Column(DateTime, server_default=func.now())
+    created_at = Column(DateTime, server_default=func.now(), nullable=False)
     updated_at = Column(
         DateTime, server_default=func.now(),
-        onupdate=func.current_timestamp()
+        onupdate=func.current_timestamp(),
+        nullable=False
     )

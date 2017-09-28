@@ -2,7 +2,7 @@ import pytest
 
 from server import create_app
 from server.config import TestConfig
-from server.helper import create_db
+from server.helpers.database import create_db
 from tests.fixtures import *
 
 

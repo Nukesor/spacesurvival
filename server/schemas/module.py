@@ -1,4 +1,4 @@
-from server import ma
+from server.extensions import ma
 from server.models.module import Module
 
 class ModuleSchema(ma.ModelSchema):

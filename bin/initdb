@@ -2,12 +2,14 @@
 import sys, os
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
 
-from server import db
-from server.helper import create_db, create_debug_user
+from server import create_app, db
+from server.extensions import db
+from server.helpers.database import create_db, create_debug_user
 
 
 config = os.getenv('SQLALCHEMY_DATABASE_URI', 'develop')
 app = create_app(config)
-db.drop_all()
-create_db()
-create_debug_user(app)
+with app.app_context():
+    db.drop_all()
+    create_db()
+    create_debug_user(app)

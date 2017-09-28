@@ -5,5 +5,4 @@ from .queue import *
 from .queue_entry import *
 from .research import *
 from .resource import *
-from .role import *
 from .user import *

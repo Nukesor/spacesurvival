@@ -1,4 +1,5 @@
-from server import db, user_datastore
+from server.extensions import db
+from server.models.user import User
 
 def create_db():
     # Create uuid-ossp extension, if it doesn't exist
@@ -12,7 +13,7 @@ def create_db():
 
 def create_debug_user(app):
     with app.app_context():
-        user = user_datastore.create_user(
+        user = User(
             nickname = 'admin',
             email = 'admin@lol.de',
             password = 'hunter2',

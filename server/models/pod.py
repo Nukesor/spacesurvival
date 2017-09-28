@@ -1,3 +1,4 @@
+import uuid
 from sqlalchemy.orm import relationship
 from sqlalchemy.dialects.postgresql import UUID
 from sqlalchemy import (
@@ -13,7 +14,7 @@ from sqlalchemy.types import (
     DateTime,
 )
 
-from server import db
+from server.extensions import db
 from server.models.queue import Queue
 from server.models.resource import Resource
 from server.data.types import ResourceTypes
@@ -28,10 +29,10 @@ class Pod(db.Model):
         ForeignKeyConstraint(['base_id'], ['base.id']),
     )
 
-    id = Column(UUID, primary_key=True, server_default=text("uuid_generate_v4()"))
-    name = Column(String(255))
-    user_id = Column(UUID)
-    base_id = Column(UUID, nullable=True)
+    id = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
+    name = Column(String(255), nullable=False)
+    user_id = Column(UUID(as_uuid=True), nullable=False)
+    base_id = Column(UUID(as_uuid=True))
 
     user = relationship("User", back_populates="pod")
 
@@ -40,10 +41,11 @@ class Pod(db.Model):
     modules = relationship("Module", back_populates="pod")
     researches = relationship("Research", back_populates="pod")
 
-    created_at = Column(DateTime, server_default=func.now())
+    created_at = Column(DateTime, server_default=func.now(), nullable=False)
     updated_at = Column(
         DateTime, server_default=func.now(),
-        onupdate=func.current_timestamp()
+        onupdate=func.current_timestamp(),
+        nullable=False
     )
 
     def __init__(self, nickname):

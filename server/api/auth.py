@@ -1,17 +1,21 @@
+from datetime import datetime
 from sqlalchemy import or_
 from webargs.flaskparser import use_args
 from flask_security.utils import login_user
 
-from server import user_bp, db
+from server import user_bp
+from server.extensions import db
 from server.models import User
 from server.responses import bad_request, ok
 from server.validation.user import login_fields
+from server.helpers.decorators import login_exempt
 
 # Endpoint for login.
 #
 # Check if we can login with the credentials.
 # We try to get the user by searching email and nickname for the given identifier.
 @user_bp.route('/api/auth/login', methods=['POST'])
+@login_exempt
 @use_args(login_fields)
 def login(args):
 
@@ -22,6 +26,7 @@ def login(args):
     user = db.session.query(User) \
         .filter(or_(User.nickname == identifier, User.email == identifier)) \
         .one_or_none()
+
     if user is None:
         return bad_request('Unknown credentials or wrong password.')
 
@@ -30,6 +35,14 @@ def login(args):
     if not valid_password:
         return bad_request('Unknown credentials or wrong password.')
 
-    login_user(user)
+    if user.has_valid_auth_token:
+        token = user.current_auth_token
+    else:
+        token = user.generate_auth_token()
+    user.last_login_at = datetime.utcnow()
+    db.session.add(user)
+    db.session.commit()
 
-    return ok()
+#    return ok({"token": token,
+#               "user_id": user.id})
+    return ok("{}:{}".format(user.id, token))

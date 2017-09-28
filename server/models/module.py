@@ -1,3 +1,4 @@
+import uuid
 from sqlalchemy.orm import relationship
 from sqlalchemy import (
     func,
@@ -14,7 +15,7 @@ from sqlalchemy.types import (
 )
 from sqlalchemy.dialects.postgresql import UUID
 
-from server import db
+from server.extensions import db
 
 
 class Module(db.Model):
@@ -29,21 +30,22 @@ class Module(db.Model):
         ),
     )
 
-    id = Column(UUID, primary_key=True, server_default=text("uuid_generate_v4()"))
-    pod_id = Column(UUID, nullable=True)
-    base_id = Column(UUID, nullable=True)
+    id = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
+    pod_id = Column(UUID(as_uuid=True))
+    base_id = Column(UUID(as_uuid=True))
 
-    type = Column(String(255))
-    level = Column(Integer)
-    stationary = Column(Boolean)
+    type = Column(String(255), nullable=False)
+    level = Column(Integer, nullable=False)
+    stationary = Column(Boolean, nullable=False)
     x_pos = Column(Integer)
     y_pos = Column(Integer)
 
     pod = relationship("Pod", back_populates="modules")
     base = relationship("Base", back_populates="modules")
 
-    created_at = Column(DateTime, server_default=func.now())
+    created_at = Column(DateTime, server_default=func.now(), nullable=False)
     updated_at = Column(
         DateTime, server_default=func.now(),
-        onupdate=func.current_timestamp()
+        onupdate=func.current_timestamp(),
+        nullable=False,
     )

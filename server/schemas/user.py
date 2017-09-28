@@ -1,4 +1,4 @@
-from server import ma
+from server.extensions import ma
 from server.models.user import User
 
 class UserSchema(ma.ModelSchema):

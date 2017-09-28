@@ -1,0 +1,17 @@
+flask>=0.12
+flask-security>=3.0.0
+flask-sqlalchemy>=2.2
+flask-migrate>=2.1.1
+flask-marshmallow>=0.8
+marshmallow-sqlalchemy>=0.12.1
+webargs>=1.8.1
+
+argon2_cffi
+passlib~=1.7.0
+
+psycopg2>=2.7.
+sqlalchemy>=1.1.13
+sqlalchemy-utils>=0.32.13
+
+pytest
+pytest-flask
