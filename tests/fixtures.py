@@ -1,15 +1,10 @@
 import pytest
+
 from server.models.user import User
 
 @pytest.fixture(scope='function')
-def user(app, session):
+def user(app, user_factory):
     """Session-wide test `Flask` application."""
 
-    user = User(
-        nickname = 'admin',
-        email = 'admin@admin.de',
-        password = 'hunter2',
-    )
-    session.add(user)
-    session.commit()
+    user = user_factory.get()
     return user

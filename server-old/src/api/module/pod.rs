@@ -23,21 +23,6 @@ use schema::researches::dsl as research_dsl;
 use schema::queue_entries::dsl as queue_entry_dsl;
 
 
-/// The user needs to be logged in to access this route!
-///
-/// This route returns the list of all modules and
-/// their current levels for the pod of the current user.
-#[get("/pod")]
-pub fn get_modules(current_user: User, db: DB) -> Result<APIResponse, APIResponse> {
-
-    let pod = current_user.get_pod(&db);
-    let modules = pod.get_modules(&db).or(Err(
-        ok().message("No modules installed."),
-    ))?;
-
-    Ok(ok().data(json!(&modules)))
-}
-
 /// Add a new module to pod
 ///
 /// This endpoint:

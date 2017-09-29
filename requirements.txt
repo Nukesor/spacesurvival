@@ -12,6 +12,3 @@ passlib~=1.7.0
 psycopg2>=2.7.
 sqlalchemy>=1.1.13
 sqlalchemy-utils>=0.32.13
-
-pytest
-pytest-flask

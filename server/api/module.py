@@ -1,4 +1,4 @@
-from flask import jsonify, g
+from flask import g
 from webargs.flaskparser import use_args
 
 from server import user_bp
@@ -6,23 +6,26 @@ from server.extensions import db
 from server.responses import created, ok
 from server.models.module import Module
 from server.schemas.module import ModuleSchema
-from server.data.types import ModuleTypes
 from server.validation.module import module_creation_fields
+from server.data.types import ModuleTypes
 
 
-@user_bp.route('/api/module', methods = ['GET'])
+@user_bp.route('/api/modules', methods = ['GET'])
 def get_module_meta():
-    schema = ModuleSchema()
-    return jsonify(schema.dump(g.current_user).data)
+    from server.data.data import module_data
+    print(module_data)
+    return ok(module_data)
 
 
+# This route returns the list of all modules and
+# their current levels for the pod of the current user.
 @user_bp.route('/api/modules/pod', methods = ['GET'])
 def get_pod_modules():
 
     modules = g.current_user.pod.modules
     schema = ModuleSchema()
 
-    return jsonify(schema.dump(modules).data)
+    return ok(schema.dump(modules).data)
 
 
 @user_bp.route('/api/modules/pod/new', methods = ['POST'])
@@ -50,4 +53,4 @@ def new_pod_module(args):
     if existing_module:
         return bad_request('There already is a module at this position')
 
-    return jsonify(schema.dump(modules).data)
+    return ok(schema.dump(modules).data)

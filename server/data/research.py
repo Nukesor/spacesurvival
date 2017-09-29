@@ -1,8 +1,8 @@
 import sys
 import json
+from flask import current_app
 from marshmallow import fields, Schema
 
-from server import app
 from server.data import Dependency, Resource
 from server.data.types import ResearchTypes
 
@@ -25,7 +25,7 @@ class Research(Schema):
 
 def load_research():
     try:
-        with open(app.config["RESEARCH_FILE_PATH"], 'r') as stream:
+        with open(current_app.config["RESEARCH_FILE_PATH"], 'r') as stream:
             data = json.load(stream)
 
         researches = {}

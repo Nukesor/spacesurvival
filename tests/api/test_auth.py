@@ -1,10 +1,13 @@
 import json
 import pytest
 
+from server.extensions import db
 from server.models.user import User
 
-class TestAuthentication:
-    def test_user_creation(self, client, session):
+
+@pytest.mark.usefixtures('dbmodels', 'dbtransaction')
+class TestUserCreation:
+    def test_user_creation(self, app, client):
         data = {
             'nickname': 'admin',
             'email': 'admin@admin.de',
@@ -15,7 +18,7 @@ class TestAuthentication:
             content_type='application/json',
         )
         assert response.status_code == 201
-        user = session.query(User) \
+        user = db.session.query(User) \
             .filter(User.nickname == 'admin') \
             .filter(User.email == 'admin@admin.de') \
             .one_or_none()
@@ -24,7 +27,7 @@ class TestAuthentication:
         assert not user.verify_password('hunter1337')
 
 
-    def test_cant_reuse_credentials(self, client, session):
+    def test_cant_reuse_credentials(self, app, client):
         data = {
             'nickname': 'admin',
             'email': 'admin@admin.de',
@@ -39,11 +42,11 @@ class TestAuthentication:
             '/api/user/register', data=json.dumps(data),
             content_type='application/json',
         )
-        assert response.status_code == 400
+        assert response.status_code == 409
 
 
     @pytest.mark.parametrize('email', ['test', 'test@de'])
-    def test_invalid_email(self, client, session, db, email):
+    def test_invalid_email(self, app, client, email):
         data = {
             'nickname': 'test',
             'email': email,
@@ -56,7 +59,9 @@ class TestAuthentication:
         assert response.status_code == 422
 
 
-    def test_login(self, client, session, db, user):
+@pytest.mark.usefixtures('dbmodels', 'dbtransaction')
+class TestAuthentication:
+    def test_login(self, app, client, user):
         for identifier in [user.nickname, user.email]:
             data = {
                 'identifier': identifier,

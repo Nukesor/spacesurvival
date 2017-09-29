@@ -1,8 +1,8 @@
 import sys
 import json
+from flask import current_app
 from marshmallow import fields, Schema
 
-from server import app
 from server.data import Dependency, Resource
 from server.data.types import ModuleTypes
 
@@ -31,8 +31,9 @@ class Module(Schema):
 
 def load_modules():
     try:
-        with open(app.config["MODULE_FILE_PATH"], 'r') as stream:
-            data = json.load(stream)
+        with current_app.app_context():
+            with open(current_app.config["MODULE_FILE_PATH"], 'r') as stream:
+                data = json.load(stream)
 
         modules = {}
         for key, module in data.items():

@@ -1,12 +1,14 @@
 import json
 import pytest
 
+from server.extensions import db
 from server.models.user import User
 
 
+@pytest.mark.usefixtures('dbmodels', 'dbtransaction')
 class TestAuthentication:
     @pytest.mark.parametrize('email', ['test', 'test@de'])
-    def test_invalid_email(self, client, session, db, email):
+    def test_invalid_email(self, app, client, email):
         data = {
             'nickname': 'test',
             'email': email,
@@ -19,7 +21,7 @@ class TestAuthentication:
         assert response.status_code == 422
 
 
-    def test_user_info(self, client, session, db, user):
+    def test_user_info(self, app, client, user):
         for identifier in [user.nickname, user.email]:
             data = {
                 'identifier': identifier,
