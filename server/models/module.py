@@ -1,8 +1,9 @@
+"""The file for the Module database model."""
+
 import uuid
 from sqlalchemy.orm import relationship
 from sqlalchemy import (
     func,
-    text,
     Column,
     CheckConstraint,
     ForeignKeyConstraint,
@@ -19,8 +20,9 @@ from server.extensions import db
 
 
 class Module(db.Model):
-    __tablename__ = 'module'
+    """The database model for all Modules."""
 
+    __tablename__ = 'module'
     __table_args__ = (
         ForeignKeyConstraint(['pod_id'], ['pod.id']),
         ForeignKeyConstraint(['base_id'], ['base.id']),
@@ -49,3 +51,12 @@ class Module(db.Model):
         onupdate=func.current_timestamp(),
         nullable=False,
     )
+
+    def __init__(self, type, pod, level, stationary, x_pos=None, y_pos=None):
+        """Create a new module."""
+        self.type = type
+        self.pod = pod
+        self.level = level
+        self.stationary = stationary
+        self.x_pos = x_pos
+        self.y_pos = y_pos
