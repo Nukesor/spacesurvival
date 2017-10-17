@@ -1,17 +1,16 @@
+"""Resource database model."""
+
 import uuid
 from server.extensions import db
 from sqlalchemy import (
     func,
-    text,
     Column,
     CheckConstraint,
     ForeignKeyConstraint,
 )
 
 from sqlalchemy.types import (
-    Boolean,
     String,
-    Integer,
     BigInteger,
     DateTime,
 )
@@ -19,8 +18,9 @@ from sqlalchemy.dialects.postgresql import UUID
 
 
 class Resource(db.Model):
-    __tablename__ = 'resource'
+    """Resource model."""
 
+    __tablename__ = 'resource'
     __table_args__ = (
         ForeignKeyConstraint(['pod_id'], ['pod.id']),
         ForeignKeyConstraint(['base_id'], ['base.id']),
@@ -43,10 +43,11 @@ class Resource(db.Model):
     updated_at = Column(
         DateTime, server_default=func.now(),
         onupdate=func.current_timestamp(),
-        nullable=False
+        nullable=False,
     )
 
     def __init__(self, name):
+        """Create a new Resource."""
         self.name = name
         self.amount = 0
         self.production = 0

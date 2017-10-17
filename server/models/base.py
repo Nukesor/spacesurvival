@@ -1,14 +1,13 @@
+"""Base database model."""
 import uuid
 from sqlalchemy.orm import relationship
 from sqlalchemy import (
     func,
     text,
     Column,
-    ForeignKeyConstraint,
 )
 
 from sqlalchemy.types import (
-    Boolean,
     String,
     DateTime,
 )
@@ -18,8 +17,9 @@ from server.extensions import db
 
 
 class Base(db.Model):
-    __tablename__ = 'base'
+    """Base model."""
 
+    __tablename__ = 'base'
     __table_args__ = ()
 
     id = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
@@ -35,5 +35,5 @@ class Base(db.Model):
     updated_at = Column(
         DateTime, server_default=func.now(),
         onupdate=func.current_timestamp(),
-        nullable=False
+        nullable=False,
     )

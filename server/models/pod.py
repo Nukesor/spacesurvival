@@ -1,15 +1,15 @@
+"""Pod database model."""
+
 import uuid
 from sqlalchemy.orm import relationship
 from sqlalchemy.dialects.postgresql import UUID
 from sqlalchemy import (
     func,
-    text,
     Column,
     ForeignKeyConstraint,
 )
 
 from sqlalchemy.types import (
-    Boolean,
     String,
     DateTime,
 )
@@ -19,9 +19,11 @@ from server.models.queue import Queue
 from server.models.resource import Resource
 from server.data.types import ResourceTypes
 
-class Pod(db.Model):
-    __tablename__ = 'pod'
 
+class Pod(db.Model):
+    """Pod model."""
+
+    __tablename__ = 'pod'
     __table_args__ = (
         ForeignKeyConstraint(
             ['user_id'], ['user.id'],
@@ -45,15 +47,14 @@ class Pod(db.Model):
     updated_at = Column(
         DateTime, server_default=func.now(),
         onupdate=func.current_timestamp(),
-        nullable=False
+        nullable=False,
     )
 
     def __init__(self, nickname):
+        """Create a new pod."""
         self.name = "{nickname}'s pod"
         self.queue = Queue()
         resources = []
         for resource in ResourceTypes:
             resources.append(Resource(resource.name))
         self.resources = resources
-
-
