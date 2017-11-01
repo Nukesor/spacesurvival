@@ -45,7 +45,5 @@ def login(args):
     db.session.add(user)
     db.session.commit()
 
-#    return ok({"token": token,
-#               "pod_id": user.pod.id})
-#               "user_id": user.id})
-    return ok(f'{user.id}:{token}')
+    return ok({"token": token,
+               "user_id": user.id})
