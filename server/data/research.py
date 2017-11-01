@@ -29,7 +29,7 @@ class Research(Schema):
     levels = fields.Nested(ResearchLevel, many=True)
 
 
-def load_research():
+def load_research() -> Research:
     """Load the research data from a file."""
     try:
         with open(current_app.config["RESEARCH_FILE_PATH"], 'r') as stream:

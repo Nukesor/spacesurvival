@@ -8,6 +8,7 @@ from server.extensions import db
 from server.responses import created, ok, bad_request
 from server.models.pod import Pod
 from server.models.module import Module
+from server.models.resource import Resource
 from server.schemas.module import ModuleSchema
 from server.validation.module import module_creation_fields
 from server.data.types import ModuleTypes
@@ -37,22 +38,23 @@ def new_pod_module(args):
     """Place a new module on the pod grid."""
     # Check for valid module type
     module_type = args['module_type']
-    stationary = args['stationary']
-    x_pos = args['position_x']
-    y_pos = args['position_y']
+    stationary = args.get('stationary')
+    x_pos = args.get('position_x')
+    y_pos = args.get('position_y')
     if module_type not in ModuleTypes.__members__:
-        return bad_request('Unknown Module type "{module_type}"')
+        return bad_request(f'Unknown Module type: {module_type}')
 
+    pod = g.current_user.pod
     if stationary:
         existing_module = db.session.query(Module) \
-            .filter(Module.pod_id == g.current_user.pod.id) \
+            .filter(Module.pod_id == pod.id) \
             .filter(Module.stationary == True) \
             .filter(Module.type == module_type) \
             .first()
 
     else:
         existing_module = db.session.query(Module) \
-            .filter(Module.pod_id == g.current_user.pod.id) \
+            .filter(Module.pod_id == pod.id) \
             .filter(Module.x_pos == x_pos) \
             .filter(Module.y_pos == y_pos) \
             .first()
@@ -60,8 +62,12 @@ def new_pod_module(args):
     if existing_module:
         return bad_request('There already is a module at this position')
 
-    module = Module(module_type, g.current_user.pod,
-                    0, stationary, x_pos, y_pos)
+    from server.data.data import module_data
+    requirements = module_data[module_type].get('levels').get('resources')
+    enough, missing = Resource.enough_resources(pod.resources, requirements)
+    if not enough:
+        return bad_request('Not enough resources.', payload=missing)
 
-    schema = ModuleSchema()
+    Resource.subtract_resources(pod.resources, requirements)
+
     return created(schema.dump(module).data)

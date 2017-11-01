@@ -7,6 +7,7 @@ from sqlalchemy import (
     CheckConstraint,
     ForeignKeyConstraint,
 )
+from sqlalchemy.orm import relationship
 
 from sqlalchemy.types import (
     Boolean,
@@ -40,6 +41,9 @@ class QueueEntry(db.Model):
     name = Column(String(255), nullable=False)
     level = Column(Integer, nullable=False)
     duration = Column(Integer, nullable=False)
+
+    module = relationship("Module")
+    research = relationship("Research")
 
     finishes_at = Column(DateTime, nullable=False)
     created_at = Column(DateTime, server_default=func.now(), nullable=False)

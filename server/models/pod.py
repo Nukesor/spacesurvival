@@ -17,7 +17,7 @@ from sqlalchemy.types import (
 from server.extensions import db
 from server.models.queue import Queue
 from server.models.resource import Resource
-from server.data.types import ResourceTypes
+from server.data.types import ResourceTypes, ModuleTypes
 
 
 class Pod(db.Model):
@@ -58,3 +58,6 @@ class Pod(db.Model):
         for resource in ResourceTypes:
             resources.append(Resource(resource.name))
         self.resources = resources
+
+    def update_resource_production(self):
+        return

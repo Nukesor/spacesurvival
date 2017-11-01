@@ -28,6 +28,8 @@ class Resource(db.Model):
             "(pod_id is NULL and base_id is not NULL) or "
             "(pod_id is not NULL and base_id is NULL)"
         ),
+        CheckConstraint("amount >= 0 and amount < max_amount"),
+        CheckConstraint("max_amount > 0"),
     )
 
     id = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
@@ -52,3 +54,42 @@ class Resource(db.Model):
         self.amount = 0
         self.production = 0
         self.max_amount = 5000
+
+    def get_by_name(resources, name):
+        """Get a resource by name."""
+        return next((r for r in resources if r.name == name), None)
+
+    def enough_resources(resources, requirements) -> bool:
+        """Check if there are enough resources for construction."""
+        enough = True
+        missing = {}
+        for requirement in requirements:
+            resource = Resource.get_by_name(resources, requirement.type)
+            if resource is None:
+                print(f'Missing resource: {requirement.type}')
+            if resource.amount <= requirement.amount:
+                enough = False
+                missing[resource.name] = requirement.amount - resource.amount
+        return enough, missing
+
+    def subtract_resources(resources, requirements) -> bool:
+        """Check if there are enough resources for construction."""
+        for requirement in requirements:
+            resource = Resource.get_by_name(resources, requirement.type)
+            if (resource.amount - requirement.amount) <= 0:
+                print(f"Can't afford resource {requirement.type}: {resource.amount} of {requirement.amount}")
+                raise Exception
+            else:
+                resource.amount -= requirement.amount
+            db.session.add(resource)
+        db.session.commit()
+        return True
+
+    def add_resources(resources, requirements) -> bool:
+        """Check if there are enough resources for construction."""
+        for requirement in requirements:
+            resource = Resource.get_by_name(resources, requirement.type)
+            resource.amount += requirement.amount
+            db.session.add(resource)
+        db.session.commit()
+        return True
