@@ -46,6 +46,6 @@ subscriptions model =
     Sub.batch
         [ Animation.subscription AnimateModal [ model.authDialogAnimation ]
         , Api.Auth.receiveToken
-            (\token -> Messages.LoggedIn (Ok { token = token }))
+            (\user -> Messages.LoggedIn (Ok user))
         , every second Tick
         ]

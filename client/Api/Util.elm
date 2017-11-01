@@ -42,7 +42,7 @@ authenticatedGet model url decoder msg =
                     Http.request
                         { method = "GET"
                         , headers =
-                            [ Http.header "Authorization" user.token
+                            [ Http.header "Authorization" (user.id ++ ":" ++ user.token)
                             ]
                         , url = url
                         , expect = expectJson decoder
@@ -65,7 +65,7 @@ authenticatedPost model url decoder msg data =
                     Http.request
                         { method = "POST"
                         , headers =
-                            [ Http.header "Authorization" user.token
+                            [ Http.header "Authorization" (user.id ++ ":" ++ user.token)
                             ]
                         , url = url
                         , expect = expectJson decoder

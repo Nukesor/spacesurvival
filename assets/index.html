@@ -14,14 +14,18 @@
 
         app.ports.readToken.subscribe(function() {
             try {
-                app.ports.receiveToken.send(localStorage.getItem('token'));
+                app.ports.receiveToken.send({
+                    token: localStorage.getItem('token'),
+                    id: localStorage.getItem('id')
+                });
             } catch (e) {
                 // so what
             }
         });
 
-        app.ports.saveToken.subscribe(function(token) {
+        app.ports.saveToken.subscribe(function({token, id}) {
             localStorage.setItem('token', token);
+            localStorage.setItem('id', id);
         });
     </script>
 </body>

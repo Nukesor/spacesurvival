@@ -103,7 +103,7 @@ fetchAvailableModules model =
 
 fetchGridModules : Model -> Cmd Messages.Msg
 fetchGridModules model =
-    authenticatedGet model "/api/modules/pod" gridDecoder Messages.ReceiveGrid
+    authenticatedGet model "/api/modules/pod/" gridDecoder Messages.ReceiveGrid
 
 
 startBuilding : Model -> ModuleId -> Point -> Cmd Messages.Msg

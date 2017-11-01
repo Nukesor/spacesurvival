@@ -16,4 +16,4 @@ type alias RegisterData =
 
 
 type alias LoggedInData =
-    { token : String }
+    { token : String, id : String, podId : String }

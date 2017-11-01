@@ -47,7 +47,7 @@ update msg model =
                             { model | user = Model.User.LoggedIn user }
                     in
                         updatedModel
-                            ! [ Api.Auth.saveToken user.token
+                            ! [ Api.Auth.saveToken user
                               , Api.Research.fetchResearches updatedModel
                               , Api.Queue.fetchQueue updatedModel
                               , Api.Modules.fetchAvailableModules updatedModel

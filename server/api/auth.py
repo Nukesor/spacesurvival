@@ -1,5 +1,6 @@
 """All routes regarding authentication."""
 
+from flask import jsonify
 from datetime import datetime
 from sqlalchemy import or_
 from webargs.flaskparser import use_args
@@ -8,6 +9,7 @@ from server import user_bp
 from server.extensions import db
 from server.models import User
 from server.responses import bad_request, ok
+from server.schemas.user import UserSchema
 from server.validation.user import login_fields
 from server.helpers.decorators import login_exempt
 
@@ -45,5 +47,5 @@ def login(args):
     db.session.add(user)
     db.session.commit()
 
-    return ok({"token": token,
-               "user_id": user.id})
+    schema = UserSchema()
+    return jsonify(schema.dump(user).data)

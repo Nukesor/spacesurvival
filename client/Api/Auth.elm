@@ -2,6 +2,7 @@ port module Api.Auth exposing (..)
 
 import Json.Encode as Encode
 import Json.Decode as Decode
+import Json.Decode.Extra exposing ((|:))
 import Model exposing (..)
 import Model.User exposing (..)
 import Http
@@ -11,10 +12,10 @@ import Messages
 port readToken : () -> Cmd msg
 
 
-port saveToken : String -> Cmd msg
+port saveToken : LoggedInData -> Cmd msg
 
 
-port receiveToken : (String -> msg) -> Sub msg
+port receiveToken : (LoggedInData -> msg) -> Sub msg
 
 
 registerEncoder : RegisterData -> Encode.Value
@@ -38,7 +39,10 @@ loginEncoder user =
 
 loginDecoder : Decode.Decoder LoggedInData
 loginDecoder =
-    Decode.map loggedInUser Decode.string
+    Decode.succeed LoggedInData
+        |: (Decode.field "current_auth_token" Decode.string)
+        |: (Decode.field "id" Decode.string)
+        |: (Decode.field "pod" Decode.string)
 
 
 registeredUser : String -> String -> LoginData
@@ -46,11 +50,6 @@ registeredUser nickname email =
     { identifier = nickname
     , password = ""
     }
-
-
-loggedInUser : String -> LoggedInData
-loggedInUser token =
-    { token = token }
 
 
 register : Model -> Cmd Messages.Msg
