@@ -33,3 +33,4 @@ type Msg
     | ReceiveGrid (Result Http.Error Grid)
     | Tick Time
     | StartBuilding ModuleId Point
+    | Upgrade ModuleId

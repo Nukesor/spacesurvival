@@ -1,7 +1,6 @@
 module Model.Grid exposing (..)
 
 import Array
-import Extra.Maybe exposing (isJust)
 import List
 import Model.Modules exposing (..)
 import Model.Util exposing (..)
@@ -41,25 +40,25 @@ filter fn grid =
     applyFunctor List.filter fn grid
 
 
-atPosition : Int -> Int -> Grid -> Maybe Slot
-atPosition x y grid =
-    Array.get x grid
-        |> Maybe.andThen (Array.get y)
+atPosition : Point -> Grid -> Maybe Slot
+atPosition point grid =
+    Array.get point.x grid
+        |> Maybe.andThen (Array.get point.y)
 
 
-setAtPosition : Int -> Int -> Module -> Grid -> Grid
-setAtPosition x y mod grid =
+setAtPosition : Point -> Module -> Grid -> Grid
+setAtPosition point mod grid =
     let
         updatedSlot =
-            atPosition x y grid
+            atPosition point grid
                 |> Maybe.map (\slot -> { slot | entry = Just mod })
 
         row =
-            Array.get x grid
+            Array.get point.x grid
     in
         case ( row, updatedSlot ) of
             ( Just row, Just slot ) ->
-                Array.set x (Array.set y slot row) grid
+                Array.set point.x (Array.set point.y slot row) grid
 
             _ ->
                 grid

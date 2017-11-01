@@ -2,7 +2,7 @@ module Update exposing (..)
 
 import Animation
 import Api.Auth
-import Api.Modules exposing (fetchGridModules, startBuilding)
+import Api.Modules exposing (fetchGridModules, startBuilding, upgrade)
 import Api.Queue exposing (fetchQueue)
 import Api.Research exposing (fetchResearches, startResearching)
 import Api.Resources
@@ -154,6 +154,9 @@ update msg model =
 
         StartBuilding id point ->
             { model | buildingAt = Nothing } ! [ startBuilding model id point ]
+
+        Upgrade id ->
+            model ! [ upgrade model id ]
 
 
 logout : Model -> Model

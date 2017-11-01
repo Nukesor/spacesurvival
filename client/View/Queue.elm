@@ -73,15 +73,24 @@ type Classes
 rules : Stylesheet
 rules =
     (stylesheet << namespace ns)
-        [ Css.class Item
+        [ class Item
             [ listStyleType none
-            , borderTop3 (px 1) solid (hex "#fff")
-            , padding2 (Css.em 0.5) zero
+            , borderTop3 (px 1) solid (rgba 21 212 232 0.6)
+            , padding (Css.em 0.5)
+            , marginLeft (px 4)
+            , firstChild
+                [ borderLeft3 (px 4) solid (rgba 21 212 232 0.9)
+                , borderTopStyle none
+                , marginLeft zero
+                ]
+            , nthChild "2"
+                [ marginLeft zero
+                ]
             ]
-        , Css.class List
+        , class List
             [ paddingLeft zero
             ]
-        , Css.class Container
+        , class Container
             [ width (pct 100) ]
         ]
 

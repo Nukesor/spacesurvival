@@ -8,8 +8,9 @@ import Html.CssHelpers
 import Html.Events exposing (..)
 import Messages
 import Model
-import Model.Modules exposing (ModuleType, buildableModules)
-import Model.Util
+import Model.Grid exposing (atPosition)
+import Model.Modules exposing (Module, ModuleType, buildableModules, findLevel)
+import Model.Util exposing (Point)
 
 
 view : Model.Model -> Html Messages.Msg
@@ -19,16 +20,30 @@ view model =
             div [ helpers.class [ Container ] ]
                 [ ul
                     [ helpers.class [ BuildItemList ] ]
-                    (model.availableModules
-                        |> buildableModules model.researches
-                        |> Dict.map (buildItem point)
-                        |> Dict.values
-                    )
+                    (availableModules model point)
                 , cancelButton
                 ]
 
         Nothing ->
             div [] []
+
+
+availableModules : Model.Model -> Point -> List (Html Messages.Msg)
+availableModules model point =
+    let
+        maybeMod =
+            atPosition point model.grid
+                |> Maybe.andThen .entry
+    in
+        case maybeMod of
+            Just mod ->
+                [ upgradeItem mod ]
+
+            Nothing ->
+                model.availableModules
+                    |> buildableModules model.researches
+                    |> Dict.map (buildItem point)
+                    |> Dict.values
 
 
 buildItem :
@@ -42,6 +57,15 @@ buildItem currentPoint id mod =
         , onClick (Messages.StartBuilding id currentPoint)
         ]
         [ Html.text mod.name ]
+
+
+upgradeItem : Module -> Html Messages.Msg
+upgradeItem mod =
+    li
+        [ helpers.class [ BuildItem ]
+        , onClick (Messages.Upgrade mod.uuid)
+        ]
+        [ Html.text ("Upgrade to level " ++ (toString (mod.level + 1))) ]
 
 
 cancelButton : Html Messages.Msg
