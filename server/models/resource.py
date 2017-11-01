@@ -28,7 +28,7 @@ class Resource(db.Model):
             "(pod_id is NULL and base_id is not NULL) or "
             "(pod_id is not NULL and base_id is NULL)"
         ),
-        CheckConstraint("amount >= 0 and amount < max_amount"),
+        CheckConstraint("amount >= 0 and amount <= max_amount"),
         CheckConstraint("max_amount > 0"),
     )
 
