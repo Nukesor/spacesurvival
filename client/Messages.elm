@@ -21,7 +21,6 @@ type Msg
     | UpdateUser User
     | Registered (Result Http.Error LoginData)
     | LoggedIn (Result Http.Error LoggedInData)
-    | ReadLocalToken LoggedInData
     | ShowBuildDialog (Maybe Point)
     | ReceiveResearches (Result Http.Error Model.Research.Researches)
     | SetMainView MainView

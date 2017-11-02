@@ -18,6 +18,10 @@ pairDecoder a b =
     Decode.map2 (,) (Decode.index 0 a) (Decode.index 1 b)
 
 
+podUrl user suffix =
+    "/api/pod/" ++ user.podId ++ suffix
+
+
 unwrap : Result String b -> b
 unwrap res =
     case res of
@@ -26,6 +30,29 @@ unwrap res =
 
         Err err ->
             Debug.crash err
+
+
+createBody maybeData =
+    case maybeData of
+        Just data ->
+            jsonBody data
+
+        Nothing ->
+            emptyBody
+
+
+createRequest user method url decoder maybeData =
+    Http.request
+        { method = method
+        , headers =
+            [ Http.header "Authorization" (user.id ++ ":" ++ user.token)
+            ]
+        , url = url
+        , expect = expectJson decoder
+        , body = createBody maybeData
+        , timeout = Nothing
+        , withCredentials = False
+        }
 
 
 authenticatedGet :
@@ -39,17 +66,7 @@ authenticatedGet model url decoder msg =
         LoggedIn user ->
             let
                 request =
-                    Http.request
-                        { method = "GET"
-                        , headers =
-                            [ Http.header "Authorization" (user.id ++ ":" ++ user.token)
-                            ]
-                        , url = url
-                        , expect = expectJson decoder
-                        , body = emptyBody
-                        , timeout = Nothing
-                        , withCredentials = False
-                        }
+                    (createRequest user "GET" url decoder Nothing)
             in
                 Http.send msg request
 
@@ -62,17 +79,7 @@ authenticatedPost model url decoder msg data =
         LoggedIn user ->
             let
                 request =
-                    Http.request
-                        { method = "POST"
-                        , headers =
-                            [ Http.header "Authorization" (user.id ++ ":" ++ user.token)
-                            ]
-                        , url = url
-                        , expect = expectJson decoder
-                        , body = jsonBody data
-                        , timeout = Nothing
-                        , withCredentials = False
-                        }
+                    (createRequest user "POST" url decoder (Just data))
             in
                 Http.send msg request
 

@@ -5,7 +5,6 @@ import Api.Auth
 import Api.Modules exposing (fetchGridModules, startBuilding, upgrade)
 import Api.Queue exposing (fetchQueue)
 import Api.Research exposing (fetchResearches, startResearching)
-import Api.Resources
 import Messages exposing (..)
 import Model exposing (..)
 import Model.Grid exposing (modules)
@@ -14,6 +13,7 @@ import Model.Queue exposing (unfinishedEntries)
 import Model.User exposing (LoginData)
 import Result exposing (withDefault)
 import Time.DateTime
+import Update.User
 
 
 update : Msg -> Model -> ( Model, Cmd Msg )
@@ -42,24 +42,10 @@ update msg model =
         Messages.LoggedIn result ->
             case Debug.log "login result" result of
                 Ok user ->
-                    let
-                        updatedModel =
-                            { model | user = Model.User.LoggedIn user }
-                    in
-                        updatedModel
-                            ! [ Api.Auth.saveToken user
-                              , Api.Research.fetchResearches updatedModel
-                              , Api.Queue.fetchQueue updatedModel
-                              , Api.Modules.fetchAvailableModules updatedModel
-                              , Api.Resources.fetchResources updatedModel
-                              , Api.Modules.fetchGridModules updatedModel
-                              ]
+                    Update.User.login model user
 
                 Err err ->
                     model ! []
-
-        Messages.ReadLocalToken user ->
-            { model | user = Model.User.LoggedIn user } ! []
 
         ShowBuildDialog maybePoint ->
             { model

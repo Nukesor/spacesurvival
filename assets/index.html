@@ -13,19 +13,25 @@
         var app = Elm.Main.fullscreen()
 
         app.ports.readToken.subscribe(function() {
-            try {
-                app.ports.receiveToken.send({
-                    token: localStorage.getItem('token'),
-                    id: localStorage.getItem('id')
-                });
-            } catch (e) {
-                // so what
+            let user = {};
+            let valid = true;
+            ['token', 'id', 'podId'].forEach((key) => {
+                let val = localStorage.getItem(key);
+                if (val !== null) {
+                    user[key] = val;
+                } else {
+                    valid = false;
+                }
+            });
+            if (valid) {
+                app.ports.receiveToken.send(user);
             }
         });
 
-        app.ports.saveToken.subscribe(function({token, id}) {
+        app.ports.saveToken.subscribe(function({token, id, podId}) {
             localStorage.setItem('token', token);
             localStorage.setItem('id', id);
+            localStorage.setItem('podId', podId);
         });
     </script>
 </body>

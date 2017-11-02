@@ -8,6 +8,7 @@ import Json.Encode
 import Messages
 import Model exposing (Model)
 import Model.Research exposing (..)
+import Model.User exposing (User(LoggedIn))
 
 
 researchesDecoder : Decode.Decoder (Dict.Dict String Research)
@@ -39,7 +40,12 @@ researchLevelDecoder =
 
 fetchResearches : Model -> Cmd Messages.Msg
 fetchResearches model =
-    authenticatedGet model "/api/researches/pod" researchesDecoder Messages.ReceiveResearches
+    case model.user of
+        LoggedIn user ->
+            authenticatedGet model ("/api/pod/" ++ user.podId ++ "/researches") researchesDecoder Messages.ReceiveResearches
+
+        _ ->
+            Cmd.none
 
 
 startResearching : Model.Model -> String -> Cmd Messages.Msg

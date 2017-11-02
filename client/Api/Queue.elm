@@ -1,11 +1,12 @@
 module Api.Queue exposing (..)
 
-import Api.Util exposing (authenticatedGet, dateDecoder)
+import Api.Util exposing (authenticatedGet, dateDecoder, podUrl)
 import Json.Decode as Decode
 import Json.Decode.Extra exposing ((|:))
 import Messages
 import Model exposing (Model)
-import Model.Queue exposing (Entry(ResearchEntry), ModuleData, Entry(ModuleEntry), Queue, ResearchData)
+import Model.Queue exposing (Entry(ModuleEntry), Entry(ResearchEntry), ModuleData, Queue, ResearchData)
+import Model.User exposing (User(LoggedIn))
 
 
 queueDecoder : Decode.Decoder Queue
@@ -46,4 +47,9 @@ moduleDecoder =
 
 fetchQueue : Model -> Cmd Messages.Msg
 fetchQueue model =
-    authenticatedGet model "/api/queue/pod" queueDecoder Messages.ReceiveQueue
+    case model.user of
+        LoggedIn user ->
+            authenticatedGet model (podUrl user "/queue") queueDecoder Messages.ReceiveQueue
+
+        _ ->
+            Cmd.none
