@@ -1,5 +1,5 @@
 from server.extensions import ma
-from server.models.module import Research
+from server.models.research import Research
 
 class ResearchSchema(ma.ModelSchema):
     class Meta:

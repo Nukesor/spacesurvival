@@ -5,6 +5,7 @@ from server import user_bp
 from server.extensions import db
 from server.responses import created, ok
 from server.models.research import Research
+from server.models.pod import Pod
 from server.schemas.research import ResearchSchema
 from server.validation.research import research_creation_fields
 from server.data.types import ResearchTypes
@@ -16,18 +17,16 @@ def get_research_meta():
     return ok(research_data)
 
 
-# This route returns the list of all modules and
-# their current levels for the pod of the current user.
 @user_bp.route('/api/pod/<uuid:pod_id>/researches', methods = ['GET'])
 def get_pod_research(pod_id):
     pod = db.session.query(Pod).get(pod_id)
-    schema = ModuleSchema()
+    schema = ResearchSchema()
 
-    return ok(schema.dump(pod.modules).data)
+    return ok(schema.dump(pod.researches).data)
 
 
 @user_bp.route('/api/pod/<uuid:pod_id>/new_research', methods = ['POST'])
-@use_args(module_creation_fields)
+@use_args(research_creation_fields)
 def new_pod_research(args):
 
     # Check for valid module type
