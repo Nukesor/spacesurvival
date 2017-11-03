@@ -11,8 +11,7 @@ import Model.User exposing (User(LoggedIn))
 
 queueDecoder : Decode.Decoder Queue
 queueDecoder =
-    Decode.list <|
-        queueEntryDecoder
+    Decode.field "queue_entries" (Decode.list queueEntryDecoder)
 
 
 queueEntryDecoder : Decode.Decoder Entry
