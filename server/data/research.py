@@ -50,7 +50,6 @@ def load_research() -> Research:
                 sys.exit(1)
             researches[key] = deserialized[1]
 
-        researches = Research().load(data)
         return researches
     except Exception as e:
         print(e)

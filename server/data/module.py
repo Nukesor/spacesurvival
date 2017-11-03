@@ -59,9 +59,8 @@ def load_modules():
                 print("Error deserializing json")
                 print(deserialized[1])
                 sys.exit(1)
-            modules[key] = deserialized[1]
+            modules[key] = deserialized[0]
 
-        modules = Module().load(data)
         return modules
     except Exception as e:
         print(e)
