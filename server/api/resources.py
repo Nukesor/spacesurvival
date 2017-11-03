@@ -14,4 +14,4 @@ def pod_resources(pod_id):
         .get(pod_id)
     schema = ResourceSchema()
 
-    return ok(schema.dump(pod.resources).data)
+    return ok(schema.dump(pod.resources, many=True).data)
