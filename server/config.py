@@ -26,7 +26,7 @@ class BaseConfig:
 
 
 class DevConfig(BaseConfig):
-    DEBUG = False
+    DEBUG = True
     SQLALCHEMY_DATABASE_URI = 'postgres://localhost/browsergame-dev'
 
 

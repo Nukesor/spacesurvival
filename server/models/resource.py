@@ -57,30 +57,35 @@ class Resource(db.Model):
 
     def get_by_name(resources, name):
         """Get a resource by name."""
-        return next((r for r in resources if r.name == name), None)
+        resource = next((r for r in resources if r.name == name), None)
+        if resource is None:
+            raise LookupError(f'No resource with name {name} found.')
+        return resource
 
     def enough_resources(resources, requirements) -> bool:
         """Check if there are enough resources for construction."""
         enough = True
         missing = {}
         for requirement in requirements:
-            resource = Resource.get_by_name(resources, requirement.type)
+            resource = Resource.get_by_name(resources, requirement['type'])
+            amount = requirement['amount']
             if resource is None:
-                print(f'Missing resource: {requirement.type}')
-            if resource.amount <= requirement.amount:
+                print(f'Missing resource: {requirement["type"]}')
+            if resource.amount <= amount:
                 enough = False
-                missing[resource.name] = requirement.amount - resource.amount
+                missing[resource.name] = amount - resource.amount
         return enough, missing
 
     def subtract_resources(resources, requirements) -> bool:
         """Check if there are enough resources for construction."""
         for requirement in requirements:
-            resource = Resource.get_by_name(resources, requirement.type)
-            if (resource.amount - requirement.amount) <= 0:
-                print(f"Can't afford resource {requirement.type}: {resource.amount} of {requirement.amount}")
+            resource = Resource.get_by_name(resources, requirement['type'])
+            amount = requirement['amount']
+            if (resource.amount - amount) <= 0:
+                print(f"Can't afford resource {requirement['type']}: {resource.amount} of {amount}")
                 raise Exception
             else:
-                resource.amount -= requirement.amount
+                resource.amount -= amount
             db.session.add(resource)
         db.session.commit()
         return True
@@ -88,8 +93,9 @@ class Resource(db.Model):
     def add_resources(resources, requirements) -> bool:
         """Check if there are enough resources for construction."""
         for requirement in requirements:
-            resource = Resource.get_by_name(resources, requirement.type)
-            resource.amount += requirement.amount
+            resource = Resource.get_by_name(resources, requirement['type'])
+            amount = requirement['amount']
+            resource.amount += amount
             db.session.add(resource)
         db.session.commit()
         return True

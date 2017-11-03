@@ -15,7 +15,6 @@ from server.validation.user import user_creation_fields
 @user_bp.route('/api/user/<uuid:user_id>', methods=['GET'])
 def info(user_id):
     """Get the info about a specific user."""
-    db.session.query(User).get(user_id)
     schema = UserSchema()
     return jsonify(schema.dump(g.current_user).data)
 

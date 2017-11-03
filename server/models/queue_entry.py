@@ -25,8 +25,10 @@ class QueueEntry(db.Model):
         ForeignKeyConstraint(
             ['queue_id'], ['queue.id'],
             deferrable=True, initially='DEFERRED'),
-        ForeignKeyConstraint(['module_id'], ['module.id']),
-        ForeignKeyConstraint(['research_id'], ['research.id']),
+        ForeignKeyConstraint(['module_id'], ['module.id'],
+            deferrable=True, initially='DEFERRED'),
+        ForeignKeyConstraint(['research_id'], ['research.id'],
+            deferrable=True, initially='DEFERRED'),
         CheckConstraint(
             "(research_id is NULL and module_id is not NULL) or "
             "(research_id is not NULL and module_id is NULL)"
@@ -38,7 +40,6 @@ class QueueEntry(db.Model):
     module_id = Column(UUID(as_uuid=True))
     research_id = Column(UUID(as_uuid=True))
 
-    name = Column(String(255), nullable=False)
     level = Column(Integer, nullable=False)
     duration = Column(Integer, nullable=False)
 
@@ -46,10 +47,17 @@ class QueueEntry(db.Model):
     module = relationship("Module")
     research = relationship("Research")
 
-    finishes_at = Column(DateTime, nullable=False)
+    started_at = Column(DateTime)
     created_at = Column(DateTime, server_default=func.now(), nullable=False)
     updated_at = Column(
         DateTime, server_default=func.now(),
         onupdate=func.current_timestamp(),
         nullable=False
     )
+
+    def __init__(self, queue, level, duration, module=None, research=None):
+        self.queue = queue
+        self.level = level
+        self.duration = duration
+        self.module = module
+        self.research = research

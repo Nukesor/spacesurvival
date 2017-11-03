@@ -21,7 +21,7 @@ class ModuleLevel(Schema):
 
     level = fields.Int()
     resources = fields.Nested(Resource, many=True)
-    time = fields.Int()
+    duration = fields.Int()
     shoots = fields.Nested(Shoots)
     generates = fields.Nested(Resource, many=True)
     consumes = fields.Nested(Resource, many=True)

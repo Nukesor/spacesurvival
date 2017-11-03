@@ -4,7 +4,7 @@
     "levels": [
       {
         "level": 1,
-        "time": 5,
+        "duration": 5,
         "resources": [
           {"type": "Fuel",
             "amount": 200}
@@ -12,7 +12,7 @@
       },
       {
         "level": 2,
-        "time": 5,
+        "duration": 5,
         "resources": [
           {"type": "Fuel",
             "amount": 200}
@@ -20,7 +20,7 @@
       },
       {
         "level": 3,
-        "time": 5,
+        "duration": 5,
         "resources": [
           {"type": "Fuel",
             "amount": 200}
@@ -33,7 +33,7 @@
     "levels": [
       {
         "level": 1,
-        "time": 5,
+        "duration": 5,
         "resources": [
           {"type": "Minerals",
             "amount": 200}
@@ -41,7 +41,7 @@
       },
       {
         "level": 2,
-        "time": 5,
+        "duration": 5,
         "resources": [
           {"type": "Minerals",
             "amount": 200}
@@ -49,7 +49,7 @@
       },
       {
         "level": 3,
-        "time": 5,
+        "duration": 5,
         "resources": [
           {"type": "Minerals",
             "amount": 200}
@@ -62,7 +62,7 @@
     "levels": [
       {
         "level": 1,
-        "time": 5,
+        "duration": 5,
         "resources": [
           {"type": "Minerals",
             "amount": 200}
@@ -70,7 +70,7 @@
       },
       {
         "level": 2,
-        "time": 5,
+        "duration": 5,
         "resources": [
           {"type": "Minerals",
             "amount": 200}
@@ -78,7 +78,7 @@
       },
       {
         "level": 3,
-        "time": 5,
+        "duration": 5,
         "resources": [
           {"type": "Minerals",
             "amount": 200}

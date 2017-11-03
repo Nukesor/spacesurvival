@@ -21,8 +21,9 @@ class ResourceTypes(Enum):
     to validate types in requests and to guarantee database string integrity.
     """
 
-    Iron = 'Minerals'
-    Water = 'Fuel'
+    Minerals = 'Minerals'
+    Fuel = 'Fuel'
+    Water = 'Water'
 
 
 class ModuleTypes(Enum):

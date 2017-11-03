@@ -1,3 +1,6 @@
 
 def auth_token(user):
-    return [('Authentication', user.get_auth_token())]
+    return [
+        ('Authorization', user.get_login_token()),
+        ('Content-Type', 'application/json'),
+    ]

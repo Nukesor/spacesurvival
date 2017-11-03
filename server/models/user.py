@@ -98,6 +98,10 @@ class User(db.Model):
                 return user
         return None
 
+    def get_login_token(self):
+        if not self.has_valid_auth_token:
+            self.generate_auth_token()
+        return f'{self.id}:{self.current_auth_token}'
 
     def generate_auth_token(self):
         """Generate an auth token and save it to the `current_auth_token` column."""

@@ -10,7 +10,7 @@
     "levels": [
       {
         "level": 1,
-        "time": 5,
+        "duration": 5,
         "resources": [
           {
             "type": "Fuel",
@@ -29,7 +29,7 @@
       },
       {
         "level": 2,
-        "time": 60,
+        "duration": 60,
         "resources": [
           {
             "type": "Fuel",
@@ -48,7 +48,7 @@
       },
       {
         "level": 3,
-        "time": 120,
+        "duration": 120,
         "resources": [
           {
             "type": "Fuel",
@@ -78,7 +78,7 @@
     "levels": [
       {
         "level": 1,
-        "time": 5,
+        "duration": 5,
         "resources": [
           {
             "type": "Fuel",
@@ -94,17 +94,11 @@
             "type": "Fuel",
             "amount": 200000000
           }
-        ],
-        "consumes": [
-          {
-            "type": "Minerals",
-            "amount": 10000000
-          }
         ]
       },
       {
         "level": 2,
-        "time": 5,
+        "duration": 5,
         "resources": [
           {
             "type": "Fuel",
@@ -130,7 +124,7 @@
       },
       {
         "level": 3,
-        "time": 5,
+        "duration": 5,
         "resources": [
           {
             "type": "Fuel",

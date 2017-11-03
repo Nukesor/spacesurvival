@@ -35,11 +35,6 @@ def register_handlers(app):
         if not token_header:
             return bad_request("'Authorization' not found in headers.")
 
-#       TODO: FORMAT token header
-#        if 'Bearer ' not in token_header:
-#            return bad_request("'Authorization' header has wrong format.")
-
-#        token = token_header.replace('Bearer ', '')
         token = token_header
         user = User.get_user_from_login_token(token)
 

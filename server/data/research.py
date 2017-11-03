@@ -12,7 +12,7 @@ class ResearchLevel(Schema):
     """The json representation of a module."""
 
     level = fields.Int()
-    time = fields.Int()
+    duration = fields.Int()
     resources = fields.Nested(Resource, many=True)
 
 

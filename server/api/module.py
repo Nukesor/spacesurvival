@@ -9,6 +9,7 @@ from server.responses import created, ok, bad_request
 from server.models.pod import Pod
 from server.models.module import Module
 from server.models.resource import Resource
+from server.models.queue_entry import QueueEntry
 from server.schemas.module import ModuleSchema
 from server.validation.module import module_creation_fields
 from server.data.types import ModuleTypes
@@ -34,8 +35,18 @@ def get_pod_modules(pod_id):
 
 @user_bp.route('/api/pod/<uuid:pod_id>/new_module', methods=['POST'])
 @use_args(module_creation_fields)
-def new_pod_module(args):
+def new_pod_module(args, pod_id):
     """Place a new module on the pod grid."""
+    from server.data.data import module_data
+
+    user_id = g.current_user.id
+    pod = db.session.query(Pod) \
+        .filter(Pod.user_id == user_id) \
+        .one()
+
+    if pod_id != pod.id:
+        return bad_request(f"Pod doesn't belong to current user.")
+
     # Check for valid module type
     module_type = args['module_type']
     stationary = args.get('stationary')
@@ -44,7 +55,8 @@ def new_pod_module(args):
     if module_type not in ModuleTypes.__members__:
         return bad_request(f'Unknown Module type: {module_type}')
 
-    pod = g.current_user.pod
+    # Check if we already have a module with this type 
+    # at the specified position.
     if stationary:
         existing_module = db.session.query(Module) \
             .filter(Module.pod_id == pod.id) \
@@ -62,12 +74,21 @@ def new_pod_module(args):
     if existing_module:
         return bad_request('There already is a module at this position')
 
-    from server.data.data import module_data
-    requirements = module_data[module_type].get('levels').get('resources')
+    # Check if we have enough resources
+    module_level = module_data[module_type]['levels'][0]
+    requirements = module_level['resources']
     enough, missing = Resource.enough_resources(pod.resources, requirements)
     if not enough:
         return bad_request('Not enough resources.', payload=missing)
 
+    # Subtract the resources from the pod and create a queue entry.
     Resource.subtract_resources(pod.resources, requirements)
+    module = Module(module_type, pod, 0, stationary, x_pos, y_pos)
+    queue_entry = QueueEntry(pod.queue, 1, module_level['duration'], module=module)
 
+    db.session.add(queue_entry)
+    db.session.add(module)
+    db.session.commit()
+
+    schema = ModuleSchema()
     return created(schema.dump(module).data)
