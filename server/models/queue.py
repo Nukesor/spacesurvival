@@ -37,6 +37,7 @@ class Queue(db.Model):
     slots = Column(Integer, default=4, nullable=False)
     pod = relationship("Pod", back_populates="queue")
     base = relationship("Base", back_populates="queue")
+    queue_entries = relationship("QueueEntry", back_populates="queue")
 
     created_at = Column(DateTime, server_default=func.now(), nullable=False)
     updated_at = Column(

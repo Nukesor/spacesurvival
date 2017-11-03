@@ -42,6 +42,7 @@ class QueueEntry(db.Model):
     level = Column(Integer, nullable=False)
     duration = Column(Integer, nullable=False)
 
+    queue = relationship("Queue", back_populates="queue_entries")
     module = relationship("Module")
     research = relationship("Research")
 
