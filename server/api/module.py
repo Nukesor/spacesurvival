@@ -39,9 +39,8 @@ def new_pod_module(args, pod_id):
     """Place a new module on the pod grid."""
     from server.data.data import module_data
 
-    user_id = g.current_user.id
     pod = db.session.query(Pod) \
-        .filter(Pod.user_id == user_id) \
+        .filter(Pod.user_id == g.current_user.id) \
         .one()
 
     if pod_id != pod.id:
@@ -79,7 +78,7 @@ def new_pod_module(args, pod_id):
     requirements = module_level['resources']
     enough, missing = Resource.enough_resources(pod.resources, requirements)
     if not enough:
-        return bad_request('Not enough resources.', payload=missing)
+        return bad_request(f'Not enough resources: {missing}')
 
     # Subtract the resources from the pod and create a queue entry.
     Resource.subtract_resources(pod.resources, requirements)

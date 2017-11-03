@@ -3,6 +3,7 @@ import pytest
 
 from tests.helper import auth_token
 from server.extensions import db
+
 from server.models.user import User
 
 
@@ -24,9 +25,8 @@ class TestModule:
             data=json.dumps(data),
             headers=auth_token(user)
         )
-        print(response.json)
-        assert response.status_code == 202
+        assert response.status_code == 201
 
-        db.session.refresh(user)
+        user = db.session.query(User).get(user.id)
 
         assert len(user.pod.modules) == 1
