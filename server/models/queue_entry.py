@@ -1,8 +1,8 @@
+"""Everything regarding queue entries."""
 import uuid
 from server.extensions import db
 from sqlalchemy import (
     func,
-    text,
     Column,
     CheckConstraint,
     ForeignKey,
@@ -10,8 +10,6 @@ from sqlalchemy import (
 from sqlalchemy.orm import relationship
 
 from sqlalchemy.types import (
-    Boolean,
-    String,
     Integer,
     DateTime,
 )
@@ -19,8 +17,9 @@ from sqlalchemy.dialects.postgresql import UUID
 
 
 class QueueEntry(db.Model):
-    __tablename__ = 'queue_entry'
+    """Queue Entry model."""
 
+    __tablename__ = 'queue_entry'
     __table_args__ = (
         CheckConstraint(
             "(research_id is NULL and module_id is not NULL) or "
@@ -45,10 +44,11 @@ class QueueEntry(db.Model):
     updated_at = Column(
         DateTime, server_default=func.now(),
         onupdate=func.current_timestamp(),
-        nullable=False
+        nullable=False,
     )
 
     def __init__(self, queue, level, duration, module=None, research=None):
+        """Create a new queue entry."""
         self.queue = queue
         self.level = level
         self.duration = duration

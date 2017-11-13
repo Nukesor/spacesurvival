@@ -14,7 +14,7 @@ admin_bp = Blueprint('admin', __name__)
 
 
 def create_app(config='develop'):
-
+    """App factory."""
     app = Flask(
         __name__,
         static_folder='../static',
@@ -40,15 +40,18 @@ def create_app(config='develop'):
 
 
 def register_blueprints(app):
+    """Register all blueprints."""
     app.register_blueprint(user_bp)
     app.register_blueprint(admin_bp, url_prefix='/admin')
 
 
 def run():
+    """Run the app on all IPs."""
     config = os.getenv('SQLALCHEMY_DATABASE_URI', 'develop')
     app = create_app(config)
     app.run(host="0.0.0.0")
 
 
-import server.api
-import server.models
+import server.api # noqa
+import server.models # noqa
+

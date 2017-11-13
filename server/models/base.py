@@ -3,7 +3,6 @@ import uuid
 from sqlalchemy.orm import relationship
 from sqlalchemy import (
     func,
-    text,
     Column,
 )
 

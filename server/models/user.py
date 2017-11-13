@@ -1,3 +1,4 @@
+"""Every regarding the User db model."""
 import uuid
 import hmac
 from datetime import datetime
@@ -6,24 +7,23 @@ from flask import current_app
 from sqlalchemy_utils import EmailType
 from sqlalchemy.orm import relationship
 from sqlalchemy.dialects.postgresql import UUID
-from sqlalchemy import func, text, Column, UniqueConstraint
+from sqlalchemy import func, Column, UniqueConstraint
 from sqlalchemy.types import (
     Boolean,
     String,
-    Integer,
     DateTime,
 )
 
 from server.extensions import db, passlib
 from server.models import (
     Pod,
-    Queue,
 )
 
 
 class User(db.Model):
-    __tablename__ = 'user'
+    """User model."""
 
+    __tablename__ = 'user'
     __table_args__ = (
         UniqueConstraint("nickname"),
         UniqueConstraint("email"),
@@ -47,10 +47,11 @@ class User(db.Model):
     updated_at = Column(
         DateTime, server_default=func.now(),
         onupdate=func.current_timestamp(),
-        nullable=False
+        nullable=False,
     )
 
     def __init__(self, nickname, email, password):
+        """Create a new user."""
         self.email = email
         self.nickname = nickname
         self.hash_password(password.encode('utf-8'))
@@ -58,7 +59,6 @@ class User(db.Model):
 
         self.pod = Pod(nickname)
 
-    # Flask login 
     def get_id(self):
         return self.id
 
@@ -88,6 +88,7 @@ class User(db.Model):
     @staticmethod
     def get_user_from_login_token(token):
         """Get a `User` from a login token.
+
         A login token has this format:
             <user uuid>:<auth token>
         """
@@ -99,6 +100,7 @@ class User(db.Model):
         return None
 
     def get_login_token(self):
+        """Get a compiled auth token."""
         if not self.has_valid_auth_token:
             self.generate_auth_token()
         return f'{self.id}:{self.current_auth_token}'

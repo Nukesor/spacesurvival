@@ -3,51 +3,81 @@ from webargs.flaskparser import use_args
 
 from server import user_bp
 from server.extensions import db
-from server.responses import created, ok
-from server.models.research import Research
-from server.models.pod import Pod
+from server.responses import created, ok, bad_request
+from server.data.types import ResearchTypes
 from server.schemas.research import ResearchSchema
 from server.validation.research import research_creation_fields
-from server.data.types import ResearchTypes
+
+from server.models import (
+    Pod,
+    QueueEntry,
+    Research,
+    Resource,
+)
 
 
-@user_bp.route('/api/researches', methods = ['GET'])
+@user_bp.route('/api/researches', methods=['GET'])
 def get_research_meta():
+    """Get the research meta data."""
     from server.data.data import research_data
     return ok(research_data)
 
 
-@user_bp.route('/api/pod/<uuid:pod_id>/researches', methods = ['GET'])
+@user_bp.route('/api/pod/<uuid:pod_id>/researches', methods=['GET'])
 def get_pod_research(pod_id):
+    """Send the pod meta data combined with your researches."""
     pod = db.session.query(Pod).get(pod_id)
     schema = ResearchSchema()
 
     return ok(schema.dump(pod.researches).data)
 
 
-@user_bp.route('/api/pod/<uuid:pod_id>/researches', methods = ['POST'])
+@user_bp.route('/api/pod/<uuid:pod_id>/researches/', methods=['POST'])
 @use_args(research_creation_fields)
-def new_pod_research(args):
+def begin_pod_research(args, pod_id):
+    """Begin a new pod research."""
+    from server.data.data import research_data
 
-    # Check for valid module type
-    module_type = args['module_type']
-    if module_type not in ModuleTypes.__members__:
-        return bad_request('Unknown Module type "{module_type}"')
+    pod = db.session.query(Pod) \
+        .filter(Pod.user_id == g.current_user.id) \
+        .one()
 
-    if args['stationary']:
-        existing_module = db.session.query(Module) \
-            .filter(Module.pod_id == g.current_user.pod.id) \
-            .filter(Module.type == args['module_type']) \
-            .first()
+    if pod_id != pod.id:
+        return bad_request(f"Pod doesn't belong to current user.")
 
-    else:
-        existing_module = db.session.query(Module) \
-            .filter(Module.pod_id == g.current_user.pod.id) \
-            .filter(Module.x_pos == args['position_x']) \
-            .filter(Module.y_pos == args['position_y']) \
-            .first()
+    # Check for valid research type
+    research_type = args['type']
+    if research_type not in ResearchTypes.__members__:
+        return bad_request('Unknown research type "{research_type}"')
 
-    if existing_module:
-        return bad_request('There already is a module at this position')
+    research = db.session.query(Research) \
+        .filter(Research.pod_id == g.current_user.pod.id) \
+        .filter(Research.type == args['research_type']) \
+        .first()
 
-    return ok(schema.dump(modules).data)
+    level = research.level if research else 0
+
+    # Check if we have enough resources
+    research_level = research_data[research_type]['levels'].get(level)
+    if level is None:
+        return bad_request("Max level reached.")
+    requirements = research_level['resources']
+    enough, missing = Resource.enough_resources(pod.resources, requirements)
+    if not enough:
+        return bad_request(f'Not enough resources: {missing}')
+
+    # Subtract the resources from the pod and create a queue entry.
+    Resource.subtract_resources(pod.resources, requirements)
+
+    # Create a new research if we don't have it yet.
+    if not research:
+        research = Research(research_type, pod)
+
+    # Create a new queue entry.
+    queue_entry = QueueEntry(pod.queue, level, research_level['duration'], research=research)
+
+    db.session.add(queue_entry)
+    db.session.add(research)
+    db.session.commit()
+
+    return created()

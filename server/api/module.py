@@ -54,7 +54,7 @@ def new_pod_module(args, pod_id):
     if module_type not in ModuleTypes.__members__:
         return bad_request(f'Unknown Module type: {module_type}')
 
-    # Check if we already have a module with this type 
+    # Check if we already have a module with this type
     # at the specified position.
     if stationary:
         existing_module = db.session.query(Module) \
@@ -89,5 +89,4 @@ def new_pod_module(args, pod_id):
     db.session.add(module)
     db.session.commit()
 
-    schema = ModuleSchema()
-    return created(schema.dump(module).data)
+    return created()
