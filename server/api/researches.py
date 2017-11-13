@@ -38,11 +38,8 @@ def begin_pod_research(args, pod_id):
     """Begin a new pod research."""
     from server.data.data import research_data
 
-    pod = db.session.query(Pod) \
-        .filter(Pod.user_id == g.current_user.id) \
-        .one()
-
-    if pod_id != pod.id:
+    pod = db.session.query(Pod).get(pod_id)
+    if pod.user_id != g.current_user.id:
         return bad_request(f"Pod doesn't belong to current user.")
 
     # Check for valid research type

@@ -33,6 +33,7 @@ class Research(db.Model):
     id = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
     pod_id = Column(UUID(as_uuid=True), ForeignKey('pod.id'))
     base_id = Column(UUID(as_uuid=True), ForeignKey('base.id'))
+
     type = Column(String(255), nullable=False)
     level = Column(Integer, nullable=False)
     researched = Column(Boolean, nullable=False, default=False)
