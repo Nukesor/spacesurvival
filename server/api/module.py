@@ -9,7 +9,6 @@ from server.responses import created, ok, bad_request
 from server.schemas.module import ModuleSchema
 from server.validation.module import module_creation_fields
 from server.data.types import ModuleTypes
-from server.helper.permissions import is_user_pod
 from server.models import (
     Module,
     Pod,
