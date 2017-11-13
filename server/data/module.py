@@ -34,6 +34,7 @@ class Module(Schema):
     It shouldn't be used in any other context!
     """
 
+    type = fields.Str(required=True)
     display_name = fields.Str(required=True)
     dependencies = fields.Nested(Dependency, many=True, required=True)
     levels = fields.Nested(ModuleLevel, many=True, required=True)
@@ -51,7 +52,11 @@ def load_modules(path):
         with open(path, 'r') as stream:
             data = json.load(stream)
 
-        return Modules().load(data).data.get('modules')
+        modules = {}
+        parsed = Modules().load(data).data.get('modules')
+        for item in parsed:
+            modules[item['type']] = item
+        return modules
     except Exception as e:
         print(e)
         sys.exit(1)

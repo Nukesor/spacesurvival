@@ -1,7 +1,7 @@
 {
   "modules": [
     {
-      "id": "LaserTurret",
+      "type": "LaserTurret",
       "display_name": "Laser turret",
       "dependencies": [
         {
@@ -69,7 +69,7 @@
         }
       ]
     }, {
-    "id": "PlasmaGenerator",
+    "type": "PlasmaGenerator",
     "display_name": "Plasma Generator",
     "dependencies": [],
     "levels": [
