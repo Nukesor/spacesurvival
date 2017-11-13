@@ -5,8 +5,9 @@ import List exposing (length)
 
 
 type alias Research =
-    { name : String
-    , currentLevel : Int
+    { id : ResearchId
+    , name : String
+    , currentLevel : Maybe Int
     , dependencies : List ( ResearchId, Int )
     , levels : List ResearchLevel
     }
@@ -36,8 +37,12 @@ atMaxLevel research =
         maxLevel =
             length research.levels
     in
-        research.currentLevel
-            >= maxLevel
+        case research.currentLevel of
+            Just level ->
+                level >= maxLevel
+
+            Nothing ->
+                False
 
 
 updateable : Researches -> String -> Bool
@@ -55,7 +60,12 @@ dependencyFulfilled : Dict.Dict String Research -> ( ResearchId, Int ) -> Bool
 dependencyFulfilled researches ( id, level ) =
     case Dict.get id researches of
         Just research ->
-            research.currentLevel >= level
+            case research.currentLevel of
+                Just currentLevel ->
+                    currentLevel >= level
+
+                Nothing ->
+                    False
 
         Nothing ->
             Debug.log ("Research not found: " ++ id) False

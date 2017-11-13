@@ -11,19 +11,34 @@ import Model.Research exposing (..)
 import Model.User exposing (User(LoggedIn))
 
 
-researchesDecoder : Decode.Decoder (Dict.Dict String Research)
+researchesDecoder : Decode.Decoder Researches
 researchesDecoder =
-    Decode.dict <|
+    listToDict <|
         Decode.succeed Research
+            |: (Decode.field "id" Decode.string)
             |: (Decode.field "display_name" Decode.string)
-            |: (Decode.field "current_level" Decode.int)
-            |: (Decode.field "dependencies" <|
-                    Decode.list <|
-                        Decode.map2 (,)
-                            (Decode.index 0 Decode.string)
-                            (Decode.index 1 Decode.int)
-               )
+            |: (Decode.succeed Nothing)
+            |: Json.Decode.Extra.withDefault [] (Decode.field "dependencies" dependencyList)
             |: (Decode.field "levels" (Decode.list researchLevelDecoder))
+
+
+dependencyList : Decode.Decoder (List ( ResourceId, Int ))
+dependencyList =
+    Decode.list <|
+        Decode.map2 (,)
+            (Decode.index 0 Decode.string)
+            (Decode.index 1 Decode.int)
+
+
+listToDict : Decode.Decoder Research -> Decode.Decoder Researches
+listToDict decoder =
+    Decode.list decoder
+        |> Decode.map (List.foldl insertResearch Dict.empty)
+
+
+insertResearch : Research -> Researches -> Researches
+insertResearch research dict =
+    Dict.insert research.id research dict
 
 
 researchLevelDecoder : Decode.Decoder ResearchLevel
@@ -33,8 +48,8 @@ researchLevelDecoder =
         |: (Decode.field "resources" <|
                 Decode.list <|
                     Decode.map2 (,)
-                        (Decode.index 0 Decode.string)
-                        (Decode.index 1 Decode.int)
+                        (Decode.field "type" Decode.string)
+                        (Decode.field "amount" Decode.int)
            )
 
 
@@ -42,7 +57,7 @@ fetchResearches : Model -> Cmd Messages.Msg
 fetchResearches model =
     case model.user of
         LoggedIn user ->
-            authenticatedGet model ("/api/pod/" ++ user.podId ++ "/researches") researchesDecoder Messages.ReceiveResearches
+            authenticatedGet model "/api/researches" researchesDecoder Messages.ReceiveResearches
 
         _ ->
             Cmd.none

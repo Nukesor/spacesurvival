@@ -45,7 +45,7 @@ applyQueueEntry entry researches =
             Dict.update data.researchId
                 (Maybe.map
                     (\research ->
-                        { research | currentLevel = max research.currentLevel data.level }
+                        { research | currentLevel = Just (max (Maybe.withDefault 0 research.currentLevel) data.level) }
                     )
                 )
                 researches
@@ -59,6 +59,7 @@ unfinishedEntries currentDate =
     List.filter (not << isFinished currentDate)
 
 
+isFinished : DateTime -> Entry -> Bool
 isFinished currentDate entry =
     timeToCompletion entry currentDate
         |> Maybe.map (\time -> time <= 0)
