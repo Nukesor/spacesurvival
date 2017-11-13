@@ -25,7 +25,7 @@ def get_pod_research(pod_id):
     return ok(schema.dump(pod.researches).data)
 
 
-@user_bp.route('/api/pod/<uuid:pod_id>/new_research', methods = ['POST'])
+@user_bp.route('/api/pod/<uuid:pod_id>/researches', methods = ['POST'])
 @use_args(research_creation_fields)
 def new_pod_research(args):
 

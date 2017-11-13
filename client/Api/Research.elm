@@ -65,4 +65,4 @@ fetchResearches model =
 
 startResearching : Model.Model -> String -> Cmd Messages.Msg
 startResearching model key =
-    authenticatedPost model ("/api/researches/pod/" ++ key) Decode.value Messages.QueueEntryAdded Json.Encode.null
+    authenticatedPost model (podUrl model.user "/researches") Decode.value Messages.QueueEntryAdded Json.Encode.null

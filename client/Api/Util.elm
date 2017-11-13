@@ -19,7 +19,12 @@ pairDecoder a b =
 
 
 podUrl user suffix =
-    "/api/pod/" ++ user.podId ++ suffix
+    case user of
+        LoggedIn user ->
+            "/api/pod/" ++ user.podId ++ suffix
+
+        _ ->
+            ""
 
 
 unwrap : Result String b -> b

@@ -6,7 +6,6 @@ import Json.Decode.Extra exposing ((|:))
 import Messages exposing (Msg(ReceiveResources))
 import Model
 import Model.Resources exposing (Resource)
-import Model.User exposing (User, User(LoggedIn))
 
 
 decodeResources : Decode.Decoder (List Resource)
@@ -25,9 +24,4 @@ decodeResource =
 
 fetchResources : Model.Model -> Cmd Msg
 fetchResources model =
-    case model.user of
-        LoggedIn user ->
-            authenticatedGet model (podUrl user "/resources") decodeResources ReceiveResources
-
-        _ ->
-            Cmd.none
+    authenticatedGet model (podUrl model.user "/resources") decodeResources ReceiveResources
