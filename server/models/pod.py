@@ -6,7 +6,7 @@ from sqlalchemy.dialects.postgresql import UUID
 from sqlalchemy import (
     func,
     Column,
-    ForeignKeyConstraint,
+    ForeignKey,
 )
 
 from sqlalchemy.types import (
@@ -17,24 +17,18 @@ from sqlalchemy.types import (
 from server.extensions import db
 from server.models.queue import Queue
 from server.models.resource import Resource
-from server.data.types import ResourceTypes, ModuleTypes
+from server.data.types import ResourceTypes
 
 
 class Pod(db.Model):
     """Pod model."""
 
     __tablename__ = 'pod'
-    __table_args__ = (
-        ForeignKeyConstraint(
-            ['user_id'], ['user.id'],
-            deferrable=True, initially='DEFERRED'),
-        ForeignKeyConstraint(['base_id'], ['base.id']),
-    )
 
     id = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
     name = Column(String(255), nullable=False)
-    user_id = Column(UUID(as_uuid=True), nullable=False)
-    base_id = Column(UUID(as_uuid=True))
+    user_id = Column(UUID(as_uuid=True), ForeignKey('user.id', deferrable=True, initially='DEFERRED'), nullable=False)
+    base_id = Column(UUID(as_uuid=True), ForeignKey('base.id'))
 
     user = relationship("User", back_populates="pod")
 

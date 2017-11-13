@@ -6,7 +6,7 @@ from sqlalchemy import (
     func,
     Column,
     CheckConstraint,
-    ForeignKeyConstraint,
+    ForeignKey,
 )
 from sqlalchemy.types import (
     Boolean,
@@ -24,8 +24,6 @@ class Module(db.Model):
 
     __tablename__ = 'module'
     __table_args__ = (
-        ForeignKeyConstraint(['pod_id'], ['pod.id']),
-        ForeignKeyConstraint(['base_id'], ['base.id']),
         CheckConstraint(
             "(pod_id is NULL and base_id is not NULL) or "
             "(pod_id is not NULL and base_id is NULL)"
@@ -33,8 +31,8 @@ class Module(db.Model):
     )
 
     id = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
-    pod_id = Column(UUID(as_uuid=True))
-    base_id = Column(UUID(as_uuid=True))
+    pod_id = Column(UUID(as_uuid=True), ForeignKey('pod.id'))
+    base_id = Column(UUID(as_uuid=True), ForeignKey('base.id'))
 
     type = Column(String(255), nullable=False)
     level = Column(Integer, nullable=False)

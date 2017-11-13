@@ -20,6 +20,7 @@ class ModuleLevel(Schema):
     """The json representation of a module."""
 
     level = fields.Int(required=True)
+    current_level = fields.Int(default=0)
     resources = fields.Nested(Resource, many=True, required=True)
     duration = fields.Int(required=True)
     shoots = fields.Nested(Shoots)

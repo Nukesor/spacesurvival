@@ -5,7 +5,7 @@ from sqlalchemy import (
     text,
     Column,
     CheckConstraint,
-    ForeignKeyConstraint,
+    ForeignKey,
 )
 from sqlalchemy.orm import relationship
 
@@ -22,13 +22,6 @@ class QueueEntry(db.Model):
     __tablename__ = 'queue_entry'
 
     __table_args__ = (
-        ForeignKeyConstraint(
-            ['queue_id'], ['queue.id'],
-            deferrable=True, initially='DEFERRED'),
-        ForeignKeyConstraint(['module_id'], ['module.id'],
-            deferrable=True, initially='DEFERRED'),
-        ForeignKeyConstraint(['research_id'], ['research.id'],
-            deferrable=True, initially='DEFERRED'),
         CheckConstraint(
             "(research_id is NULL and module_id is not NULL) or "
             "(research_id is not NULL and module_id is NULL)"
@@ -36,9 +29,9 @@ class QueueEntry(db.Model):
     )
 
     id = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
-    queue_id = Column(UUID(as_uuid=True), nullable=False)
-    module_id = Column(UUID(as_uuid=True))
-    research_id = Column(UUID(as_uuid=True))
+    queue_id = Column(UUID(as_uuid=True), ForeignKey('queue.id'), nullable=False)
+    module_id = Column(UUID(as_uuid=True), ForeignKey('module.id'))
+    research_id = Column(UUID(as_uuid=True), ForeignKey('research.id'))
 
     level = Column(Integer, nullable=False)
     duration = Column(Integer, nullable=False)
