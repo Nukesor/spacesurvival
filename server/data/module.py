@@ -34,9 +34,13 @@ class Module(Schema):
     It shouldn't be used in any other context!
     """
 
-    display_name = fields.Str()
-    dependencies = fields.Nested(Dependency, many=True)
-    levels = fields.Nested(ModuleLevel, many=True)
+    display_name = fields.Str(required=True)
+    dependencies = fields.Nested(Dependency, many=True, required=True)
+    levels = fields.Nested(ModuleLevel, many=True, required=True)
+
+
+class Modules(Schema):
+    modules = fields.Nested(Module, many=True)
 
 
 def load_modules():
@@ -46,22 +50,7 @@ def load_modules():
             with open(current_app.config["MODULE_FILE_PATH"], 'r') as stream:
                 data = json.load(stream)
 
-        modules = {}
-        for key, module in data.items():
-            # Check if the key is a valid module Type
-            if key not in ModuleTypes.__members__:
-                print('Unknown ModuleType "{key} in json"')
-                sys.exit(1)
-
-            # Deserialize
-            deserialized = Module().load(module)
-            if len(deserialized[1]) > 0:
-                print("Error deserializing json")
-                print(deserialized[1])
-                sys.exit(1)
-            modules[key] = deserialized[0]
-
-        return modules
+        return Modules().load(data).data.get('modules')
     except Exception as e:
         print(e)
         sys.exit(1)
