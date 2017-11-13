@@ -2,18 +2,18 @@
 import sys
 import json
 from flask import current_app
-from marshmallow import fields, Schema
+from marshmallow import fields
 
-from server.data import Dependency, Resource
+from server.data import Dependency, Resource, BaseSchema as Schema
 from server.data.types import ResearchTypes
 
 
 class ResearchLevel(Schema):
     """The json representation of a module."""
 
-    level = fields.Int()
-    duration = fields.Int()
-    resources = fields.Nested(Resource, many=True)
+    level = fields.Int(required=True)
+    duration = fields.Int(required=True)
+    resources = fields.Nested(Resource, many=True, required=True)
 
 
 class Research(Schema):
@@ -24,20 +24,19 @@ class Research(Schema):
     """
 
     id = fields.Str()
-    display_name = fields.Str()
-    dependencies = fields.Nested(Dependency, many=True)
-    current_level = fields.Int(default=0)
-    levels = fields.Nested(ResearchLevel, many=True)
+    display_name = fields.Str(required=True)
+    dependencies = fields.Nested(Dependency, many=True, required=True)
+    levels = fields.Nested(ResearchLevel, many=True, required=True)
 
 
 class Researches(Schema):
-    researches = fields.Nested(Research, many=True)
+    researches = fields.Nested(Research, many=True, required=True)
 
 
-def load_research() -> Research:
+def load_research(path) -> Research:
     """Load the research data from a file."""
     try:
-        with open(current_app.config["RESEARCH_FILE_PATH"], 'r') as stream:
+        with open(path, 'r') as stream:
             data = json.load(stream)
 
         return Researches().load(data).data.get('researches')

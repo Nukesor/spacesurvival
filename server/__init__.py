@@ -2,6 +2,8 @@ import os
 from flask import Flask, Blueprint
 from server.config import configs
 from server.extensions import db, mail, ma, migrate, passlib
+from server.data.module import load_modules
+from server.data.research import load_research
 
 
 # Blueprints
@@ -16,7 +18,8 @@ def create_app(config='develop'):
         static_folder='../static',
         static_url_path='/static-native',
     )
-    app.config.from_object(configs[config])
+    config = configs[config]
+    app.config.from_object(config)
     db.init_app(app)
     ma.init_app(app)
     migrate.init_app(app, db)
@@ -27,6 +30,9 @@ def create_app(config='develop'):
     register_handlers(app)
 
     register_blueprints(app)
+
+    module_data = load_modules(getattr(config(), "MODULE_FILE_PATH"))
+    research_data = load_research(getattr(config(), "RESEARCH_FILE_PATH"))
 
     return app
 

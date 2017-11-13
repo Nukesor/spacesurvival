@@ -2,26 +2,26 @@
 import sys
 import json
 from flask import current_app
-from marshmallow import fields, Schema
+from marshmallow import fields
 
-from server.data import Dependency, Resource
+from server.data import Dependency, Resource, BaseSchema as Schema
 from server.data.types import ModuleTypes
 
 
 class Shoots(Schema):
     """Trait for a module."""
 
-    rate = fields.Int()
-    damage = fields.Int()
-    range = fields.Int()
+    rate = fields.Int(required=True)
+    damage = fields.Int(required=True)
+    range = fields.Int(required=True)
 
 
 class ModuleLevel(Schema):
     """The json representation of a module."""
 
-    level = fields.Int()
-    resources = fields.Nested(Resource, many=True)
-    duration = fields.Int()
+    level = fields.Int(required=True)
+    resources = fields.Nested(Resource, many=True, required=True)
+    duration = fields.Int(required=True)
     shoots = fields.Nested(Shoots)
     generates = fields.Nested(Resource, many=True)
     consumes = fields.Nested(Resource, many=True)
@@ -34,17 +34,16 @@ class Module(Schema):
     It shouldn't be used in any other context!
     """
 
-    display_name = fields.Str()
-    dependencies = fields.Nested(Dependency, many=True)
-    levels = fields.Nested(ModuleLevel, many=True)
+    display_name = fields.Str(required=True)
+    dependencies = fields.Nested(Dependency, many=True, required=True)
+    levels = fields.Nested(ModuleLevel, many=True, required=True)
 
 
-def load_modules():
+def load_modules(path):
     """Load the module data from a file."""
     try:
-        with current_app.app_context():
-            with open(current_app.config["MODULE_FILE_PATH"], 'r') as stream:
-                data = json.load(stream)
+        with open(path, 'r') as stream:
+            data = json.load(stream)
 
         modules = {}
         for key, module in data.items():

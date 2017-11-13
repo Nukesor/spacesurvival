@@ -3,6 +3,7 @@
     {
       "id": "Plasma",
       "display_name": "Plasma Technology",
+      "dependencies": [],
       "levels": [
         {
           "level": 1,
@@ -33,6 +34,7 @@
     {
       "id": "EnergyWeapons",
       "display_name": "Energy Weapons",
+      "dependencies": [],
       "levels": [
         {
           "level": 1,
@@ -63,6 +65,12 @@
     {
       "id": "MiningEfficiency",
       "display_name": "Mining Efficiency",
+      "dependencies": [
+        {
+          "type": "EnergyWeapons",
+          "level": 1
+        }
+      ],
       "levels": [
         {
           "level": 1,

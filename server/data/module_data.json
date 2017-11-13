@@ -4,7 +4,7 @@
     "dependencies": [
       {
         "type": "EnergyWeapons",
-        "leve": 1
+        "level": 1
       }
     ],
     "levels": [
@@ -69,12 +69,7 @@
   },
   "PlasmaGenerator": {
     "display_name": "Plasma Generator",
-    "dependencies": [
-      {
-        "type": "Plasma",
-        "level": 1
-      }
-    ],
+    "dependencies": [],
     "levels": [
       {
         "level": 1,
