@@ -6,7 +6,6 @@ import Json.Decode.Extra exposing ((|:))
 import Messages
 import Model exposing (Model)
 import Model.Queue exposing (Entry(ModuleEntry), Entry(ResearchEntry), ModuleData, Queue, ResearchData)
-import Model.User exposing (User(LoggedIn))
 
 
 queueDecoder : Decode.Decoder Queue
@@ -46,9 +45,4 @@ moduleDecoder =
 
 fetchQueue : Model -> Cmd Messages.Msg
 fetchQueue model =
-    case model.user of
-        LoggedIn user ->
-            authenticatedGet model (podUrl user "/queue") queueDecoder Messages.ReceiveQueue
-
-        _ ->
-            Cmd.none
+    authenticatedGet model (podUrl model.user "/queue") queueDecoder Messages.ReceiveQueue

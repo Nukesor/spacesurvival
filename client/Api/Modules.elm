@@ -104,12 +104,7 @@ fetchAvailableModules model =
 
 fetchGridModules : Model -> Cmd Messages.Msg
 fetchGridModules model =
-    case model.user of
-        LoggedIn user ->
-            authenticatedGet model (podUrl user "/modules") gridDecoder Messages.ReceiveGrid
-
-        _ ->
-            Cmd.none
+    authenticatedGet model (podUrl model.user "/modules") gridDecoder Messages.ReceiveGrid
 
 
 startBuilding : Model -> ModuleId -> Point -> Cmd Messages.Msg
