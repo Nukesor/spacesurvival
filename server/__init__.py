@@ -1,9 +1,11 @@
 import os
 from flask import Flask, Blueprint
+
 from server.config import configs
-from server.extensions import db, mail, ma, migrate, passlib
+from server.data import data
 from server.data.module import load_modules
 from server.data.research import load_research
+from server.extensions import db, mail, ma, migrate, passlib
 
 
 # Blueprints
@@ -31,8 +33,8 @@ def create_app(config='develop'):
 
     register_blueprints(app)
 
-    module_data = load_modules(getattr(config(), "MODULE_FILE_PATH"))
-    research_data = load_research(getattr(config(), "RESEARCH_FILE_PATH"))
+    data.module_data = load_modules(getattr(config(), "MODULE_FILE_PATH"))
+    data.research_data = load_research(getattr(config(), "RESEARCH_FILE_PATH"))
 
     return app
 
