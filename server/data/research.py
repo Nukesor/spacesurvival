@@ -1,11 +1,9 @@
 """Parse, validate and load the `research_data.json`."""
 import sys
 import json
-from flask import current_app
 from marshmallow import fields
 
 from server.data import Dependency, Resource, BaseSchema as Schema
-from server.data.types import ResearchTypes
 
 
 class ResearchLevel(Schema):
@@ -30,6 +28,8 @@ class Research(Schema):
 
 
 class Researches(Schema):
+    """Researches wrapper for easier research loading."""
+
     researches = fields.Nested(Research, many=True, required=True)
 
 

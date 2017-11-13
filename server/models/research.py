@@ -11,6 +11,7 @@ from sqlalchemy import (
 )
 
 from sqlalchemy.types import (
+    Boolean,
     String,
     Integer,
     DateTime,
@@ -34,6 +35,7 @@ class Research(db.Model):
     base_id = Column(UUID(as_uuid=True), ForeignKey('base.id'))
     type = Column(String(255), nullable=False)
     level = Column(Integer, nullable=False)
+    researched = Column(Boolean, nullable=False, default=False)
 
     pod = relationship("Pod", back_populates="researches")
     base = relationship("Base", back_populates="researches")

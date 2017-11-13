@@ -32,7 +32,7 @@ def get_pod_research(pod_id):
     return ok(schema.dump(pod.researches).data)
 
 
-@user_bp.route('/api/pod/<uuid:pod_id>/researches/', methods=['POST'])
+@user_bp.route('/api/pod/<uuid:pod_id>/researches', methods=['POST'])
 @use_args(research_creation_fields)
 def begin_pod_research(args, pod_id):
     """Begin a new pod research."""
@@ -55,11 +55,20 @@ def begin_pod_research(args, pod_id):
         .filter(Research.type == args['research_type']) \
         .first()
 
-    level = research.level if research else 0
+    next_level = 0
+    if research:
+        next_level = research.level + 1
+        highest_queue_entry = db.session.query(QueueEntry) \
+            .filter(QueueEntry.pod == pod) \
+            .filter(QueueEntry.research == research) \
+            .order_by(QueueEntry.level.desc()) \
+            .first()
+        if highest_queue_entry:
+            next_level = highest_queue_entry.level + 1
 
     # Check if we have enough resources
-    research_level = research_data[research_type]['levels'].get(level)
-    if level is None:
+    research_level = research_data[research_type]['levels'].get(next_level)
+    if research_level is None:
         return bad_request("Max level reached.")
     requirements = research_level['resources']
     enough, missing = Resource.enough_resources(pod.resources, requirements)
@@ -74,7 +83,7 @@ def begin_pod_research(args, pod_id):
         research = Research(research_type, pod)
 
     # Create a new queue entry.
-    queue_entry = QueueEntry(pod.queue, level, research_level['duration'], research=research)
+    queue_entry = QueueEntry(pod.queue, next_level, research_level['duration'], research=research)
 
     db.session.add(queue_entry)
     db.session.add(research)

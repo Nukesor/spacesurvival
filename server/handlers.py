@@ -1,3 +1,4 @@
+"""Flask app handler."""
 from flask import g, request
 from datetime import datetime
 from server.extensions import db
@@ -7,11 +8,13 @@ from server.responses import (
     unauthorized,
 )
 
+
 def register_handlers(app):
     """Register app handlers."""
     @app.before_request
     def require_json_input():
         """Require JSON input.
+
         If the request's method is either 'POST' or 'PUT', require the
         'Content-Type' to be JSON.
         """

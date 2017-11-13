@@ -39,6 +39,7 @@ class Module(db.Model):
     stationary = Column(Boolean, nullable=False)
     x_pos = Column(Integer)
     y_pos = Column(Integer)
+    finished = Column(Boolean, nullable=False, default=False)
 
     pod = relationship("Pod", back_populates="modules")
     base = relationship("Base", back_populates="modules")

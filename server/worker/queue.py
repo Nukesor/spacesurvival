@@ -1,13 +1,14 @@
+"""Process queues."""
 from datetime import datetime
 
 from server.extensions import db
 from server.models.queue import Queue
 
 
-
 def finished_entries():
+    """Process finished entries."""
     queue_entries = db.session.query(Queue) \
-        .filter(Queue.finishes_at < datetime.now())
+        .filter(Queue.finishes_at < datetime.now()) \
         .all()
 
     for entry in queue_entries:

@@ -1,11 +1,9 @@
 """Parse, validate and load the `module_data.json`."""
 import sys
 import json
-from flask import current_app
 from marshmallow import fields
 
 from server.data import Dependency, Resource, BaseSchema as Schema
-from server.data.types import ModuleTypes
 
 
 class Shoots(Schema):
@@ -22,6 +20,7 @@ class ModuleLevel(Schema):
     level = fields.Int(required=True)
     current_level = fields.Int(default=0)
     resources = fields.Nested(Resource, many=True, required=True)
+
     duration = fields.Int(required=True)
     shoots = fields.Nested(Shoots)
     generates = fields.Nested(Resource, many=True)
@@ -41,6 +40,8 @@ class Module(Schema):
 
 
 class Modules(Schema):
+    """Modules wrapper for easy Module loading."""
+
     modules = fields.Nested(Module, many=True)
 
 

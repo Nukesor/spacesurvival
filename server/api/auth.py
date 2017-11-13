@@ -8,7 +8,7 @@ from webargs.flaskparser import use_args
 from server import user_bp
 from server.extensions import db
 from server.models import User
-from server.responses import bad_request, ok
+from server.responses import bad_request
 from server.schemas.user import UserSchema
 from server.validation.user import login_fields
 from server.helpers.decorators import login_exempt
@@ -39,10 +39,8 @@ def login(args):
     if not valid_password:
         return bad_request('Unknown credentials or wrong password.')
 
-    if user.has_valid_auth_token:
-        token = user.current_auth_token
-    else:
-        token = user.generate_auth_token()
+    if not user.has_valid_auth_token:
+        user.generate_auth_token()
     user.last_login_at = datetime.utcnow()
     db.session.add(user)
     db.session.commit()
