@@ -1,73 +1,75 @@
 {
-  "LaserTurret": {
-    "display_name": "Laser turret",
-    "dependencies": [
-      {
-        "type": "EnergyWeapons",
-        "level": 1
-      }
-    ],
-    "levels": [
-      {
-        "level": 1,
-        "duration": 5,
-        "resources": [
-          {
-            "type": "Fuel",
-            "amount": 200
-          },
-          {
-            "type": "Minerals",
-            "amount": 100
-          }
-        ],
-        "shoots": {
-          "rate": 1,
-          "damage": 10,
-          "range": 100
+  "modules": [
+    {
+      "id": "LaserTurret",
+      "display_name": "Laser turret",
+      "dependencies": [
+        {
+          "type": "EnergyWeapons",
+          "level": 1
         }
-      },
-      {
-        "level": 2,
-        "duration": 60,
-        "resources": [
-          {
-            "type": "Fuel",
-            "amount": 200
-          },
-          {
-            "type": "Minerals",
-            "amount": 100
+      ],
+      "levels": [
+        {
+          "level": 1,
+          "duration": 5,
+          "resources": [
+            {
+              "type": "Fuel",
+              "amount": 200
+            },
+            {
+              "type": "Minerals",
+              "amount": 100
+            }
+          ],
+          "shoots": {
+            "rate": 1,
+            "damage": 10,
+            "range": 100
           }
-        ],
-        "shoots": {
-          "rate": 1,
-          "damage": 10,
-          "range": 100
-        }
-      },
-      {
-        "level": 3,
-        "duration": 120,
-        "resources": [
-          {
-            "type": "Fuel",
-            "amount": 200
-          },
-          {
-            "type": "Minerals",
-            "amount": 100
+        },
+        {
+          "level": 2,
+          "duration": 60,
+          "resources": [
+            {
+              "type": "Fuel",
+              "amount": 200
+            },
+            {
+              "type": "Minerals",
+              "amount": 100
+            }
+          ],
+          "shoots": {
+            "rate": 1,
+            "damage": 10,
+            "range": 100
           }
-        ],
-        "shoots": {
-          "rate": 1,
-          "damage": 10,
-          "range": 100
+        },
+        {
+          "level": 3,
+          "duration": 120,
+          "resources": [
+            {
+              "type": "Fuel",
+              "amount": 200
+            },
+            {
+              "type": "Minerals",
+              "amount": 100
+            }
+          ],
+          "shoots": {
+            "rate": 1,
+            "damage": 10,
+            "range": 100
+          }
         }
-      }
-    ]
-  },
-  "PlasmaGenerator": {
+      ]
+    }, {
+    "id": "PlasmaGenerator",
     "display_name": "Plasma Generator",
     "dependencies": [],
     "levels": [
@@ -116,33 +118,33 @@
             "amount": 10000000
           }
         ]
-      },
-      {
-        "level": 3,
-        "duration": 5,
-        "resources": [
-          {
-            "type": "Fuel",
-            "amount": 200
-          },
-          {
-            "type": "Minerals",
-            "amount": 100
-          }
-        ],
-        "generates": [
-          {
-            "type": "Fuel",
-            "amount": 200000000
-          }
-        ],
-        "consumes": [
-          {
-            "type": "Minerals",
-            "amount": 10000000
-          }
-        ]
+      }, {
+      "level": 3,
+      "duration": 5,
+      "resources": [
+        {
+          "type": "Fuel",
+          "amount": 200
+        },
+        {
+          "type": "Minerals",
+          "amount": 100
+        }
+      ],
+      "generates": [
+        {
+          "type": "Fuel",
+          "amount": 200000000
+        }
+      ],
+      "consumes": [
+        {
+          "type": "Minerals",
+          "amount": 10000000
+        }
+      ]
       }
     ]
-  }
+    }
+  ]
 }
