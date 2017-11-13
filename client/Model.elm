@@ -14,7 +14,8 @@ import Time
 
 
 type alias Model =
-    { grid : Model.Grid.Grid
+    { pod : Model.Grid.Grid
+    , base : Model.Grid.Grid
     , user : User
     , authDialogAnimation : Animation.State
     , availableModules : AvailableModules
@@ -29,6 +30,11 @@ type alias Model =
 
 
 type MainView
-    = GridView
+    = GridView SelectedGrid
     | ResearchView
     | ResourcesView
+
+
+type SelectedGrid
+    = Pod
+    | Base

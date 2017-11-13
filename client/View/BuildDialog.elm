@@ -32,7 +32,7 @@ availableModules : Model.Model -> Point -> List (Html Messages.Msg)
 availableModules model point =
     let
         maybeMod =
-            atPosition point model.grid
+            atPosition point model.pod
                 |> Maybe.andThen .entry
     in
         case maybeMod of
