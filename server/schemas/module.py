@@ -10,16 +10,16 @@ class ModuleSchema(BaseSchema):
     pod_id = fields.UUID()
     base_id = fields.UUID()
 
-    type = fields.Str()
+    type = fields.Str(required=True)
     level = fields.Int()
-    stationary = fields.Bool()
-    x_pos = fields.Int()
-    y_pos = fields.Int()
+    stationary = fields.Bool(required=True)
+    x_pos = fields.Int(allow_none=True)
+    y_pos = fields.Int(allow_none=True)
     finished = fields.Bool()
 
     @validates_schema
     def position_or_stationary(self, data):
-        """Either pos_x, pos_y or stationary."""
+        """Either x_pos_x, y_pos or stationary."""
         print(data)
         if (data['x_pos'] and not data['y_pos']) or \
            (not data['x_pos'] and data['y_pos']):
