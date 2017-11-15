@@ -20,7 +20,6 @@ class ModuleSchema(BaseSchema):
     @validates_schema
     def position_or_stationary(self, data):
         """Either x_pos_x, y_pos or stationary."""
-        print(data)
         if (data['x_pos'] and not data['y_pos']) or \
            (not data['x_pos'] and data['y_pos']):
                 raise ValidationError('x and y position needed',

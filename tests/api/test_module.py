@@ -57,7 +57,9 @@ class TestModule:
         assert len(user.pod.modules) == 1
 
         response = self.post(client, user, data)
+        message = response.get_data().decode('utf-8')
         assert response.status_code == 400
+        assert "There already is a module" in message
 
     def test_stationary_already_exists(self, app, user, client):
         """Ensure that you can't build a module twice."""
@@ -69,7 +71,9 @@ class TestModule:
         assert len(user.pod.modules) == 1
 
         response = self.post(client, user, data)
+        message = response.get_data().decode('utf-8')
         assert response.status_code == 400
+        assert "There already is a module" in message
 
     def test_too_few_resources(self, app, user, client):
         """Too few resources."""
@@ -81,4 +85,6 @@ class TestModule:
         data = {'module_type': 'PlasmaGenerator', 'stationary': True,
                 'x_pos': None, 'y_pos': None}
         response = self.post(client, user, data)
+        message = response.get_data().decode('utf-8')
         assert response.status_code == 400
+        assert "Not enough resources" in message
