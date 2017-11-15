@@ -21,8 +21,8 @@ class TestModule:
         data = {
             'module_type': 'PlasmaGenerator',
             'stationary': False,
-            'position_x': 1,
-            'position_y': 1,
+            'x_pos': 1,
+            'y_pos': 1,
         }
 
         response = client.post(
@@ -35,3 +35,19 @@ class TestModule:
 
         assert response.status_code == 201
         assert len(user.pod.modules) == 1
+
+    def test_poisition_stationary_validation(self, app, user, client):
+        """Simple module creation."""
+        data = {
+            'module_type': 'PlasmaGenerator',
+            'stationary': True,
+            'x_pos': 1,
+            'y_pos': 1,
+        }
+
+        response = client.post(
+            self.get_url(user),
+            data=json.dumps(data),
+            headers=auth_token(user),
+        )
+        assert response.status_code == 422

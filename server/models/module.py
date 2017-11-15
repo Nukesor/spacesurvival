@@ -51,9 +51,9 @@ class Module(db.Model):
         nullable=False,
     )
 
-    def __init__(self, type, pod, level, stationary, x_pos=None, y_pos=None):
+    def __init__(self, module_type, pod=None, level=0, stationary=False, x_pos=None, y_pos=None):
         """Create a new module."""
-        self.type = type
+        self.type = module_type
         self.pod = pod
         self.level = level
         self.stationary = stationary

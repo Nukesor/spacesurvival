@@ -5,10 +5,9 @@ from webargs.flaskparser import use_args
 
 from server import user_bp
 from server.extensions import db
+from server.data.types import ModuleTypes
 from server.responses import created, ok, bad_request
 from server.schemas.module import ModuleSchema
-from server.validation.module import module_creation_fields
-from server.data.types import ModuleTypes
 from server.models import (
     Module,
     Pod,
@@ -36,7 +35,7 @@ def get_pod_modules(pod_id):
 
 
 @user_bp.route('/api/pod/<uuid:pod_id>/new_module', methods=['POST'])
-@use_args(module_creation_fields)
+@use_args(ModuleSchema(only=['module_type', 'stationary', 'x_pos', 'y_pos']))
 def new_pod_module(args, pod_id):
     """Place a new module on the pod grid."""
     from server.data.data import module_data
@@ -91,8 +90,7 @@ def new_pod_module(args, pod_id):
     return created()
 
 
-@user_bp.route('/api/pod/<uuid:pod_id>/module/<uuid:module_id>/upgrade', methods=['POST'])
-@use_args(module_creation_fields)
+@user_bp.route('/api/pod/<uuid:pod_id>/module/<uuid:module_id>/upgrade', methods=['PUT'])
 def upgrade_pod_module(args, pod_id, module_id):
     """Update a module on the pod grid."""
     from server.data.data import module_data
