@@ -109,9 +109,9 @@ def upgrade_pod_module(pod_id, module_id):
 
     next_level = module.level + 1
     highest_queue_entry = db.session.query(QueueEntry) \
+        .filter(QueueEntry.module == module) \
         .join(Queue) \
         .filter(Queue.pod == pod) \
-        .filter(QueueEntry.module == module) \
         .order_by(QueueEntry.level.desc()) \
         .first()
     if highest_queue_entry:

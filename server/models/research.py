@@ -26,7 +26,7 @@ class Research(db.Model):
     __table_args__ = (
         CheckConstraint(
             "(pod_id is NULL and base_id is not NULL) or "
-            "(pod_id is not NULL and base_id is NULL)"
+            "(pod_id is not NULL and base_id is NULL)",
         ),
     )
 
@@ -48,7 +48,8 @@ class Research(db.Model):
         nullable=False,
     )
 
-    def __init__(self, research_type, pod):
+    def __init__(self, research_type, pod, level=0):
         """Create a new research."""
         self.type = research_type
         self.pod = pod
+        self.level = level
