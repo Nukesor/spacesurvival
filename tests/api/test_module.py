@@ -1,4 +1,5 @@
 """Module tests."""
+import uuid
 import json
 import pytest
 
@@ -94,10 +95,10 @@ class TestBuildModule:
 class TestUpgradeModule:
     """Test all module related api functionality."""
 
-    def put(self, client, user, module):
+    def put(self, client, user, module_id):
         """Url for this test class."""
         response = client.put(
-            f'/api/pod/{user.pod.id}/module/{module.id}/upgrade',
+            f'/api/pod/{user.pod.id}/module/{module_id}/upgrade',
             headers=auth_token(user),
         )
         return response
@@ -106,7 +107,7 @@ class TestUpgradeModule:
         """Simple module creation."""
         # Normal new module request
         module = pod.user.pod.modules[0]
-        response = self.put(client, pod.user, module)
+        response = self.put(client, pod.user, module.id)
 
         pod = db.session.query(Pod).get(pod.id)
         assert response.status_code == 200
@@ -116,10 +117,10 @@ class TestUpgradeModule:
         """Upgrade a module multiple times."""
         # Normal new module request
         module = pod.user.pod.modules[0]
-        response = self.put(client, pod.user, module)
+        response = self.put(client, pod.user, module.id)
         assert response.status_code == 200
 
-        response = self.put(client, pod.user, module)
+        response = self.put(client, pod.user, module.id)
         assert response.status_code == 200
 
         pod = db.session.query(Pod).get(pod.id)
@@ -127,3 +128,21 @@ class TestUpgradeModule:
         assert len(queue_entries) == 2
         assert queue_entries[0].level == 1
         assert queue_entries[1].level == 2
+
+    def test_no_such_module(self, app, pod, client):
+        """Upgrade a module multiple times."""
+        # Normal new module request
+        module_id = uuid.uuid4()
+        response = self.put(client, pod.user, module_id)
+        assert response.status_code == 400
+
+    def test_too_few_resources(self, app, pod, client):
+        """Too few resources."""
+        for resource in pod.resources:
+            resource.amount = 10
+        db.session.add(pod)
+        db.session.commit()
+
+        module = pod.modules[0]
+        response = self.put(client, pod.user, module.id)
+        assert response.status_code == 400
