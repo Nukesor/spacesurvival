@@ -5,11 +5,11 @@ import pytest
 from tests.helper import auth_token
 from server.extensions import db
 
-from server.models.user import User
+from server.models.user import User, Pod
 
 
 @pytest.mark.usefixtures('dbmodels', 'dbtransaction')
-class TestModule:
+class TestBuildModule:
     """Test all module related api functionality."""
 
     def post(self, client, user, data):
@@ -88,3 +88,42 @@ class TestModule:
         message = response.get_data().decode('utf-8')
         assert response.status_code == 400
         assert "Not enough resources" in message
+
+
+@pytest.mark.usefixtures('dbmodels', 'dbtransaction')
+class TestUpgradeModule:
+    """Test all module related api functionality."""
+
+    def put(self, client, user, module):
+        """Url for this test class."""
+        response = client.put(
+            f'/api/pod/{user.pod.id}/module/{module.id}/upgrade',
+            headers=auth_token(user),
+        )
+        return response
+
+    def test_module_upgrade(self, app, pod, client):
+        """Simple module creation."""
+        # Normal new module request
+        module = pod.user.pod.modules[0]
+        response = self.put(client, pod.user, module)
+
+        pod = db.session.query(Pod).get(pod.id)
+        assert response.status_code == 200
+        assert len(pod.queue.queue_entries) == 1
+
+    def test_module_upgrade_twice(self, app, pod, client):
+        """Upgrade a module multiple times."""
+        # Normal new module request
+        module = pod.user.pod.modules[0]
+        response = self.put(client, pod.user, module)
+        assert response.status_code == 200
+
+        response = self.put(client, pod.user, module)
+        assert response.status_code == 200
+
+        pod = db.session.query(Pod).get(pod.id)
+        queue_entries = pod.queue.queue_entries
+        assert len(queue_entries) == 2
+        assert queue_entries[0].level == 1
+        assert queue_entries[1].level == 2

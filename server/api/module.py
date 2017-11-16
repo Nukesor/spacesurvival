@@ -11,6 +11,7 @@ from server.schemas.module import ModuleSchema
 from server.models import (
     Module,
     Pod,
+    Queue,
     QueueEntry,
     Resource,
 )
@@ -91,7 +92,7 @@ def new_pod_module(args, pod_id):
 
 
 @user_bp.route('/api/pod/<uuid:pod_id>/module/<uuid:module_id>/upgrade', methods=['PUT'])
-def upgrade_pod_module(args, pod_id, module_id):
+def upgrade_pod_module(pod_id, module_id):
     """Update a module on the pod grid."""
     from server.data.data import module_data
 
@@ -108,18 +109,20 @@ def upgrade_pod_module(args, pod_id, module_id):
 
     next_level = module.level + 1
     highest_queue_entry = db.session.query(QueueEntry) \
-        .filter(QueueEntry.pod == pod) \
+        .join(Queue) \
+        .filter(Queue.pod == pod) \
         .filter(QueueEntry.module == module) \
         .order_by(QueueEntry.level.desc()) \
         .first()
     if highest_queue_entry:
         next_level = highest_queue_entry.level + 1
 
-    # Check if we have enough resources
-    module_level = module_data[module.type]['levels'].get(next_level)
-    if module_level is None:
+    # Ensure we didn't reach max level.
+    if next_level >= len(module_data[module.type]['levels']):
         return bad_request("Max level reached.")
+    module_level = module_data[module.type]['levels'][next_level]
 
+    # Ensure we have enough resources
     requirements = module_level['resources']
     enough, missing = Resource.enough_resources(pod.resources, requirements)
     if not enough:
@@ -133,4 +136,4 @@ def upgrade_pod_module(args, pod_id, module_id):
     db.session.add(module)
     db.session.commit()
 
-    return created()
+    return ok()
