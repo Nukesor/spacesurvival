@@ -31,8 +31,8 @@ class Resource(db.Model):
     )
 
     id = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
-    pod_id = Column(UUID(as_uuid=True), ForeignKey('pod.id'))
-    base_id = Column(UUID(as_uuid=True), ForeignKey('base.id'))
+    pod_id = Column(UUID(as_uuid=True), ForeignKey('pod.id'), index=True)
+    base_id = Column(UUID(as_uuid=True), ForeignKey('base.id'), index=True)
 
     name = Column(String(255), nullable=False)
     amount = Column(BigInteger, nullable=False)

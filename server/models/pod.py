@@ -27,8 +27,8 @@ class Pod(db.Model):
 
     id = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
     name = Column(String(255), nullable=False)
-    user_id = Column(UUID(as_uuid=True), ForeignKey('user.id', deferrable=True, initially='DEFERRED'), nullable=False)
-    base_id = Column(UUID(as_uuid=True), ForeignKey('base.id'))
+    user_id = Column(UUID(as_uuid=True), ForeignKey('user.id', deferrable=True, initially='DEFERRED'), index=True, nullable=False)
+    base_id = Column(UUID(as_uuid=True), ForeignKey('base.id'), index=True)
 
     user = relationship("User", back_populates="pod")
 

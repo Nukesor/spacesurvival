@@ -3,15 +3,12 @@ from server.extensions import db
 from sqlalchemy.orm import relationship
 from sqlalchemy import (
     func,
-    text,
     Column,
     CheckConstraint,
     ForeignKey,
 )
 
 from sqlalchemy.types import (
-    Boolean,
-    String,
     Integer,
     DateTime,
 )
@@ -29,8 +26,8 @@ class Queue(db.Model):
     )
 
     id = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
-    pod_id = Column(UUID(as_uuid=True), ForeignKey('pod.id'))
-    base_id = Column(UUID(as_uuid=True), ForeignKey('base.id'))
+    pod_id = Column(UUID(as_uuid=True), ForeignKey('pod.id'), index=True)
+    base_id = Column(UUID(as_uuid=True), ForeignKey('base.id'), index=True)
 
     slots = Column(Integer, default=4, nullable=False)
     pod = relationship("Pod", back_populates="queue")

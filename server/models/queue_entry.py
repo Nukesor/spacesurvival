@@ -29,9 +29,9 @@ class QueueEntry(db.Model):
     )
 
     id = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
-    queue_id = Column(UUID(as_uuid=True), ForeignKey('queue.id'), nullable=False)
-    module_id = Column(UUID(as_uuid=True), ForeignKey('module.id'))
-    research_id = Column(UUID(as_uuid=True), ForeignKey('research.id'))
+    queue_id = Column(UUID(as_uuid=True), ForeignKey('queue.id'), index=True, nullable=False)
+    module_id = Column(UUID(as_uuid=True), ForeignKey('module.id'), index=True)
+    research_id = Column(UUID(as_uuid=True), ForeignKey('research.id'), index=True)
 
     level = Column(Integer, nullable=False)
     duration = Column(Integer, nullable=False)
