@@ -30,7 +30,7 @@ def get_pod_research(pod_id):
     pod = db.session.query(Pod).get(pod_id)
     schema = ResearchSchema()
 
-    return ok(schema.dump(pod.researches).data)
+    return ok(schema.dump(pod.researches, many=True).data)
 
 
 @user_bp.route('/api/pod/<uuid:pod_id>/researches', methods=['POST'])

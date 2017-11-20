@@ -34,6 +34,17 @@ class TestBuildModule:
         assert len(user.pod.modules) == 1
         assert len(user.pod.queue.queue_entries) == 1
 
+        response = client.get(f'/api/pod/{user.pod.id}/modules',
+                              headers=auth_token(user))
+        assert response.status_code == 200
+        assert response.json[0]
+        assert response.json[0]['type'] == 'PlasmaGenerator'
+        assert response.json[0]['stationary'] is False
+        assert response.json[0]['x_pos'] == 1
+        assert response.json[0]['y_pos'] == 1
+        assert response.json[0]['level'] == 0
+        assert response.json[0]['finished'] is False
+
     def test_position_stationary_validation(self, app, user, client):
         """Ensure that you send stationary and position."""
         # Stationary with x_pos and y_pos

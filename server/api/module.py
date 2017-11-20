@@ -32,7 +32,7 @@ def get_pod_modules(pod_id):
     pod = db.session.query(Pod).get(pod_id)
     schema = ModuleSchema()
 
-    return ok(schema.dump(pod.modules).data)
+    return ok(schema.dump(pod.modules, many=True).data)
 
 
 @user_bp.route('/api/pod/<uuid:pod_id>/new_module', methods=['POST'])
@@ -48,8 +48,8 @@ def new_pod_module(args, pod_id):
     # Check for valid module type
     module_type = args['module_type']
     stationary = args.get('stationary')
-    x_pos = args.get('position_x')
-    y_pos = args.get('position_y')
+    x_pos = args.get('x_pos')
+    y_pos = args.get('y_pos')
     if module_type not in ModuleTypes.__members__:
         return bad_request(f'Unknown Module type: {module_type}')
 

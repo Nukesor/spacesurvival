@@ -26,7 +26,11 @@ class Module(db.Model):
     __table_args__ = (
         CheckConstraint(
             "(pod_id is NULL and base_id is not NULL) or "
-            "(pod_id is not NULL and base_id is NULL)"
+            "(pod_id is not NULL and base_id is NULL)",
+        ),
+        CheckConstraint(
+            "(x_pos is not NULL and y_pos is not NULL) and not stationary or"
+            "(x_pos is NULL and y_pos is null) and stationary",
         ),
     )
 
