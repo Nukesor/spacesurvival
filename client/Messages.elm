@@ -3,7 +3,7 @@ module Messages exposing (..)
 import Animation
 import Http
 import Json.Decode
-import Model exposing (MainView)
+import Model exposing (MainView, SelectedGrid)
 import Model.Grid exposing (Grid)
 import Model.Modules exposing (AvailableModules, ModuleId)
 import Model.Queue exposing (Queue)

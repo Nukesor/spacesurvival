@@ -115,7 +115,7 @@ update msg model =
                                 unfinishedEntries model.currentDate model.queue
 
                             updatedResources =
-                                Model.Modules.tick dt (modules model.grid) model.availableModules model.resources
+                                Model.Modules.tick dt (modules model.pod) model.availableModules model.resources
 
                             commands =
                                 if model.queue /= updatedQueue then
@@ -135,7 +135,7 @@ update msg model =
 
         ReceiveGrid result ->
             result
-                |> Result.map (\modules -> { model | grid = modules } ! [])
+                |> Result.map (\modules -> { model | pod = modules } ! [])
                 |> withDefault (model ! [])
 
         StartBuilding id point ->

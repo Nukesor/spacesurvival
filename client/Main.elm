@@ -23,10 +23,11 @@ main =
 
 init : ( Model, Cmd Msg )
 init =
-    { grid = Model.Grid.empty
+    { pod = Model.Grid.empty
+    , base = Model.Grid.empty
     , user = LoggingIn { identifier = "", password = "" }
     , authDialogAnimation = Animation.interrupt Animations.dialogAppear Animations.dialogAppearStyle
-    , mainView = GridView
+    , mainView = GridView Pod
     , availableModules =
         Dict.empty
     , researches = Dict.empty

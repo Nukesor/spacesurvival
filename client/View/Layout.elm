@@ -23,7 +23,7 @@ view model =
 mainView : MainView -> (Model -> Html Msg)
 mainView viewType =
     case viewType of
-        GridView ->
+        GridView grid ->
             View.Grid.view
 
         ResearchView ->
