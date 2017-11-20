@@ -1,3 +1,4 @@
+"""App factory."""
 import os
 from flask import Flask, Blueprint
 
@@ -54,4 +55,3 @@ def run():
 
 import server.api # noqa
 import server.models # noqa
-

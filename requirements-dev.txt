@@ -15,6 +15,9 @@ pytest-watch
 hypothesis
 retry
 
+# Local deployment
+uwsgi
+
 # Niceness
 ipython
 flask-shell-ipython

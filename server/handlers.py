@@ -5,7 +5,12 @@ from server.extensions import db
 from server.models.user import User
 from server.responses import (
     bad_request,
+    conflict,
+    forbidden,
+    method_not_allowed,
+    not_found,
     unauthorized,
+    unprocessable_entity,
 )
 
 
@@ -61,3 +66,38 @@ def register_handlers(app):
         response.headers['Access-Control-Allow-Methods'] = app.config['CORS_ALLOW_METHODS']
         response.headers['Access-Control-Allow-Headers'] = app.config['CORS_ALLOW_HEADERS']
         return response
+
+    @app.errorhandler(400)
+    def handle_bad_request(e):
+        return bad_request(e.name)
+
+    @app.errorhandler(401)
+    def handle_unauthorized(e):
+        return unauthorized(e.name)
+
+    @app.errorhandler(403)
+    def handle_forbidden(e):
+        return forbidden(e.name)
+
+    @app.errorhandler(404)
+    def handle_not_found(e):
+        return not_found(e.name)
+
+    @app.errorhandler(405)
+    def handle_method_not_allowed(e):
+        return method_not_allowed(e.name)
+
+    @app.errorhandler(409)
+    def handle_conflict(e):
+        return conflict(e.name)
+
+    @app.errorhandler(422)
+    def handle_unprocessable_entity(e):
+        # webargs attaches additional metadata to the `data` attribute
+        data = getattr(e, 'data') if hasattr(e, 'data') else None
+        if data:
+            # Get validations from the ValidationError object
+            messages = data['messages']
+        else:
+            messages = ['Invalid request']
+        return unprocessable_entity(messages)
