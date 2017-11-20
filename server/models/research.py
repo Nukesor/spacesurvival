@@ -11,6 +11,7 @@ from sqlalchemy import (
 )
 
 from sqlalchemy.types import (
+    Boolean,
     String,
     Integer,
     DateTime,
@@ -25,15 +26,17 @@ class Research(db.Model):
     __table_args__ = (
         CheckConstraint(
             "(pod_id is NULL and base_id is not NULL) or "
-            "(pod_id is not NULL and base_id is NULL)"
+            "(pod_id is not NULL and base_id is NULL)",
         ),
     )
 
     id = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
     pod_id = Column(UUID(as_uuid=True), ForeignKey('pod.id'))
     base_id = Column(UUID(as_uuid=True), ForeignKey('base.id'))
+
     type = Column(String(255), nullable=False)
     level = Column(Integer, nullable=False)
+    researched = Column(Boolean, nullable=False, default=False)
 
     pod = relationship("Pod", back_populates="researches")
     base = relationship("Base", back_populates="researches")
@@ -45,7 +48,8 @@ class Research(db.Model):
         nullable=False,
     )
 
-    def __init__(self, research_type, pod):
+    def __init__(self, research_type, pod, level=0):
         """Create a new research."""
         self.type = research_type
         self.pod = pod
+        self.level = level

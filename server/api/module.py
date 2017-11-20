@@ -5,14 +5,16 @@ from webargs.flaskparser import use_args
 
 from server import user_bp
 from server.extensions import db
-from server.responses import created, ok, bad_request
-from server.models.pod import Pod
-from server.models.module import Module
-from server.models.resource import Resource
-from server.models.queue_entry import QueueEntry
-from server.schemas.module import ModuleSchema
-from server.validation.module import module_creation_fields
 from server.data.types import ModuleTypes
+from server.responses import created, ok, bad_request
+from server.schemas.module import ModuleSchema
+from server.models import (
+    Module,
+    Pod,
+    Queue,
+    QueueEntry,
+    Resource,
+)
 
 
 @user_bp.route('/api/modules', methods=['GET'])
@@ -30,27 +32,24 @@ def get_pod_modules(pod_id):
     pod = db.session.query(Pod).get(pod_id)
     schema = ModuleSchema()
 
-    return ok(schema.dump(pod.modules).data)
+    return ok(schema.dump(pod.modules, many=True).data)
 
 
 @user_bp.route('/api/pod/<uuid:pod_id>/new_module', methods=['POST'])
-@use_args(module_creation_fields)
+@use_args(ModuleSchema(only=['module_type', 'stationary', 'x_pos', 'y_pos']))
 def new_pod_module(args, pod_id):
     """Place a new module on the pod grid."""
     from server.data.data import module_data
 
-    pod = db.session.query(Pod) \
-        .filter(Pod.user_id == g.current_user.id) \
-        .one()
-
-    if pod_id != pod.id:
+    pod = db.session.query(Pod).get(pod_id)
+    if pod.user_id != g.current_user.id:
         return bad_request(f"Pod doesn't belong to current user.")
 
     # Check for valid module type
     module_type = args['module_type']
     stationary = args.get('stationary')
-    x_pos = args.get('position_x')
-    y_pos = args.get('position_y')
+    x_pos = args.get('x_pos')
+    y_pos = args.get('y_pos')
     if module_type not in ModuleTypes.__members__:
         return bad_request(f'Unknown Module type: {module_type}')
 
@@ -83,10 +82,58 @@ def new_pod_module(args, pod_id):
     # Subtract the resources from the pod and create a queue entry.
     Resource.subtract_resources(pod.resources, requirements)
     module = Module(module_type, pod, 0, stationary, x_pos, y_pos)
-    queue_entry = QueueEntry(pod.queue, 1, module_level['duration'], module=module)
+    queue_entry = QueueEntry(pod.queue, 0, module_level['duration'], module=module)
 
     db.session.add(queue_entry)
     db.session.add(module)
     db.session.commit()
 
     return created()
+
+
+@user_bp.route('/api/pod/<uuid:pod_id>/module/<uuid:module_id>/upgrade', methods=['PUT'])
+def upgrade_pod_module(pod_id, module_id):
+    """Update a module on the pod grid."""
+    from server.data.data import module_data
+
+    pod = db.session.query(Pod).get(pod_id)
+    if pod.user_id != g.current_user.id:
+        return bad_request(f"Pod doesn't belong to current user.")
+
+    # Check if we already have a module with this type
+    # at the specified position.
+    module = db.session.query(Module).get(module_id)
+
+    if not module:
+        return bad_request('No module with this id')
+
+    next_level = module.level + 1
+    highest_queue_entry = db.session.query(QueueEntry) \
+        .filter(QueueEntry.module == module) \
+        .join(Queue) \
+        .filter(Queue.pod == pod) \
+        .order_by(QueueEntry.level.desc()) \
+        .first()
+    if highest_queue_entry:
+        next_level = highest_queue_entry.level + 1
+
+    # Ensure we didn't reach max level.
+    if next_level >= len(module_data[module.type]['levels']):
+        return bad_request("Max level reached.")
+    module_level = module_data[module.type]['levels'][next_level]
+
+    # Ensure we have enough resources
+    requirements = module_level['resources']
+    enough, missing = Resource.enough_resources(pod.resources, requirements)
+    if not enough:
+        return bad_request(f'Not enough resources: {missing}')
+
+    # Subtract the resources from the pod and create a queue entry.
+    Resource.subtract_resources(pod.resources, requirements)
+    queue_entry = QueueEntry(pod.queue, next_level, module_level['duration'], module=module)
+
+    db.session.add(queue_entry)
+    db.session.add(module)
+    db.session.commit()
+
+    return ok()

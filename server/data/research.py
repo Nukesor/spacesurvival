@@ -1,11 +1,9 @@
 """Parse, validate and load the `research_data.json`."""
 import sys
 import json
-from flask import current_app
 from marshmallow import fields
 
 from server.data import Dependency, Resource, BaseSchema as Schema
-from server.data.types import ResearchTypes
 
 
 class ResearchLevel(Schema):
@@ -23,13 +21,15 @@ class Research(Schema):
     It shouldn't be used in any other context!
     """
 
-    id = fields.Str()
+    type = fields.Str(required=True)
     display_name = fields.Str(required=True)
     dependencies = fields.Nested(Dependency, many=True, required=True)
     levels = fields.Nested(ResearchLevel, many=True, required=True)
 
 
 class Researches(Schema):
+    """Researches wrapper for easier research loading."""
+
     researches = fields.Nested(Research, many=True, required=True)
 
 
@@ -39,7 +39,11 @@ def load_research(path) -> Research:
         with open(path, 'r') as stream:
             data = json.load(stream)
 
-        return Researches().load(data).data.get('researches')
+        researches = {}
+        parsed = Researches().load(data).data.get('researches')
+        for item in parsed:
+            researches[item['type']] = item
+        return researches
 
     except Exception as e:
         print(e)

@@ -26,7 +26,11 @@ class Module(db.Model):
     __table_args__ = (
         CheckConstraint(
             "(pod_id is NULL and base_id is not NULL) or "
-            "(pod_id is not NULL and base_id is NULL)"
+            "(pod_id is not NULL and base_id is NULL)",
+        ),
+        CheckConstraint(
+            "(x_pos is not NULL and y_pos is not NULL) and not stationary or"
+            "(x_pos is NULL and y_pos is null) and stationary",
         ),
     )
 
@@ -39,6 +43,7 @@ class Module(db.Model):
     stationary = Column(Boolean, nullable=False)
     x_pos = Column(Integer)
     y_pos = Column(Integer)
+    finished = Column(Boolean, nullable=False, default=False)
 
     pod = relationship("Pod", back_populates="modules")
     base = relationship("Base", back_populates="modules")
@@ -50,9 +55,9 @@ class Module(db.Model):
         nullable=False,
     )
 
-    def __init__(self, type, pod, level, stationary, x_pos=None, y_pos=None):
+    def __init__(self, module_type, pod=None, level=0, stationary=False, x_pos=None, y_pos=None):
         """Create a new module."""
-        self.type = type
+        self.type = module_type
         self.pod = pod
         self.level = level
         self.stationary = stationary

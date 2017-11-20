@@ -1,7 +1,6 @@
 {
   "researches": [
-    {
-      "id": "Plasma",
+    { "type": "Plasma",
       "display_name": "Plasma Technology",
       "dependencies": [],
       "levels": [
@@ -31,8 +30,7 @@
         }
       ]
     },
-    {
-      "id": "EnergyWeapons",
+    { "type": "EnergyWeapons",
       "display_name": "Energy Weapons",
       "dependencies": [],
       "levels": [
@@ -62,8 +60,7 @@
         }
       ]
     },
-    {
-      "id": "MiningEfficiency",
+    { "type": "MiningEfficiency",
       "display_name": "Mining Efficiency",
       "dependencies": [
         {

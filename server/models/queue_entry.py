@@ -1,5 +1,6 @@
 """Everything regarding queue entries."""
 import uuid
+from datetime import datetime
 from server.extensions import db
 from sqlalchemy import (
     func,
@@ -49,6 +50,8 @@ class QueueEntry(db.Model):
 
     def __init__(self, queue, level, duration, module=None, research=None):
         """Create a new queue entry."""
+        if len(queue.queue_entries) == 0:
+            self.started_at = datetime.now()
         self.queue = queue
         self.level = level
         self.duration = duration

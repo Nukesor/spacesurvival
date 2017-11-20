@@ -1,7 +1,10 @@
+"""Various configs for different environments."""
 from datetime import timedelta
 
 
 class BaseConfig:
+    """Base config."""
+
     DEBUG = False
     SECRET_KEY = 'lolololol'
     SQLALCHEMY_TRACK_MODIFICATIONS = False
@@ -26,15 +29,21 @@ class BaseConfig:
 
 
 class DevConfig(BaseConfig):
+    """Develop config."""
+
     DEBUG = True
     SQLALCHEMY_DATABASE_URI = 'postgres://localhost/browsergame-dev'
 
 
 class TestConfig(BaseConfig):
+    """Testing config."""
+
     SQLALCHEMY_DATABASE_URI = 'postgres://localhost/browsergame-test'
 
 
 class ProdConfig(BaseConfig):
+    """Production config."""
+
     SQLALCHEMY_DATABASE_URI = 'postgres://localhost/browsergame'
     AUTH_TOKEN_TIMEOUT = 30 * 12 * 30 * 24 * 3600
 

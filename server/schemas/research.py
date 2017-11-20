@@ -1,10 +1,15 @@
-from server.extensions import ma
-from server.models.research import Research
+"""Research schema for serialization and validation."""
+from server.schemas import BaseSchema
+from marshmallow import fields
 
-class ResearchSchema(ma.ModelSchema):
-    class Meta:
-        model = Research
-        exclude = (
-            "created_at",
-            "updated_at",
-        )
+
+class ResearchSchema(BaseSchema):
+    """Research Schema."""
+
+    id = fields.UUID()
+    pod_id = fields.UUID()
+    base_id = fields.UUID()
+
+    type = fields.Str(required=True)
+    level = fields.Int()
+    researched = fields.Bool(required=True)
