@@ -91,7 +91,7 @@ update msg model =
             model ! [ startResearching model key ]
 
         ReceiveAvailableModules result ->
-            case result of
+            case Debug.log "available modules" result of
                 Ok modules ->
                     { model | availableModules = modules } ! []
 

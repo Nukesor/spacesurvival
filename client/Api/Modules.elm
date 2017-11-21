@@ -9,7 +9,6 @@ import Messages exposing (Msg(QueueEntryAdded))
 import Model exposing (Model)
 import Model.Grid exposing (Grid, setAtPosition)
 import Model.Modules exposing (Module, ModuleId, ModuleLevel, ModuleType, Shoots)
-import Model.User exposing (User(LoggedIn))
 import Model.Util exposing (Point)
 
 
@@ -71,7 +70,7 @@ moduleLevelDecoder =
         |: (Decode.field "generates" (Decode.list resourceAmountDecoder))
         |: (Decode.field "resources" (Decode.list resourceAmountDecoder))
         |: (Decode.field "shoots" (Decode.maybe shootsDecoder))
-        |: (Decode.field "time" Decode.int)
+        |: (Decode.field "duration" Decode.int)
 
 
 shootsDecoder : Decode.Decoder Shoots
@@ -94,7 +93,9 @@ newModuleEncoder mod_type point =
 
 resourceAmountDecoder : Decode.Decoder ( String, Int )
 resourceAmountDecoder =
-    pairDecoder Decode.string Decode.int
+    Decode.map2 (,)
+        (Decode.field "type" Decode.string)
+        (Decode.field "amount" Decode.int)
 
 
 fetchAvailableModules : Model -> Cmd Messages.Msg
