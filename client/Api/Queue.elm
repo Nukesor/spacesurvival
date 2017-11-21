@@ -24,21 +24,18 @@ entryDecoder constructor =
         |: (Decode.field "started_at" (Decode.maybe dateDecoder))
         |: (Decode.field "level" Decode.int)
         |: (Decode.field "duration" Decode.int)
+        |: (Decode.field "type" Decode.string)
 
 
 researchDecoder : Decode.Decoder Model.Queue.Entry
 researchDecoder =
-    (entryDecoder ResearchData
-        |: (Decode.field "research" Decode.string)
-    )
+    entryDecoder ResearchData
         |> Decode.map ResearchEntry
 
 
 moduleDecoder : Decode.Decoder Entry
 moduleDecoder =
-    (entryDecoder ModuleData
-        |: (Decode.field "module" Decode.string)
-    )
+    entryDecoder ModuleData
         |> Decode.map ModuleEntry
 
 
