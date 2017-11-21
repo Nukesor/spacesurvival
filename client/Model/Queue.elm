@@ -2,25 +2,24 @@ module Model.Queue exposing (..)
 
 import Dict
 import Model.Research exposing (ResearchId, Researches)
-import Time.DateTime exposing (DateTime)
+import Time.DateTime exposing (DateTime, addSeconds)
 
 
 type alias ResearchData =
-    { createdAt : DateTime
-    , id : String
-    , researchId : ResearchId
+    { id : String
+    , startedAt : Maybe DateTime
     , level : Int
-    , finishesAt : Maybe DateTime
+    , duration : Int
+    , researchId : ResearchId
     }
 
 
 type alias ModuleData =
-    { createdAt : DateTime
-    , id : String
-    , moduleId : String
-    , name : String
+    { id : String
+    , startedAt : Maybe DateTime
     , level : Int
-    , finishesAt : Maybe DateTime
+    , duration : Int
+    , moduleId : String
     }
 
 
@@ -72,10 +71,10 @@ timeToCompletion entry currentDate =
         time =
             (\data ->
                 Maybe.map
-                    (\finishesAt ->
-                        max (secondsBetween finishesAt currentDate) 0
+                    (\startedAt ->
+                        max (secondsBetween currentDate (addSeconds data.duration startedAt)) 0
                     )
-                    data.finishesAt
+                    data.startedAt
             )
     in
         case entry of

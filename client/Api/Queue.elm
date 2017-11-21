@@ -18,27 +18,26 @@ queueEntryDecoder =
     Decode.oneOf [ researchDecoder, moduleDecoder ]
 
 
+entryDecoder constructor =
+    Decode.succeed constructor
+        |: (Decode.field "id" Decode.string)
+        |: (Decode.field "started_at" (Decode.maybe dateDecoder))
+        |: (Decode.field "level" Decode.int)
+        |: (Decode.field "duration" Decode.int)
+
+
 researchDecoder : Decode.Decoder Model.Queue.Entry
 researchDecoder =
-    (Decode.succeed ResearchData
-        |: (Decode.field "created_at" dateDecoder)
-        |: (Decode.field "id" Decode.string)
-        |: (Decode.field "research_name" Decode.string)
-        |: (Decode.field "level" Decode.int)
-        |: (Decode.field "finishes_at" (Decode.maybe dateDecoder))
+    (entryDecoder ResearchData
+        |: (Decode.field "research" Decode.string)
     )
         |> Decode.map ResearchEntry
 
 
 moduleDecoder : Decode.Decoder Entry
 moduleDecoder =
-    (Decode.succeed ModuleData
-        |: (Decode.field "created_at" dateDecoder)
-        |: (Decode.field "id" Decode.string)
-        |: (Decode.field "module_name" Decode.string)
-        |: (Decode.field "module_name" Decode.string)
-        |: (Decode.field "level" Decode.int)
-        |: (Decode.field "finishes_at" (Decode.maybe dateDecoder))
+    (entryDecoder ModuleData
+        |: (Decode.field "module" Decode.string)
     )
         |> Decode.map ModuleEntry
 

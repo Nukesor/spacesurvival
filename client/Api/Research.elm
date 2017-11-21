@@ -59,4 +59,8 @@ fetchResearches model =
 
 startResearching : Model.Model -> String -> Cmd Messages.Msg
 startResearching model key =
-    authenticatedPost model (podUrl model.user "/researches") Decode.value Messages.QueueEntryAdded Json.Encode.null
+    let
+        researchObject =
+            Json.Encode.object [ ( "type", Json.Encode.string key ) ]
+    in
+        authenticatedPost model (podUrl model.user "/researches") Decode.value Messages.QueueEntryAdded researchObject
