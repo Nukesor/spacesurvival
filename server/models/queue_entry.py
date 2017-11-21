@@ -11,8 +11,9 @@ from sqlalchemy import (
 from sqlalchemy.orm import relationship
 
 from sqlalchemy.types import (
-    Integer,
     DateTime,
+    Integer,
+    String,
 )
 from sqlalchemy.dialects.postgresql import UUID
 
@@ -29,6 +30,7 @@ class QueueEntry(db.Model):
     )
 
     id = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
+    type = Column(String(255), nullable=False)
     queue_id = Column(UUID(as_uuid=True), ForeignKey('queue.id'), index=True, nullable=False)
     module_id = Column(UUID(as_uuid=True), ForeignKey('module.id'), index=True)
     research_id = Column(UUID(as_uuid=True), ForeignKey('research.id'), index=True)
@@ -57,3 +59,4 @@ class QueueEntry(db.Model):
         self.duration = duration
         self.module = module
         self.research = research
+        self.type = module.type if module else research.type

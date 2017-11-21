@@ -6,7 +6,7 @@ import pytest
 from tests.helper import auth_token
 from server.extensions import db
 
-from server.models.user import User, Pod
+from server.models import User, Pod, QueueEntry
 
 
 @pytest.mark.usefixtures('dbmodels', 'dbtransaction')
@@ -33,6 +33,9 @@ class TestBuildModule:
         assert response.status_code == 201
         assert len(user.pod.modules) == 1
         assert len(user.pod.queue.queue_entries) == 1
+
+        assert user.pod.queue.queue_entries[0].type == 'PlasmaGenerator'
+        assert user.pod.queue.queue_entries[0].level == 0
 
         response = client.get(f'/api/pod/{user.pod.id}/modules',
                               headers=auth_token(user))
@@ -135,7 +138,9 @@ class TestUpgradeModule:
         assert response.status_code == 200
 
         pod = db.session.query(Pod).get(pod.id)
-        queue_entries = pod.queue.queue_entries
+        queue_entries = db.session.query(QueueEntry) \
+            .order_by(QueueEntry.created_at.asc()) \
+            .all()
         assert len(queue_entries) == 2
         assert queue_entries[0].level == 1
         assert queue_entries[1].level == 2
