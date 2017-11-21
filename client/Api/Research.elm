@@ -13,9 +13,9 @@ import Model.User exposing (User(LoggedIn))
 
 researchesDecoder : Decode.Decoder Researches
 researchesDecoder =
-    listToDict <|
+    Decode.dict <|
         Decode.succeed Research
-            |: (Decode.field "id" Decode.string)
+            |: (Decode.field "type" Decode.string)
             |: (Decode.field "display_name" Decode.string)
             |: (Decode.succeed Nothing)
             |: Json.Decode.Extra.withDefault [] (Decode.field "dependencies" dependencyList)
@@ -28,12 +28,6 @@ dependencyList =
         Decode.map2 (,)
             (Decode.index 0 Decode.string)
             (Decode.index 1 Decode.int)
-
-
-listToDict : Decode.Decoder Research -> Decode.Decoder Researches
-listToDict decoder =
-    Decode.list decoder
-        |> Decode.map (List.foldl insertResearch Dict.empty)
 
 
 insertResearch : Research -> Researches -> Researches
