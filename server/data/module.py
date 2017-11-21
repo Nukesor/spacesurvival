@@ -22,9 +22,9 @@ class ModuleLevel(Schema):
     resources = fields.Nested(Resource, many=True, required=True)
 
     duration = fields.Int(required=True)
-    shoots = fields.Nested(Shoots)
-    generates = fields.Nested(Resource, many=True)
-    consumes = fields.Nested(Resource, many=True)
+    shoots = fields.Nested(Shoots, default=list())
+    generates = fields.Nested(Resource, many=True, default=list())
+    consumes = fields.Nested(Resource, many=True, default=list())
 
 
 class Module(Schema):
@@ -36,7 +36,7 @@ class Module(Schema):
 
     type = fields.Str(required=True)
     display_name = fields.Str(required=True)
-    dependencies = fields.Nested(Dependency, many=True, required=True)
+    dependencies = fields.Nested(Dependency, many=True, required=True, default=list())
     levels = fields.Nested(ModuleLevel, many=True, required=True)
 
 

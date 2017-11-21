@@ -23,7 +23,7 @@ class Research(Schema):
 
     type = fields.Str(required=True)
     display_name = fields.Str(required=True)
-    dependencies = fields.Nested(Dependency, many=True, required=True)
+    dependencies = fields.Nested(Dependency, many=True, required=True, default=list())
     levels = fields.Nested(ResearchLevel, many=True, required=True)
 
 
