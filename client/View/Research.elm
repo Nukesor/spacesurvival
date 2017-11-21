@@ -26,15 +26,23 @@ view model =
 researchItem : Model -> String -> Research -> Html Messages.Msg
 researchItem model key research =
     let
+        ( currentLevel, upgradeText ) =
+            case research.currentLevel of
+                Just level ->
+                    ( "Lv. " ++ (toString (level + 1)), "Research next level" )
+
+                Nothing ->
+                    ( "", "Start researching" )
+
         updateButton =
             if updateable (applyQueue model.researches model.queue) key then
-                [ button [ onClick (StartResearching key) ] [ Html.text "Research next level" ] ]
+                [ button [ onClick (StartResearching key) ] [ Html.text upgradeText ] ]
             else
                 []
     in
         li []
             (List.concat
-                [ [ Html.text ("Lv. " ++ (toString research.currentLevel) ++ " " ++ research.name) ]
+                [ [ Html.text (currentLevel ++ " " ++ research.name) ]
                 , updateButton
                 ]
             )

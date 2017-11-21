@@ -30,7 +30,7 @@ queueItem model entry =
                 |> Maybe.withDefault ""
     in
         li [ helpers.class [ Item ] ]
-            [ Html.text <| "Lv. " ++ (toString level) ++ " " ++ name
+            [ Html.text <| "Lv. " ++ (toString (level + 1)) ++ " " ++ name
             , br [] []
             , Html.text remainingTimeString
             ]
