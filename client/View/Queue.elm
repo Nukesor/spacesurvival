@@ -47,7 +47,7 @@ getInfo model entry =
                             research.name
 
                         Nothing ->
-                            ""
+                            Debug.log ("Research type " ++ entry.researchId ++ " not found!") ""
             in
                 ( name, entry.level )
 
@@ -59,7 +59,7 @@ getInfo model entry =
                             mod.name
 
                         Nothing ->
-                            ""
+                            Debug.log ("Module type " ++ entry.moduleId ++ " not found!") ""
             in
                 ( name, entry.level )
 
