@@ -36,6 +36,7 @@ class TestBuildModule:
 
         assert user.pod.queue.queue_entries[0].type == 'PlasmaGenerator'
         assert user.pod.queue.queue_entries[0].level == 0
+        assert user.pod.queue.queue_entries[0].finishes_at is not None
 
         response = client.get(f'/api/pod/{user.pod.id}/modules',
                               headers=auth_token(user))

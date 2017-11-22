@@ -86,6 +86,7 @@ def begin_pod_research(args, pod_id):
     # Create a new queue entry.
     queue_entry = QueueEntry(pod.queue, next_level, research_level['duration'], research=research)
 
+    pod.queue.next_entry()
     db.session.add(queue_entry)
     db.session.add(research)
     db.session.commit()

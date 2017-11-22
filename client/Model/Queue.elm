@@ -7,7 +7,7 @@ import Time.DateTime exposing (DateTime, addSeconds)
 
 type alias ResearchData =
     { id : String
-    , startedAt : Maybe DateTime
+    , finishesAt : Maybe DateTime
     , level : Int
     , duration : Int
     , researchId : ResearchId
@@ -16,7 +16,7 @@ type alias ResearchData =
 
 type alias ModuleData =
     { id : String
-    , startedAt : Maybe DateTime
+    , finishesAt : Maybe DateTime
     , level : Int
     , duration : Int
     , moduleId : String
@@ -71,10 +71,10 @@ timeToCompletion entry currentDate =
         time =
             (\data ->
                 Maybe.map
-                    (\startedAt ->
-                        max (secondsBetween currentDate (addSeconds data.duration startedAt)) 0
+                    (\finishesAt ->
+                        max (secondsBetween currentDate finishesAt) 0
                     )
-                    data.startedAt
+                    data.finishesAt
             )
     in
         case entry of

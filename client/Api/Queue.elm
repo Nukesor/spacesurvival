@@ -21,7 +21,7 @@ queueEntryDecoder =
 entryDecoder constructor =
     Decode.succeed constructor
         |: (Decode.field "id" Decode.string)
-        |: (Decode.field "started_at" (Decode.maybe dateDecoder))
+        |: (Decode.field "finishes_at" (Decode.maybe dateDecoder))
         |: (Decode.field "level" Decode.int)
         |: (Decode.field "duration" Decode.int)
         |: (Decode.field "type" Decode.string)

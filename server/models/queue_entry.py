@@ -25,7 +25,7 @@ class QueueEntry(db.Model):
     __table_args__ = (
         CheckConstraint(
             "(research_id is NULL and module_id is not NULL) or "
-            "(research_id is not NULL and module_id is NULL)"
+            "(research_id is not NULL and module_id is NULL)",
         ),
     )
 
@@ -42,7 +42,7 @@ class QueueEntry(db.Model):
     module = relationship("Module")
     research = relationship("Research")
 
-    started_at = Column(DateTime)
+    finishes_at = Column(DateTime)
     created_at = Column(DateTime, server_default=func.now(), nullable=False)
     updated_at = Column(
         DateTime, server_default=func.now(),

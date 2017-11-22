@@ -84,6 +84,7 @@ def new_pod_module(args, pod_id):
     module = Module(module_type, pod, 0, stationary, x_pos, y_pos)
     queue_entry = QueueEntry(pod.queue, 0, module_level['duration'], module=module)
 
+    pod.queue.next_entry()
     db.session.add(queue_entry)
     db.session.add(module)
     db.session.commit()
@@ -132,6 +133,7 @@ def upgrade_pod_module(pod_id, module_id):
     Resource.subtract_resources(pod.resources, requirements)
     queue_entry = QueueEntry(pod.queue, next_level, module_level['duration'], module=module)
 
+    pod.queue.next_entry()
     db.session.add(queue_entry)
     db.session.add(module)
     db.session.commit()

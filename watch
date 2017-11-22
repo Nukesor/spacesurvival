@@ -5,7 +5,7 @@ npm install
 elm-package install
 source venv/bin/activate
 ./bin/initdb
-uwsgi --py-autoreload 1 --socket 0.0.0.0:5000 --protocol=http -H venv -w server.startserver --callable app &
+uwsgi --py-autoreload 1 --socket 0.0.0.0:5000 --protocol=http -H venv -w server.start --callable app &
 watchexec --watch client --restart "elm-make client/Main.elm --output static/main.js" &
 watchexec --watch assets "cp -r assets/* static/" &
 watchexec --watch client/View "node_modules/.bin/elm-css --output static/css client/Stylesheets.elm"
