@@ -23,7 +23,7 @@ class ResourceTypes(Enum):
 
     Minerals = 'Minerals'
     Fuel = 'Fuel'
-    Water = 'Water'
+    Nanobots = 'Nanobots'
 
 
 class ModuleTypes(Enum):
