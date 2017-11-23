@@ -32,7 +32,7 @@ class Queue(db.Model):
     pod_id = Column(UUID(as_uuid=True), ForeignKey('pod.id'), index=True)
     base_id = Column(UUID(as_uuid=True), ForeignKey('base.id'), index=True)
 
-    slots = Column(Integer, default=4, nullable=False)
+    slots = Column(Integer, default=2, nullable=False)
     pod = relationship("Pod", back_populates="queue")
     base = relationship("Base", back_populates="queue")
     queue_entries = relationship("QueueEntry", back_populates="queue", order_by='QueueEntry.created_at')

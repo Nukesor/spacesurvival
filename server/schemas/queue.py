@@ -1,35 +1,29 @@
 """Queue schemas."""
 
-from server.extensions import ma
-from server.models.queue import Queue
-from server.models.queue_entry import QueueEntry
+from marshmallow import fields
+
+from server.schemas import Schema
 
 
-class QueueEntrySchema(ma.ModelSchema):
+class QueueEntrySchema(Schema):
     """QueueEntry serialization validation schema."""
 
-    class Meta:
-        """Meta class."""
+    id = fields.UUID()
+    type = fields.Str(required=True)
+    queue_id = fields.UUID()
+    module_id = fields.UUID()
+    research_id = fields.UUID()
 
-        strict = True
-        model = QueueEntry
-        exclude = (
-            "created_at",
-            "updated_at",
-        )
+    level = fields.Int()
+    duration = fields.Int()
 
 
-class QueueSchema(ma.ModelSchema):
+class QueueSchema(Schema):
     """Queue serialization validation schema."""
 
-    queue_entries = ma.Nested(QueueEntrySchema, many=True)
+    id = fields.UUID()
+    pod_id = fields.UUID()
+    base_id = fields.UUID()
 
-    class Meta:
-        """Meta class."""
-
-        strict = True
-        model = Queue
-        exclude = (
-            "created_at",
-            "updated_at",
-        )
+    slots = fields.Int()
+    queue_entries = fields.Nested(QueueEntrySchema, many=True)

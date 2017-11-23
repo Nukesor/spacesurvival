@@ -53,4 +53,4 @@ class Resource(db.Model):
         self.name = name
         self.amount = 0
         self.production = 0
-        self.max_amount = 5000
+        self.max_amount = 5000000000

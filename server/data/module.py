@@ -57,6 +57,6 @@ def load_modules(path):
         for item in parsed:
             modules[item['type']] = item
         return modules
-    except Exception as e:
-        print(e)
+    except BaseException as exc:
+        print(exc)
         sys.exit(1)

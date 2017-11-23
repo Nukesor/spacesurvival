@@ -1,8 +1,8 @@
 """Base schema."""
-from marshmallow import Schema
+from marshmallow import Schema as MarshmallowSchmema
 
 
-class BaseSchema(Schema):
+class Schema(MarshmallowSchmema):
     """Base schema class."""
 
     class Meta:

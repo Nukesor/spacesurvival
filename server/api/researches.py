@@ -13,7 +13,6 @@ from server.models import (
     Queue,
     QueueEntry,
     Research,
-    Resource,
 )
 
 

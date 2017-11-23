@@ -1,9 +1,9 @@
 """Research schema for serialization and validation."""
-from server.schemas import BaseSchema
+from server.schemas import Schema
 from marshmallow import fields
 
 
-class ResearchSchema(BaseSchema):
+class ResearchSchema(Schema):
     """Research Schema."""
 
     id = fields.UUID()

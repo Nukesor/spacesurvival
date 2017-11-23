@@ -1,7 +1,7 @@
 """All routes regarding authentication."""
 
-from flask import jsonify
 from datetime import datetime
+from flask import jsonify
 from sqlalchemy import or_
 from webargs.flaskparser import use_args
 
