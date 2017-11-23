@@ -72,12 +72,12 @@ def begin_pod_research(args, pod_id):
 
     # Check if we have enough resources
     requirements = research_level['resources']
-    enough, missing = Resource.enough_resources(pod.resources, requirements)
+    enough, missing = pod.enough_resources(requirements)
     if not enough:
         return bad_request(f'Not enough resources: {missing}')
 
     # Subtract the resources from the pod and create a queue entry.
-    Resource.subtract_resources(pod.resources, requirements)
+    pod.subtract_resources(requirements)
 
     # Create a new research if we don't have it yet.
     if not research:

@@ -75,12 +75,12 @@ def new_pod_module(args, pod_id):
     # Check if we have enough resources
     module_level = module_data[module_type]['levels'][0]
     requirements = module_level['resources']
-    enough, missing = Resource.enough_resources(pod.resources, requirements)
+    enough, missing = pod.enough_resources(requirements)
     if not enough:
         return bad_request(f'Not enough resources: {missing}')
 
     # Subtract the resources from the pod and create a queue entry.
-    Resource.subtract_resources(pod.resources, requirements)
+    pod.subtract_resources(requirements)
     module = Module(module_type, pod, 0, stationary, x_pos, y_pos)
     queue_entry = QueueEntry(pod.queue, 0, module_level['duration'], module=module)
 
@@ -125,12 +125,12 @@ def upgrade_pod_module(pod_id, module_id):
 
     # Ensure we have enough resources
     requirements = module_level['resources']
-    enough, missing = Resource.enough_resources(pod.resources, requirements)
+    enough, missing = pod.enough_resources(requirements)
     if not enough:
         return bad_request(f'Not enough resources: {missing}')
 
     # Subtract the resources from the pod and create a queue entry.
-    Resource.subtract_resources(pod.resources, requirements)
+    pod.subtract_resources(requirements)
     queue_entry = QueueEntry(pod.queue, next_level, module_level['duration'], module=module)
 
     pod.queue.next_entry()
