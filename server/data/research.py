@@ -3,7 +3,8 @@ import sys
 import json
 from marshmallow import fields
 
-from server.data import Dependency, Resource, BaseSchema as Schema
+from server.schemas import Schema
+from server.data import Dependency, Resource
 
 
 class ResearchLevel(Schema):

@@ -1,9 +1,10 @@
 """Parse, validate and load the `module_data.json`."""
 import sys
 import json
-from marshmallow import fields
+from marshmallow import fields, post_load
 
-from server.data import Dependency, Resource, BaseSchema as Schema
+from server.schemas import Schema
+from server.data import Dependency, Resource
 
 
 class Shoots(Schema):
@@ -25,6 +26,19 @@ class ModuleLevel(Schema):
     shoots = fields.Nested(Shoots, allow_none=True)
     generates = fields.Nested(Resource, many=True, missing=list)
     consumes = fields.Nested(Resource, many=True, missing=list)
+
+    @post_load
+    def normalize_generation(self, data):
+        """Normalize generation and consumption.
+
+        They are specified in hours, but we want seconds.
+        """
+        for resource in data['generates']:
+            resource['amount'] = resource['amount']/3600
+
+        for resource in data['consumes']:
+            resource['amount'] = resource['amount']/3600
+        return data
 
 
 class Module(Schema):
