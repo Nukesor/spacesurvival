@@ -13,7 +13,6 @@ from server.models import (
     Pod,
     Queue,
     QueueEntry,
-    Resource,
 )
 
 
