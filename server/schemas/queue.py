@@ -16,6 +16,7 @@ class QueueEntrySchema(Schema):
 
     level = fields.Int()
     duration = fields.Int()
+    finishes_at = fields.DateTime()
 
 
 class QueueSchema(Schema):

@@ -41,8 +41,8 @@ class QueueEntry(db.Model):
     queue = relationship("Queue", back_populates="queue_entries")
     module = relationship("Module")
     research = relationship("Research")
-
     finishes_at = Column(DateTime)
+
     created_at = Column(DateTime, server_default=func.now(), nullable=False)
     updated_at = Column(
         DateTime, server_default=func.now(),
