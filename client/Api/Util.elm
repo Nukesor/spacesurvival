@@ -1,16 +1,22 @@
 module Api.Util exposing (..)
 
 import Http exposing (emptyBody, expectJson, jsonBody, stringBody)
-import String exposing (concat)
 import Json.Decode as Decode
 import Model exposing (Model)
 import Model.User exposing (User(LoggedIn))
 import Time.DateTime exposing (DateTime, fromISO8601)
+import Time.TimeZones
+import Time.ZonedDateTime exposing (toDateTime)
 
 
 dateDecoder : Decode.Decoder DateTime
 dateDecoder =
-    Decode.map (fromISO8601 >> unwrap) Decode.string
+    Decode.map
+        (Time.ZonedDateTime.fromISO8601 (Time.TimeZones.utc ())
+            >> unwrap
+            >> toDateTime
+        )
+        Decode.string
 
 
 pairDecoder : Decode.Decoder a -> Decode.Decoder b -> Decode.Decoder ( a, b )

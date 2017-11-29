@@ -12,7 +12,7 @@ import Model.Modules
 import Model.Queue exposing (unfinishedEntries)
 import Model.User exposing (LoginData)
 import Result exposing (withDefault)
-import Time.DateTime
+import Time.DateTime exposing (addMinutes, fromTimestamp)
 import Update.User
 
 
@@ -124,7 +124,10 @@ update msg model =
                                     []
                         in
                             { model
-                                | currentDate = Time.DateTime.fromTimestamp time
+                                | currentDate =
+                                    time
+                                        |> fromTimestamp
+                                        |> addMinutes (negate (round model.timeZoneOffset))
                                 , resources = updatedResources
                                 , lastTick = Just time
                             }

@@ -16,13 +16,17 @@ import Update exposing (..)
 import View exposing (..)
 
 
-main : Program Never Model Msg
+main : Program Flags Model Msg
 main =
-    Html.program { init = init, update = update, subscriptions = subscriptions, view = View.view }
+    Html.programWithFlags { init = init, update = update, subscriptions = subscriptions, view = View.view }
 
 
-init : ( Model, Cmd Msg )
-init =
+type alias Flags =
+    { timeZoneOffset : Float }
+
+
+init : Flags -> ( Model, Cmd Msg )
+init flags =
     { pod = Model.Grid.empty
     , base = Model.Grid.empty
     , user = LoggingIn { identifier = "", password = "" }
@@ -36,6 +40,7 @@ init =
     , resources = []
     , currentDate = dateTime Time.DateTime.zero
     , lastTick = Nothing
+    , timeZoneOffset = flags.timeZoneOffset
     }
         ! [ Api.Auth.readToken ()
           , perform Tick Time.now

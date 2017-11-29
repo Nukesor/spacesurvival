@@ -72,7 +72,7 @@ timeToCompletion entry currentDate =
             (\data ->
                 Maybe.map
                     (\finishesAt ->
-                        max (secondsBetween currentDate finishesAt) 0
+                        max (secondsBetween finishesAt currentDate) 0
                     )
                     data.finishesAt
             )

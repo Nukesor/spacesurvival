@@ -26,6 +26,7 @@ type alias Model =
     , resources : Resources
     , currentDate : DateTime
     , lastTick : Maybe Time.Time
+    , timeZoneOffset : Float
     }
 
 

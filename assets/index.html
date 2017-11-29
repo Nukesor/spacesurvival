@@ -10,7 +10,7 @@
     <audio src="/static/audio/soaring.mp3" autoplay="true" loop="true"></audio>
     <script src="/static/main.js"></script>
     <script>
-        var app = Elm.Main.fullscreen()
+        var app = Elm.Main.fullscreen({timeZoneOffset: new Date().getTimezoneOffset()});
 
         app.ports.readToken.subscribe(function() {
             let user = {};
