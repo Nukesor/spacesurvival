@@ -46,6 +46,8 @@ class Queue(db.Model):
 
     def next_entry(self):
         """Activate the next queue entry."""
+        if len(self.queue_entries) == 0:
+            return
         next_entry = self.queue_entries[0]
         if next_entry and next_entry.finishes_at is None:
             finishes_at = datetime.now() + timedelta(seconds=next_entry.duration)
