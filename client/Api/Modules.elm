@@ -117,7 +117,7 @@ fetchGridModules model =
 startBuilding : Model -> ModuleId -> Point -> Cmd Messages.Msg
 startBuilding model id point =
     authenticatedPost model
-        "/api/modules/pod/new"
+        (podUrl model.user "/modules")
         Decode.value
         QueueEntryAdded
         (newModuleEncoder id point)

@@ -34,7 +34,7 @@ def get_pod_modules(pod_id):
     return ok(schema.dump(pod.modules, many=True).data)
 
 
-@user_bp.route('/api/pod/<uuid:pod_id>/new_module', methods=['POST'])
+@user_bp.route('/api/pod/<uuid:pod_id>/modules', methods=['POST'])
 @use_args(ModuleSchema(only=['module_type', 'stationary', 'x_pos', 'y_pos']))
 def new_pod_module(args, pod_id):
     """Place a new module on the pod grid."""

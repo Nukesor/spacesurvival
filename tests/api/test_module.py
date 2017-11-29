@@ -16,7 +16,7 @@ class TestBuildModule:
     def post(self, client, user, data):
         """Url for this test class."""
         response = client.post(
-            f'/api/pod/{user.pod.id}/new_module',
+            f'/api/pod/{user.pod.id}/modules',
             data=json.dumps(data),
             headers=auth_token(user),
         )
