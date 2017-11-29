@@ -27,19 +27,6 @@ class ModuleLevel(Schema):
     generates = fields.Nested(Resource, many=True, missing=list)
     consumes = fields.Nested(Resource, many=True, missing=list)
 
-    @post_load
-    def normalize_generation(self, data):
-        """Normalize generation and consumption.
-
-        They are specified in hours, but we want seconds.
-        """
-        for resource in data['generates']:
-            resource['amount'] = resource['amount']/3600
-
-        for resource in data['consumes']:
-            resource['amount'] = resource['amount']/3600
-        return data
-
 
 class Module(Schema):
     """The json representation of a full module.

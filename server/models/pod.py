@@ -63,7 +63,7 @@ class Pod(db.Model):
         for resource in self.resources:
             time_diff = datetime.now() - resource.last_update
             diff_in_seconds = time_diff.total_seconds()
-            resource_diff = diff_in_seconds * resource.production
+            resource_diff = diff_in_seconds * resource.production / 3600
 
             resource.amount += resource_diff
             if resource.amount < 0:
