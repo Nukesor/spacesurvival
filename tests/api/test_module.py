@@ -63,6 +63,23 @@ class TestBuildModule:
         response = self.post(client, user, data)
         assert response.status_code == 422
 
+    @pytest.mark.parametrize('payload', [
+        {'module_type': 'PlasmaGenerator'},
+        {'module_type': 'PlasmaGenerator', 'x_pos': 2, 'stationary': False},
+        {'module_type': 'PlasmaGenerator', 'y_pos': 2},
+    ])
+    def test_missing_fields(self, app, user, client, payload):
+        """Ensure that you send stationary and position."""
+        # Stationary with x_pos and y_pos
+        response = self.post(client, user, payload)
+        assert response.status_code == 422
+
+        # Y pos exists, but x_pos is missing
+        data = {'module_type': 'PlasmaGenerator', 'stationary': False,
+                'x_pos': None, 'y_pos': 1}
+        response = self.post(client, user, data)
+        assert response.status_code == 422
+
     def test_position_already_exists(self, app, user, client):
         """Ensure that you can't build a module twice."""
         # Normal new module request
