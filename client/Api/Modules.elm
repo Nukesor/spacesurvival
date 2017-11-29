@@ -58,8 +58,14 @@ moduleTypeDecoder : Decode.Decoder ModuleType
 moduleTypeDecoder =
     Decode.succeed ModuleType
         |: (Decode.field "display_name" Decode.string)
-        |: (Decode.field "dependencies" (Decode.list (pairDecoder Decode.string Decode.int)))
+        |: (Decode.field "dependencies" (Decode.list dependencyDecoder))
         |: (Decode.field "levels" (Decode.list moduleLevelDecoder))
+
+
+dependencyDecoder =
+    Decode.map2 (,)
+        (Decode.field "type" Decode.string)
+        (Decode.field "level" Decode.int)
 
 
 moduleLevelDecoder : Decode.Decoder ModuleLevel
@@ -69,7 +75,7 @@ moduleLevelDecoder =
         |: (Decode.field "consumes" (Decode.list resourceAmountDecoder))
         |: (Decode.field "generates" (Decode.list resourceAmountDecoder))
         |: (Decode.field "resources" (Decode.list resourceAmountDecoder))
-        |: (Decode.field "shoots" (Decode.maybe shootsDecoder))
+        |: (Decode.maybe (Decode.field "shoots" shootsDecoder))
         |: (Decode.field "duration" Decode.int)
 
 
