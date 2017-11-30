@@ -21,6 +21,8 @@ def finished_entries():
             entry.research.level += 1
             db.session.add(entry.research)
 
-        entry.queue.next_entry()
+        queue = entry.queue
         db.session.delete(entry)
+        queue = queue.next_entry()
+
     db.session.commit()
