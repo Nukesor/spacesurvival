@@ -12,4 +12,3 @@ class ResearchSchema(Schema):
 
     type = fields.Str(required=True)
     level = fields.Int()
-    researched = fields.Bool(required=True)
