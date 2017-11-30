@@ -92,8 +92,8 @@ newModuleEncoder mod_type point =
     Encode.object
         [ ( "module_type", Encode.string mod_type )
         , ( "stationary", Encode.bool False )
-        , ( "position_x", Encode.int point.x )
-        , ( "position_y", Encode.int point.y )
+        , ( "x_pos", Encode.int point.x )
+        , ( "y_pos", Encode.int point.y )
         ]
 
 

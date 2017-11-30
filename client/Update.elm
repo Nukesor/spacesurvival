@@ -86,7 +86,7 @@ update msg model =
                     let
                         commands =
                             if queue /= model.queue then
-                                [ fetchAvailableResearches model ]
+                                [ fetchResearchLevels model, fetchGridModules model ]
                             else
                                 []
                     in
