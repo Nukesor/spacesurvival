@@ -135,7 +135,7 @@ def upgrade_pod_module(pod_id, module_id):
     pod.subtract_resources(requirements)
     queue_entry = QueueEntry(
         pod.queue, next_level,
-        module_level['duration'], module=module
+        module_level['duration'], module=module,
     )
 
     pod.queue.next_entry()
