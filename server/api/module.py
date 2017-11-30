@@ -57,7 +57,7 @@ def new_pod_module(args, pod_id):
     if stationary:
         existing_module = db.session.query(Module) \
             .filter(Module.pod_id == pod.id) \
-            .filter(Module.stationary == True) \
+            .filter(Module.stationary.is_(True)) \
             .filter(Module.type == module_type) \
             .first()
 
@@ -81,7 +81,10 @@ def new_pod_module(args, pod_id):
     # Subtract the resources from the pod and create a queue entry.
     pod.subtract_resources(requirements)
     module = Module(module_type, pod, 0, stationary, x_pos, y_pos)
-    queue_entry = QueueEntry(pod.queue, 0, module_level['duration'], module=module)
+    queue_entry = QueueEntry(
+        pod.queue, 0,
+        module_level['duration'], module=module
+    )
 
     pod.queue.next_entry()
     db.session.add(queue_entry)
@@ -130,7 +133,10 @@ def upgrade_pod_module(pod_id, module_id):
 
     # Subtract the resources from the pod and create a queue entry.
     pod.subtract_resources(requirements)
-    queue_entry = QueueEntry(pod.queue, next_level, module_level['duration'], module=module)
+    queue_entry = QueueEntry(
+        pod.queue, next_level,
+        module_level['duration'], module=module
+    )
 
     pod.queue.next_entry()
     db.session.add(queue_entry)

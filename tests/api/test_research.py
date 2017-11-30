@@ -1,4 +1,4 @@
-"""Module tests."""
+"""Research tests."""
 import json
 import pytest
 
@@ -10,7 +10,7 @@ from server.models.user import User
 
 @pytest.mark.usefixtures('dbmodels', 'dbtransaction')
 class TestResearch:
-    """Test all module related api functionality."""
+    """Test all research related api functionality."""
 
     def pod_resource_url(self, user):
         """Return the formatted pod research url."""
@@ -25,7 +25,7 @@ class TestResearch:
         )
         return response
 
-    def test_module_creation(self, app, user, client):
+    def test_research_creation(self, app, user, client):
         """Simple research creation."""
         # Normal research request
         data = {'type': 'Plasma'}
@@ -35,13 +35,6 @@ class TestResearch:
         assert response.status_code == 200
         assert len(user.pod.researches) == 1
         assert len(user.pod.queue.queue_entries) == 1
-
-        response = client.get(self.pod_resource_url(user),
-                              headers=auth_token(user))
-        assert response.status_code == 200
-        assert response.json[0]
-        assert response.json[0]['type'] == 'Plasma'
-        assert response.json[0]['level'] == 0
 
     def test_upgrade_research(self, app, user, client):
         """Simple research upgrade."""

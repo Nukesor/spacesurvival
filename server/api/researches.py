@@ -27,9 +27,16 @@ def get_research_meta():
 def get_pod_research(pod_id):
     """Send the pod meta data combined with your researches."""
     pod = db.session.query(Pod).get(pod_id)
+    if pod.user_id != g.current_user.id:
+        return bad_request(f"Pod doesn't belong to current user.")
+
+    researches = db.session.query(Research) \
+        .filter(Research.pod == pod) \
+        .filter(Research.researched.is_(True)) \
+        .all()
     schema = ResearchSchema()
 
-    return ok(schema.dump(pod.researches, many=True).data)
+    return ok(schema.dump(researches, many=True).data)
 
 
 @user_bp.route('/api/pod/<uuid:pod_id>/researches', methods=['POST'])
@@ -83,7 +90,12 @@ def begin_pod_research(args, pod_id):
         research = Research(research_type, pod, 0)
 
     # Create a new queue entry.
-    queue_entry = QueueEntry(pod.queue, next_level, research_level['duration'], research=research)
+    queue_entry = QueueEntry(
+        pod.queue,
+        next_level,
+        research_level['duration'],
+        research=research
+    )
 
     pod.queue.next_entry()
     db.session.add(queue_entry)
