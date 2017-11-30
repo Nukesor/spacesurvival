@@ -4,7 +4,8 @@ import Animation
 import Api.Auth
 import Api.Modules exposing (fetchGridModules, startBuilding, upgrade)
 import Api.Queue exposing (fetchQueue)
-import Api.Research exposing (fetchResearches, startResearching)
+import Api.Research exposing (fetchAvailableResearches, fetchResearchLevels, startResearching)
+import Dict
 import Messages exposing (..)
 import Model exposing (..)
 import Model.Grid exposing (modules)
@@ -53,12 +54,30 @@ update msg model =
             }
                 ! []
 
-        ReceiveResearches result ->
-            case Debug.log "researches" result of
+        ReceiveAvailableResearches result ->
+            case result of
                 Ok researches ->
-                    { model | researches = researches } ! []
+                    { model | researches = researches } ! [ fetchResearchLevels model ]
 
                 Err err ->
+                    logout model ! []
+
+        ReceiveResearchLevels result ->
+            case result of
+                Ok levels ->
+                    let
+                        setLevel level =
+                            Maybe.map (\research -> { research | currentLevel = Just level })
+
+                        updateDict ( id, level ) =
+                            Dict.update id (setLevel level)
+
+                        updatedResearches =
+                            List.foldl updateDict model.researches levels
+                    in
+                        { model | researches = updatedResearches } ! []
+
+                Err _ ->
                     logout model ! []
 
         ReceiveQueue result ->
@@ -67,7 +86,7 @@ update msg model =
                     let
                         commands =
                             if queue /= model.queue then
-                                [ fetchResearches model ]
+                                [ fetchAvailableResearches model ]
                             else
                                 []
                     in
@@ -93,7 +112,7 @@ update msg model =
         ReceiveAvailableModules result ->
             case Debug.log "available modules" result of
                 Ok modules ->
-                    { model | availableModules = modules } ! []
+                    { model | availableModules = modules } ! [ Api.Modules.fetchGridModules model ]
 
                 Err err ->
                     model ! []

@@ -22,7 +22,8 @@ type Msg
     | Registered (Result Http.Error LoginData)
     | LoggedIn (Result Http.Error LoggedInData)
     | ShowBuildDialog (Maybe Point)
-    | ReceiveResearches (Result Http.Error Model.Research.Researches)
+    | ReceiveAvailableResearches (Result Http.Error Model.Research.Researches)
+    | ReceiveResearchLevels (Result Http.Error (List ( Model.Research.ResearchId, Int )))
     | SetMainView MainView
     | ReceiveQueue (Result Http.Error Queue)
     | QueueEntryAdded (Result Http.Error Json.Decode.Value)

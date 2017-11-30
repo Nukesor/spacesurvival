@@ -19,7 +19,7 @@ researchesDecoder =
             |: (Decode.field "display_name" Decode.string)
             |: (Decode.succeed Nothing)
             |: Json.Decode.Extra.withDefault [] (Decode.field "dependencies" dependencyList)
-            |: (Decode.field "levels" (Decode.list researchLevelDecoder))
+            |: (Decode.field "levels" (Decode.list researchLevelSpecDecoder))
 
 
 dependencyList : Decode.Decoder (List ( ResourceId, Int ))
@@ -35,8 +35,8 @@ insertResearch research dict =
     Dict.insert research.id research dict
 
 
-researchLevelDecoder : Decode.Decoder ResearchLevel
-researchLevelDecoder =
+researchLevelSpecDecoder : Decode.Decoder ResearchLevel
+researchLevelSpecDecoder =
     Decode.succeed ResearchLevel
         |: (Decode.field "level" Decode.int)
         |: (Decode.field "resources" <|
@@ -47,14 +47,26 @@ researchLevelDecoder =
            )
 
 
-fetchResearches : Model -> Cmd Messages.Msg
-fetchResearches model =
+currentResearchLevelDecoder : Decode.Decoder ( ResearchId, Int )
+currentResearchLevelDecoder =
+    Decode.map2 (,)
+        (Decode.field "type" Decode.string)
+        (Decode.field "level" Decode.int)
+
+
+fetchAvailableResearches : Model -> Cmd Messages.Msg
+fetchAvailableResearches model =
     case model.user of
         LoggedIn user ->
-            authenticatedGet model "/api/researches" researchesDecoder Messages.ReceiveResearches
+            authenticatedGet model "/api/researches" researchesDecoder Messages.ReceiveAvailableResearches
 
         _ ->
             Cmd.none
+
+
+fetchResearchLevels : Model -> Cmd Messages.Msg
+fetchResearchLevels model =
+    authenticatedGet model (podUrl model.user "/researches") (Decode.list currentResearchLevelDecoder) Messages.ReceiveResearchLevels
 
 
 startResearching : Model.Model -> String -> Cmd Messages.Msg

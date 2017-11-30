@@ -19,9 +19,8 @@ login model user =
     in
         updatedModel
             ! [ Api.Auth.saveToken user
-              , Api.Research.fetchResearches updatedModel
+              , Api.Research.fetchAvailableResearches updatedModel
               , Api.Queue.fetchQueue updatedModel
               , Api.Modules.fetchAvailableModules updatedModel
               , Api.Resources.fetchResources updatedModel
-              , Api.Modules.fetchGridModules updatedModel
               ]
