@@ -48,7 +48,7 @@ gridSlotDecoder : Decode.Decoder GridSlot
 gridSlotDecoder =
     Decode.succeed toGridSlot
         |: (Decode.field "level" Decode.int)
-        |: (Decode.field "name" Decode.string)
+        |: (Decode.field "type" Decode.string)
         |: (Decode.field "id" Decode.string)
         |: (Decode.field "x_pos" Decode.int)
         |: (Decode.field "y_pos" Decode.int)

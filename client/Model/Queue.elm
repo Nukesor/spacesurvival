@@ -11,6 +11,7 @@ type alias ResearchData =
     , level : Int
     , duration : Int
     , researchId : ResearchId
+    , researchUuid : String
     }
 
 
@@ -20,6 +21,7 @@ type alias ModuleData =
     , level : Int
     , duration : Int
     , moduleId : String
+    , moduleUuid : String
     }
 
 

@@ -30,12 +30,14 @@ entryDecoder constructor =
 researchDecoder : Decode.Decoder Model.Queue.Entry
 researchDecoder =
     entryDecoder ResearchData
+        |: Decode.field "research_id" Decode.string
         |> Decode.map ResearchEntry
 
 
 moduleDecoder : Decode.Decoder Entry
 moduleDecoder =
     entryDecoder ModuleData
+        |: Decode.field "module_id" Decode.string
         |> Decode.map ModuleEntry
 
 
