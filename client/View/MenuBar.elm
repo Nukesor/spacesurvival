@@ -6,14 +6,15 @@ import Html exposing (..)
 import Html.CssHelpers
 import Html.Events exposing (onClick)
 import Messages exposing (Msg(SetMainView))
-import Model exposing (MainView(GridView), MainView(ResearchView), MainView(ResourcesView), Model, SelectedGrid(Pod))
+import Model exposing (MainView(GridView), MainView(ResearchView), MainView(ResourcesView), Model, SelectedGrid(Base), SelectedGrid(Pod))
 import View.Queue
 
 
 view : Model -> Html.Html Messages.Msg
 view model =
     div [ helpers.class [ Container ] ]
-        [ switchButton model.mainView (GridView Pod) "Space Station"
+        [ switchButton model.mainView (GridView Pod) "Pod"
+        , switchButton model.mainView (GridView Base) "Base"
         , switchButton model.mainView ResearchView "Research"
         , switchButton model.mainView ResourcesView "Resources"
         , View.Queue.view model
