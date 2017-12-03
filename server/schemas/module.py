@@ -20,17 +20,17 @@ class ModuleSchema(Schema):
     @validates_schema
     def both_positions_needed(self, data):
         """x_pos_x and y_pos needed."""
-        if (data.get('x_pos') and not data.get('y_pos')) or \
-           (not data.get('x_pos') and data.get('y_pos')):
+        if (data.get('x_pos') is not None and data.get('y_pos') is None) or \
+           (data.get('x_pos') is None and data.get('y_pos') is not None):
             raise ValidationError('x and y position needed', ['x_pos', 'y_pos'])
 
     @validates_schema
     def position_or_stationary(self, data):
         """Either x_pos_x, y_pos or stationary."""
         position_or_stationary = False
-        if data.get('x_pos') and data.get('y_pos') and data.get('stationary'):
+        if data.get('x_pos') is not None and data.get('y_pos') is not None and data.get('stationary'):
             position_or_stationary = True
-        if not data.get('x_pos') and not data.get('y_pos') and not data.get('stationary'):
+        if data.get('x_pos') is None and data.get('y_pos') is None and not data.get('stationary'):
             position_or_stationary = True
 
         if position_or_stationary:
