@@ -1,13 +1,19 @@
 # Spacesurvival
+An incremental, collaborative survival game set in a futuristic deep space scenario.
 
-# Setup:
-    1. Make sure ~/.cargo/bin is in your $PATH
-    2. `cargo install diesel_cli`
-    3. `cargo install watchexec`
-    4. Install `npm` and run `npm install`
-    5. Install `elm-platform` from the AUR (or `elm` using `npm`)
+## requirements
+- python 3 / `virtualenv`
+- npm
+- postgresql
 
-# Build:
+## running
+If running for the first time:
 
-To build just run the `watch` script.
-The server will start on [http://localhost:8080](http://localhost:8080).
+    bin/setup
+    createdb browsergame-dev
+    createdb browsergame-test
+
+
+Then, to start the server, watch and rebuild the frontend, etc.:
+
+    ./watch
