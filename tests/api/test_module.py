@@ -80,6 +80,15 @@ class TestBuildModule:
         response = self.post(client, user, data)
         assert response.status_code == 422
 
+    def test_zero_module_position(self, app, user, client):
+        """Ensure that you can't build a module twice."""
+        # Normal new module request
+        data = {'module_type': 'PlasmaGenerator', 'stationary': False,
+                'x_pos': 0, 'y_pos': 0}
+        response = self.post(client, user, data)
+        assert response.status_code == 201
+        assert len(user.pod.modules) == 1
+
     def test_position_already_exists(self, app, user, client):
         """Ensure that you can't build a module twice."""
         # Normal new module request
