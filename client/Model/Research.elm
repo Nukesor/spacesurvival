@@ -35,7 +35,7 @@ atMaxLevel : Research -> Bool
 atMaxLevel research =
     let
         maxLevel =
-            length research.levels
+            (length research.levels) - 1
     in
         case research.currentLevel of
             Just level ->
