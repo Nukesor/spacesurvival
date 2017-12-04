@@ -17,3 +17,8 @@ If running for the first time:
 Then, to start the server, watch and rebuild the frontend, etc.:
 
     ./watch
+
+## tests
+
+    source venv/bin/activate
+    pytest

@@ -54,7 +54,7 @@ cancelEntry model entry =
             (commonData entry).uuid
     in
         createRequest
-            model.user
+            model
             "DELETE"
             (podUrl model.user "/queue/entry/" ++ uuid)
             (Decode.value)

@@ -98,14 +98,6 @@ update msg model =
         SetMainView view ->
             { model | mainView = view } ! []
 
-        QueueEntryAdded result ->
-            case Debug.log "queue entry" result of
-                Ok _ ->
-                    model ! [ fetchQueue model ]
-
-                Err err ->
-                    model ! []
-
         StartResearching key ->
             model ! [ startResearching model key ]
 
@@ -164,7 +156,7 @@ update msg model =
             { model | buildingAt = Nothing } ! [ startBuilding model id point ]
 
         Upgrade id ->
-            model ! [ upgrade model id ]
+            { model | buildingAt = Nothing } ! [ upgrade model id ]
 
         Noop res ->
             model ! []

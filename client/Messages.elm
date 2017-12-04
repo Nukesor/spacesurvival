@@ -26,7 +26,6 @@ type Msg
     | ReceiveResearchLevels (Result Http.Error (List ( Model.Research.ResearchId, Int )))
     | SetMainView MainView
     | ReceiveQueue (Result Http.Error Queue)
-    | QueueEntryAdded (Result Http.Error Json.Decode.Value)
     | StartResearching String
     | ReceiveAvailableModules (Result Http.Error AvailableModules)
     | ReceiveResources (Result Http.Error Resources)

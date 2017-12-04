@@ -94,7 +94,7 @@ def new_pod_module(args, pod_id):
     return created()
 
 
-@user_bp.route('/api/pod/<uuid:pod_id>/module/<uuid:module_id>/upgrade', methods=['PUT'])
+@user_bp.route('/api/pod/<uuid:pod_id>/modules/<uuid:module_id>', methods=['PUT'])
 def upgrade_pod_module(pod_id, module_id):
     """Update a module on the pod grid."""
     from server.data.data import module_data

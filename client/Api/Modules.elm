@@ -1,11 +1,12 @@
 module Api.Modules exposing (..)
 
+import Api.Queue exposing (fetchQueue)
 import Api.Util exposing (authenticatedGet, authenticatedPost, pairDecoder, podUrl)
 import Dict
 import Json.Decode as Decode
 import Json.Decode.Extra exposing ((|:))
 import Json.Encode as Encode
-import Messages exposing (Msg(QueueEntryAdded))
+import Messages exposing (commandAsMsg)
 import Model exposing (Model)
 import Model.Grid exposing (Grid, setAtPosition)
 import Model.Modules exposing (Module, ModuleId, ModuleLevel, ModuleType, Shoots)
@@ -119,14 +120,16 @@ startBuilding model id point =
     authenticatedPost model
         (podUrl model.user "/modules")
         Decode.value
-        QueueEntryAdded
+        (commandAsMsg (fetchQueue model))
         (newModuleEncoder id point)
 
 
 upgrade : Model -> String -> Cmd Messages.Msg
 upgrade model uuid =
-    authenticatedPost model
-        ("/api/modules/pod/upgrade/" ++ uuid)
+    Api.Util.createRequest
+        model
+        "PUT"
+        (podUrl model.user "/modules/" ++ uuid)
         Decode.value
-        QueueEntryAdded
-        Encode.null
+        Nothing
+        (commandAsMsg (fetchQueue model))

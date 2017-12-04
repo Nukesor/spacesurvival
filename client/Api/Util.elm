@@ -1,10 +1,10 @@
 module Api.Util exposing (..)
 
-import Animation exposing (Msg)
 import Http exposing (emptyBody, expectJson, jsonBody, stringBody)
 import Json.Decode as Decode
 import Model exposing (Model)
 import Model.User exposing (User(LoggedIn))
+import Json.Encode
 import Time.DateTime exposing (DateTime, fromISO8601)
 import Time.TimeZones
 import Time.ZonedDateTime exposing (toDateTime)
@@ -50,11 +50,19 @@ createBody maybeData =
             jsonBody data
 
         Nothing ->
-            emptyBody
+            jsonBody Json.Encode.null
 
 
-createRequest user method url decoder maybeData msg =
-    case user of
+createRequest :
+    Model
+    -> String
+    -> String
+    -> Decode.Decoder a
+    -> Maybe Json.Encode.Value
+    -> (Result Http.Error a -> msg)
+    -> Cmd msg
+createRequest model method url decoder maybeData msg =
+    case model.user of
         LoggedIn user ->
             Http.send
                 msg
@@ -75,15 +83,9 @@ createRequest user method url decoder maybeData msg =
             Debug.log "Unable to send authorized request, no token!" Cmd.none
 
 
-authenticatedGet :
-    Model
-    -> String
-    -> Decode.Decoder a
-    -> (Result Http.Error a -> msg)
-    -> Cmd msg
 authenticatedGet model url decoder msg =
-    createRequest model.user "GET" url decoder Nothing msg
+    createRequest model "GET" url decoder Nothing msg
 
 
 authenticatedPost model url decoder msg data =
-    createRequest model.user "POST" url decoder (Just data) msg
+    createRequest model "POST" url decoder (Just data) msg

@@ -139,7 +139,7 @@ class TestUpgradeModule:
     def put(self, client, user, module_id):
         """Url for this test class."""
         response = client.put(
-            f'/api/pod/{user.pod.id}/module/{module_id}/upgrade',
+            f'/api/pod/{user.pod.id}/modules/{module_id}',
             headers=auth_token(user),
         )
         return response
