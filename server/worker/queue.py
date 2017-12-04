@@ -18,7 +18,7 @@ def finished_entries():
             entry.module.pod.update_resources()
 
         elif entry.research:
-            entry.research.level += 1
+            entry.research.level = entry.level
             entry.research.researched = True
             db.session.add(entry.research)
 
