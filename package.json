@@ -4,7 +4,12 @@
     "elm": "^0.18.0",
     "elm-css": "^0.6.0"
   },
-  "devDependencies": {},
+  "devDependencies": {
+    "elm-hot-loader": "^0.5.4",
+    "elm-webpack-loader": "^4.4.0",
+    "webpack": "^3.9.1",
+    "webpack-dev-server": "^2.9.5"
+  },
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },

@@ -8,30 +8,5 @@
 
 <body>
     <audio src="/static/audio/soaring.mp3" autoplay="true" loop="true"></audio>
-    <script src="/static/main.js"></script>
-    <script>
-        var app = Elm.Main.fullscreen({timeZoneOffset: new Date().getTimezoneOffset()});
-
-        app.ports.readToken.subscribe(function() {
-            let user = {};
-            let valid = true;
-            ['token', 'id', 'podId'].forEach((key) => {
-                let val = localStorage.getItem(key);
-                if (val !== null) {
-                    user[key] = val;
-                } else {
-                    valid = false;
-                }
-            });
-            if (valid) {
-                app.ports.receiveToken.send(user);
-            }
-        });
-
-        app.ports.saveToken.subscribe(function({token, id, podId}) {
-            localStorage.setItem('token', token);
-            localStorage.setItem('id', id);
-            localStorage.setItem('podId', podId);
-        });
-    </script>
+    <script src="http://localhost:8080/static/main.js"></script>
 </body>

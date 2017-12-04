@@ -1,5 +1,0 @@
-#!/bin/bash
-
-elm-make client/Main.elm --output static/main.js
-node_modules/.bin/elm-css --output static/css client/Stylesheets.elm
-cp -r assets/* static/

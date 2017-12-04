@@ -7,6 +7,6 @@ source venv/bin/activate
 ./bin/initdb
 uwsgi --ini configs/uwsgi.ini &
 uwsgi --ini configs/tick-uwsgi.ini &
-watchexec --watch client --restart "elm-make client/Main.elm --output static/main.js" &
+node_modules/.bin/webpack-dev-server --hot --inline &
 watchexec --watch assets "cp -r assets/* static/" &
 watchexec --watch client/View "node_modules/.bin/elm-css --output static/css client/Stylesheets.elm"
