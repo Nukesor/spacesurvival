@@ -19,6 +19,7 @@ def finished_entries():
 
         elif entry.research:
             entry.research.level += 1
+            entry.research.researched = True
             db.session.add(entry.research)
 
         queue = entry.queue
