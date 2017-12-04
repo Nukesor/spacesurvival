@@ -1,15 +1,18 @@
 module View.Queue exposing (..)
 
+import Api.Queue exposing (cancelEntry)
 import Css exposing (..)
 import Css.Namespace exposing (namespace)
 import Dict
 import Html exposing (..)
 import Html.CssHelpers
+import Html.Events exposing (onClick)
+import Messages
 import Model exposing (Model)
 import Model.Queue exposing (Entry, timeToCompletion)
 
 
-view : Model -> Html msg
+view : Model -> Html Messages.Msg
 view model =
     div [ helpers.class [ Container ] ]
         [ h3 [] [ Html.text "Queue" ]
@@ -17,7 +20,7 @@ view model =
         ]
 
 
-queueItem : Model -> Entry -> Html msg
+queueItem : Model -> Entry -> Html Messages.Msg
 queueItem model entry =
     let
         ( name, level ) =
@@ -30,9 +33,16 @@ queueItem model entry =
                 |> Maybe.withDefault ""
     in
         li [ helpers.class [ Item ] ]
-            [ Html.text <| "Lv. " ++ (toString (level + 1)) ++ " " ++ name
-            , br [] []
-            , Html.text remainingTimeString
+            [ p []
+                [ Html.text <| "Lv. " ++ (toString (level + 1)) ++ " " ++ name
+                , br [] []
+                , Html.text remainingTimeString
+                ]
+            , button
+                [ helpers.class [ CancelButton ]
+                , onClick (Messages.Command (cancelEntry model entry))
+                ]
+                [ Html.text "×" ]
             ]
 
 
@@ -68,6 +78,7 @@ type Classes
     = Item
     | List
     | Container
+    | CancelButton
 
 
 rules : Stylesheet
@@ -92,6 +103,16 @@ rules =
             ]
         , class Container
             [ width (pct 100) ]
+        , class CancelButton
+            [ lineHeight (Css.rem 1)
+            , width (pct 100)
+            , minWidth (Css.em 1)
+            , margin zero
+            , backgroundColor (rgba 21 212 232 0.7)
+            , fontSize xLarge
+            , borderStyle none
+            , hover [ backgroundColor (rgba 21 212 232 0.9) ]
+            ]
         ]
 
 

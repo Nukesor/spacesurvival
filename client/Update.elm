@@ -3,7 +3,7 @@ module Update exposing (..)
 import Animation
 import Api.Auth
 import Api.Modules exposing (fetchGridModules, startBuilding, upgrade)
-import Api.Queue exposing (fetchQueue)
+import Api.Queue exposing (cancelEntry, fetchQueue)
 import Api.Research exposing (fetchAvailableResearches, fetchResearchLevels, startResearching)
 import Dict
 import Messages exposing (..)
@@ -165,6 +165,12 @@ update msg model =
 
         Upgrade id ->
             model ! [ upgrade model id ]
+
+        Noop res ->
+            model ! []
+
+        Command cmd ->
+            model ! [ cmd ]
 
 
 logout : Model -> Model

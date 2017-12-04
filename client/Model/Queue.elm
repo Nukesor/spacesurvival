@@ -10,6 +10,7 @@ type alias ResearchData =
     , finishesAt : Maybe DateTime
     , level : Int
     , duration : Int
+    , uuid : String
     , researchId : ResearchId
     , researchUuid : String
     }
@@ -20,6 +21,7 @@ type alias ModuleData =
     , finishesAt : Maybe DateTime
     , level : Int
     , duration : Int
+    , uuid : String
     , moduleId : String
     , moduleUuid : String
     }
@@ -32,6 +34,24 @@ type Entry
 
 type alias Queue =
     List Entry
+
+
+commonData entry =
+    let
+        record contents =
+            { id = contents.id
+            , finishesAt = contents.finishesAt
+            , level = contents.level
+            , duration = contents.duration
+            , uuid = contents.uuid
+            }
+    in
+        case entry of
+            ResearchEntry contents ->
+                record contents
+
+            ModuleEntry contents ->
+                record contents
 
 
 applyQueue : Researches -> Queue -> Researches

@@ -1,5 +1,6 @@
 module Api.Util exposing (..)
 
+import Animation exposing (Msg)
 import Http exposing (emptyBody, expectJson, jsonBody, stringBody)
 import Json.Decode as Decode
 import Model exposing (Model)
@@ -52,18 +53,26 @@ createBody maybeData =
             emptyBody
 
 
-createRequest user method url decoder maybeData =
-    Http.request
-        { method = method
-        , headers =
-            [ Http.header "Authorization" (user.id ++ ":" ++ user.token)
-            ]
-        , url = url
-        , expect = expectJson decoder
-        , body = createBody maybeData
-        , timeout = Nothing
-        , withCredentials = False
-        }
+createRequest user method url decoder maybeData msg =
+    case user of
+        LoggedIn user ->
+            Http.send
+                msg
+                (Http.request
+                    { method = method
+                    , headers =
+                        [ Http.header "Authorization" (user.id ++ ":" ++ user.token)
+                        ]
+                    , url = url
+                    , expect = expectJson decoder
+                    , body = createBody maybeData
+                    , timeout = Nothing
+                    , withCredentials = False
+                    }
+                )
+
+        _ ->
+            Debug.log "Unable to send authorized request, no token!" Cmd.none
 
 
 authenticatedGet :
@@ -73,26 +82,8 @@ authenticatedGet :
     -> (Result Http.Error a -> msg)
     -> Cmd msg
 authenticatedGet model url decoder msg =
-    case model.user of
-        LoggedIn user ->
-            let
-                request =
-                    (createRequest user "GET" url decoder Nothing)
-            in
-                Http.send msg request
-
-        _ ->
-            Debug.log "Unable to send authorized request, no token!" Cmd.none
+    createRequest model.user "GET" url decoder Nothing msg
 
 
 authenticatedPost model url decoder msg data =
-    case model.user of
-        LoggedIn user ->
-            let
-                request =
-                    (createRequest user "POST" url decoder (Just data))
-            in
-                Http.send msg request
-
-        _ ->
-            Debug.log "Unable to send authorized request, no token!" Cmd.none
+    createRequest model.user "POST" url decoder (Just data) msg

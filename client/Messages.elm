@@ -34,3 +34,12 @@ type Msg
     | Tick Time
     | StartBuilding ModuleId Point
     | Upgrade ModuleId
+    | Noop (Result Http.Error Json.Decode.Value)
+    | Command (Cmd Msg)
+
+
+{-| Useful for executing another command after completing an API call.
+-}
+commandAsMsg : Cmd Msg -> a -> Msg
+commandAsMsg cmd _ =
+    Command cmd
